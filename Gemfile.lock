@@ -543,8 +543,7 @@ GEM
     uniform_notifier (1.18.0)
     uri (1.1.1)
     useragent (0.16.11)
-    vcr (6.3.1)
-      base64
+    vcr (6.4.0)
     version_gem (1.1.9)
     vite_rails (3.0.19)
       railties (>= 5.1, < 9)
