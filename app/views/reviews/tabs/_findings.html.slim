@@ -24,10 +24,10 @@
       .review-finding-item
         .d-flex.flex-column.flex-md-row.align-items-md-start.justify-content-between.gap-3.mb-3
           .d-flex.align-items-start.gap-3
-            - if finding[:severity] == "Critical"
+            - if finding[:severity] == 'Critical'
               span.finding-severity-icon.finding-severity-critical
                 i.bi.bi-exclamation-octagon
-            - elsif finding[:severity] == "Warning"
+            - elsif finding[:severity] == 'Warning'
               span.finding-severity-icon.finding-severity-warning
                 i.bi.bi-exclamation-triangle
             - else
@@ -49,9 +49,9 @@
                 - if finding[:line_number].present?
                   | :#{finding[:line_number]}
 
-          - if finding[:severity] == "Critical"
+          - if finding[:severity] == 'Critical'
             span.badge.severity-critical Critical
-          - elsif finding[:severity] == "Warning"
+          - elsif finding[:severity] == 'Warning'
             span.badge.severity-warning Warning
           - else
             span.badge.severity-suggestion Suggestion

@@ -9,7 +9,7 @@
   .col-12.col-xl-3
     .dashboard-card.settings-navigation-card
       nav.settings-navigation
-        = link_to settings_path(tab: "profile"),
+        = link_to settings_path(tab: 'profile'),
             class: "settings-navigation-item #{'active' if @active_tab == 'profile'}" do
           span.settings-navigation-icon
             i.bi.bi-person
@@ -18,7 +18,7 @@
             strong Profile
             small Personal information
 
-        = link_to settings_path(tab: "ai_review"),
+        = link_to settings_path(tab: 'ai_review'),
             class: "settings-navigation-item #{'active' if @active_tab == 'ai_review'}" do
           span.settings-navigation-icon
             i.bi.bi-stars
@@ -27,7 +27,7 @@
             strong AI review
             small Review configuration
 
-        = link_to settings_path(tab: "notifications"),
+        = link_to settings_path(tab: 'notifications'),
             class: "settings-navigation-item #{'active' if @active_tab == 'notifications'}" do
           span.settings-navigation-icon
             i.bi.bi-bell
@@ -36,7 +36,7 @@
             strong Notifications
             small Email and GitHub alerts
 
-        = link_to settings_path(tab: "github"),
+        = link_to settings_path(tab: 'github'),
             class: "settings-navigation-item #{'active' if @active_tab == 'github'}" do
           span.settings-navigation-icon
             i.bi.bi-github
@@ -45,7 +45,7 @@
             strong GitHub integration
             small Connected account
 
-        = link_to settings_path(tab: "billing"),
+        = link_to settings_path(tab: 'billing'),
             class: "settings-navigation-item #{'active' if @active_tab == 'billing'}" do
           span.settings-navigation-icon
             i.bi.bi-credit-card
@@ -56,13 +56,13 @@
 
   .col-12.col-xl-9
     - case @active_tab
-    - when "ai_review"
-      = render "settings/sections/ai_review"
-    - when "notifications"
-      = render "settings/sections/notifications"
-    - when "github"
-      = render "settings/sections/github"
-    - when "billing"
-      = render "settings/sections/billing"
+    - when 'ai_review'
+      = render 'settings/sections/ai_review'
+    - when 'notifications'
+      = render 'settings/sections/notifications'
+    - when 'github'
+      = render 'settings/sections/github'
+    - when 'billing'
+      = render 'settings/sections/billing'
     - else
-      = render "settings/sections/profile"
+      = render 'settings/sections/profile'

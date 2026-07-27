@@ -5,16 +5,16 @@
     p.page-description
       | Manage all users in the application.
 
-  = link_to "Back to dashboard",
+  = link_to 'Back to dashboard',
       admin_root_path,
-      class: "btn btn-light"
+      class: 'btn btn-light'
 
 .dashboard-card.mb-4
   .p-4
     = form_with url: admin_users_path,
         method: :get,
         local: true,
-        class: "d-flex.flex-column.flex-md-row.gap-2" do |form|
+        class: 'd-flex.flex-column.flex-md-row.gap-2' do |form|
 
       .input-group
         span.input-group-text.bg-white.border-end-0
@@ -22,13 +22,13 @@
 
         = form.search_field :query,
             value: params[:query],
-            placeholder: "Search by name or email",
-            class: "form-control border-start-0 ps-0"
+            placeholder: 'Search by name or email',
+            class: 'form-control border-start-0 ps-0'
 
       - if params[:query].present?
-        = link_to "Clear",
+        = link_to 'Clear',
             admin_users_path,
-            class: "btn btn-light"
+            class: 'btn btn-light'
 
 .dashboard-card
   .table-responsive
@@ -48,7 +48,7 @@
             tr
               td
                 = link_to repositories_path(user_id: user[:id]),
-                    class: "text-decoration-none" do
+                    class: 'text-decoration-none' do
                   p.mb-1.fw-semibold.text-dark
                     = user[:name]
 
@@ -78,6 +78,6 @@
               p.mb-3
                 | No users found.
 
-              = link_to "Clear search",
+              = link_to 'Clear search',
                   admin_users_path,
-                  class: "btn btn-primary btn-sm"
+                  class: 'btn btn-primary btn-sm'

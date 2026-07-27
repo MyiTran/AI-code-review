@@ -12,7 +12,7 @@ class RepositoriesController < ApplicationController
     end
 
     @languages = repositories
-      .map { |repository| repository[:language] }
+      .pluck(:language)
       .uniq
       .sort
 
@@ -25,17 +25,17 @@ class RepositoriesController < ApplicationController
   end
 
   def show
-    @repository = Mock::Repositories.find(params[:id])
+    @repository = Mock::Repositories.find(params.expect(:id))
 
-    raise ActiveRecord::RecordNotFound, "Repository not found" unless @repository
+    raise ActiveRecord::RecordNotFound, 'Repository not found' unless @repository
 
     if params[:user_id].present?
       @selected_user = find_selected_user
 
-      raise ActiveRecord::RecordNotFound, "User not found" unless @selected_user
+      raise ActiveRecord::RecordNotFound, 'User not found' unless @selected_user
 
       if @repository[:user_id].to_s != params[:user_id].to_s
-        raise ActiveRecord::RecordNotFound, "Repository not found"
+        raise ActiveRecord::RecordNotFound, 'Repository not found'
       end
     end
 
@@ -54,7 +54,7 @@ class RepositoriesController < ApplicationController
     result = repositories
 
     if params[:query].present?
-      query = params[:query].downcase.strip
+      query = params.expect(:query).downcase.strip
 
       result = result.select do |repository|
         repository[:name].downcase.include?(query) ||
@@ -86,7 +86,7 @@ class RepositoriesController < ApplicationController
   def filter_review_history(reviews)
     return reviews if params[:review_query].blank?
 
-    query = params[:review_query].downcase.strip
+    query = params.expect(:review_query).downcase.strip
 
     reviews.select do |review|
       review[:title].downcase.include?(query) ||

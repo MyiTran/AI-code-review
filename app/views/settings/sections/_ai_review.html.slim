@@ -61,13 +61,13 @@ section.dashboard-card.settings-section
           | Default AI model
 
         select#default-ai-model.form-select
-          option selected=(@settings[:review][:default_model] == "Gemini 2.5 Flash")
+          option selected=(@settings[:review][:default_model] == 'Gemini 2.5 Flash')
             | Gemini 2.5 Flash
 
-          option selected=(@settings[:review][:default_model] == "Claude Sonnet")
+          option selected=(@settings[:review][:default_model] == 'Claude Sonnet')
             | Claude Sonnet
 
-          option selected=(@settings[:review][:default_model] == "GPT-4.1 Mini")
+          option selected=(@settings[:review][:default_model] == 'GPT-4.1 Mini')
             | GPT-4.1 Mini
 
         p.form-helper-text
@@ -78,13 +78,13 @@ section.dashboard-card.settings-section
           | Minimum finding level
 
         select#severity-threshold.form-select
-          option selected=(@settings[:review][:severity_threshold] == "Suggestion")
+          option selected=(@settings[:review][:severity_threshold] == 'Suggestion')
             | Suggestion
 
-          option selected=(@settings[:review][:severity_threshold] == "Warning")
+          option selected=(@settings[:review][:severity_threshold] == 'Warning')
             | Warning
 
-          option selected=(@settings[:review][:severity_threshold] == "Critical")
+          option selected=(@settings[:review][:severity_threshold] == 'Critical')
             | Critical only
 
         p.form-helper-text

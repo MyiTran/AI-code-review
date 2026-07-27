@@ -5,12 +5,12 @@ class ReviewsController < ApplicationController
     reviews = Mock::Reviews.all
 
     @repositories = reviews
-      .map { |review| review[:repository_name] }
+      .pluck(:repository_name)
       .uniq
       .sort
 
     @models = reviews
-      .map { |review| review[:model] }
+      .pluck(:model)
       .uniq
       .sort
 
@@ -18,10 +18,9 @@ class ReviewsController < ApplicationController
   end
 
   def show
-    @review = Mock::Reviews.find(params[:id])
+    @review = Mock::Reviews.find(params.expect(:id))
 
-    raise ActiveRecord::RecordNotFound, "Review not found" unless @review
-
+    raise ActiveRecord::RecordNotFound, 'Review not found' unless @review
   end
 
   private
@@ -30,7 +29,7 @@ class ReviewsController < ApplicationController
     result = reviews
 
     if params[:query].present?
-      query = params[:query].downcase.strip
+      query = params.expect(:query).downcase.strip
 
       result = result.select do |review|
         review[:title].downcase.include?(query) ||

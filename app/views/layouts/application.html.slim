@@ -2,15 +2,15 @@ doctype html
 
 html lang="en"
   head
-    = render "layouts/head"
+    = render 'layouts/head'
 
   body
-    = render "shared/flash"
+    = render 'shared/flash'
 
-    = render "shared/sidebar"
+    = render 'shared/sidebar'
 
     .app-main
-      = render "shared/navbar"
+      = render 'shared/navbar'
 
       main.app-content
         = yield

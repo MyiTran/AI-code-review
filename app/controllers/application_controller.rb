@@ -15,7 +15,7 @@ class ApplicationController < ActionController::Base
   def self.only_turbo_stream_for(*actions)
     if actions.blank?
       raise ArgumentError,
-            "force_turbo_stream_for arguments must have least one item"
+        'force_turbo_stream_for arguments must have least one item'
     end
 
     before_action :ensure_turbo_frame_request, only: actions
@@ -39,13 +39,13 @@ class ApplicationController < ActionController::Base
   def not_authorized
     redirect_back_or_to(
       root_path,
-      alert: "You are not authorized to perform this action."
+      alert: 'You are not authorized to perform this action.'
     )
   end
 
   def rescue_routing_error
     redirect_to root_path,
-                alert: "Resource not found"
+      alert: 'Resource not found'
   end
 
   def ensure_turbo_frame_request

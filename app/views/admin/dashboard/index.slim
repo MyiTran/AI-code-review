@@ -32,7 +32,7 @@
               = number_with_delimiter(stat[:value])
 
             .d-flex.align-items-center.gap-2
-              - if stat[:trend] == "up"
+              - if stat[:trend] == 'up'
                 span.admin-stat-change.admin-stat-change-positive
                   i.bi.bi-arrow-up-right
                   = stat[:change]
@@ -63,7 +63,7 @@
           option This year
 
       .p-4
-        - maximum_reviews = @admin[:usage].map { |item| item[:reviews] }.max
+        - maximum_reviews = @admin[:usage].pluck(:reviews).max
 
         .admin-chart
           - @admin[:usage].each do |item|
@@ -144,9 +144,9 @@
 
             input.form-control.border-start-0.ps-0 type="search" placeholder="Search users"
 
-          = link_to "View all",
+          = link_to 'View all',
             admin_users_path,
-            class: "btn btn-light btn-sm"
+            class: 'btn btn-light btn-sm'
 
       .table-responsive
         table.table.mb-0
@@ -170,7 +170,7 @@
 
                     div
                       = link_to repositories_path(user_id: user[:id]),
-                            class: "text-decoration-none" do
+                            class: 'text-decoration-none' do
                         p.mb-1.fw-semibold.text-dark
                             = user[:name]
 
@@ -178,10 +178,10 @@
                             = user[:email]
 
                 td
-                  - if user[:plan] == "Team"
+                  - if user[:plan] == 'Team'
                     span.badge.admin-plan-team.rounded-pill
                       = user[:plan]
-                  - elsif user[:plan] == "Pro"
+                  - elsif user[:plan] == 'Pro'
                     span.badge.admin-plan-pro.rounded-pill
                       = user[:plan]
                   - else
@@ -195,7 +195,7 @@
                   = number_with_delimiter(user[:reviews])
 
                 td
-                  - if user[:status] == "Active"
+                  - if user[:status] == 'Active'
                     span.badge.badge-soft-success.rounded-pill.px-3.py-2
                       span.status-mini-dot.me-1
                       | Active
@@ -261,7 +261,7 @@
             td
               = link_to review[:pull_request],
                   review_path(review[:id]),
-                  class: "fw-semibold text-dark text-decoration-none"
+                  class: 'fw-semibold text-dark text-decoration-none'
 
             td
               span.repository-small-link
@@ -280,7 +280,7 @@
               = review[:duration]
 
             td
-              - if review[:status] == "Completed"
+              - if review[:status] == 'Completed'
                 span.badge.badge-soft-success.rounded-pill.px-3.py-2
                   i.bi.bi-check-circle.me-1
                   | Completed
@@ -293,5 +293,5 @@
               = review[:created_at]
 
             td.text-end
-              = link_to review_path(review[:id]), class: "btn btn-sm btn-light" do
+              = link_to review_path(review[:id]), class: 'btn btn-sm btn-light' do
                 i.bi.bi-chevron-right

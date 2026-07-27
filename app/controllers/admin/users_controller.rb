@@ -4,7 +4,7 @@ module Admin
       @users = Mock::AdminDashboard.data[:users]
 
       if params[:query].present?
-        query = params[:query].downcase.strip
+        query = params.expect(:query).downcase.strip
 
         @users = @users.select do |user|
           user[:name].downcase.include?(query) ||

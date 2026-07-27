@@ -35,9 +35,9 @@
           p.mb-0.mt-1.text-secondary.small
             | Repositories connected to AI Review
 
-        = link_to "View all",
+        = link_to 'View all',
             repositories_path,
-            class: "btn btn-sm btn-light"
+            class: 'btn btn-sm btn-light'
 
       .table-responsive
         table.table.mb-0
@@ -68,7 +68,7 @@
                   = repository[:reviews]
 
                 td
-                  - if repository[:status] == "Active"
+                  - if repository[:status] == 'Active'
                     span.badge.badge-soft-success.rounded-pill.px-3.py-2
                       = repository[:status]
                   - else
@@ -137,9 +137,9 @@
           p.mb-0.mt-1.text-secondary.small
             | Latest pull requests analyzed by AI
 
-        = link_to "View all reviews",
+        = link_to 'View all reviews',
             reviews_path,
-            class: "btn btn-light"
+            class: 'btn btn-light'
 
       .table-responsive
         table.table.mb-0
@@ -173,7 +173,7 @@
                       | No issues
 
                 td
-                  - if review[:status] == "Completed"
+                  - if review[:status] == 'Completed'
                     span.badge.badge-soft-success.rounded-pill.px-3.py-2
                       i.bi.bi-check-circle.me-1
                       = review[:status]

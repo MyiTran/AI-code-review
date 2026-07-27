@@ -1,6 +1,6 @@
 .mb-4
   = link_to repositories_path(user_id: params[:user_id]),
-      class: "text-decoration-none text-secondary small" do
+      class: 'text-decoration-none text-secondary small' do
     i.bi.bi-arrow-left.me-2
     | Back to repositories
 
@@ -14,7 +14,7 @@
         h1.page-title.mb-0
           = @repository[:name]
 
-        - if @repository[:connection_status] == "Connected"
+        - if @repository[:connection_status] == 'Connected'
           span.badge.badge-soft-success.rounded-pill.px-3.py-2
             i.bi.bi-link-45deg.me-1
             | Connected
@@ -138,7 +138,7 @@
         = form_with url: repository_path(@repository[:id]),
             method: :get,
             local: true,
-            class: "repository-review-search-form" do |form|
+            class: 'repository-review-search-form' do |form|
           - if params[:user_id].present?
             = form.hidden_field :user_id, value: params[:user_id]
 
@@ -148,13 +148,13 @@
 
             = form.search_field :review_query,
                 value: params[:review_query],
-                placeholder: "Search pull requests",
-                class: "form-control border-start-0 ps-0"
+                placeholder: 'Search pull requests',
+                class: 'form-control border-start-0 ps-0'
 
             - if params[:review_query].present?
               = link_to repository_path(@repository[:id], user_id: params[:user_id]),
-                  class: "btn btn-light border",
-                  title: "Clear search" do
+                  class: 'btn btn-light border',
+                  title: 'Clear search' do
                 i.bi.bi-x-lg
 
       - if @review_history.any?
@@ -175,7 +175,7 @@
                 tr
                   td
                     = link_to review_path(review[:id], repository_id: @repository[:id], user_id: params[:user_id]),
-                        class: "text-decoration-none text-dark" do
+                        class: 'text-decoration-none text-dark' do
                       p.mb-1.fw-semibold
                         | ##{review[:pull_request_number]} #{review[:title]}
 
@@ -209,7 +209,7 @@
                         | No issues
 
                   td
-                    - if review[:status] == "Completed"
+                    - if review[:status] == 'Completed'
                       span.badge.badge-soft-success.rounded-pill.px-3.py-2
                         i.bi.bi-check-circle.me-1
                         | Completed
@@ -231,9 +231,9 @@
             p.text-secondary.mb-4
             | No pull request matches your search.
 
-            = link_to "Clear search",
+            = link_to 'Clear search',
                 repository_path(@repository[:id]),
-                class: "btn btn-primary"
+                class: 'btn btn-primary'
 
   .col-12.col-xl-4
     .dashboard-card.p-4.mb-4
@@ -252,10 +252,10 @@
               | Review new and updated pull requests automatically.
 
           .form-check.form-switch
-            input#repository-auto-review.form-check-input.ai-review-toggle type="checkbox" role="switch" checked=@repository[:auto_review_enabled] disabled=(@repository[:connection_status] == "Disconnected") data-status-target="repository-auto-review-status"
+            input#repository-auto-review.form-check-input.ai-review-toggle type="checkbox" role="switch" checked=@repository[:auto_review_enabled] disabled=(@repository[:connection_status] == 'Disconnected') data-status-target="repository-auto-review-status"
 
-          - review_status_class = @repository[:auto_review_enabled] ? "text-success" : "text-secondary"
-          - review_status_text = @repository[:auto_review_enabled] ? "Automatic review is on" : "Automatic review is off"
+          - review_status_class = @repository[:auto_review_enabled] ? 'text-success' : 'text-secondary'
+          - review_status_text = @repository[:auto_review_enabled] ? 'Automatic review is on' : 'Automatic review is off'
 
           p#repository-auto-review-status.mt-3.mb-0.small.fw-semibold class=review_status_class
            = review_status_text
@@ -267,19 +267,19 @@
         select#repository-ai-model.form-select
           option[
             value="Gemini 2.5 Flash"
-            selected=(@repository[:ai_model] == "Gemini 2.5 Flash")
+            selected=(@repository[:ai_model] == 'Gemini 2.5 Flash')
           ]
             | Gemini 2.5 Flash
 
           option[
             value="Claude Sonnet"
-            selected=(@repository[:ai_model] == "Claude Sonnet")
+            selected=(@repository[:ai_model] == 'Claude Sonnet')
           ]
             | Claude Sonnet
 
           option[
             value="GPT-4.1 Mini"
-            selected=(@repository[:ai_model] == "GPT-4.1 Mini")
+            selected=(@repository[:ai_model] == 'GPT-4.1 Mini')
           ]
             | GPT-4.1 Mini
 

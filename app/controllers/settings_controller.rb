@@ -15,7 +15,7 @@ class SettingsController < ApplicationController
       if SETTINGS_TABS.include?(params[:tab])
         params[:tab]
       else
-        "profile"
+        'profile'
       end
   end
 end

@@ -1,5 +1,5 @@
 .mb-4
-  = link_to reviews_path, class: "text-decoration-none text-secondary small" do
+  = link_to reviews_path, class: 'text-decoration-none text-secondary small' do
     i.bi.bi-arrow-left.me-2
     | Back to AI reviews
 
@@ -13,7 +13,7 @@
         h1.page-title.mb-0
           | ##{@review[:pull_request_number]} #{@review[:title]}
 
-        - if @review[:status] == "Completed"
+        - if @review[:status] == 'Completed'
           span.badge.badge-soft-success.rounded-pill.px-3.py-2
             i.bi.bi-check-circle.me-1
             | Completed
@@ -26,7 +26,7 @@
         = @review[:description]
 
       .d-flex.flex-wrap.align-items-center.gap-3.text-secondary.small
-        = link_to repository_path(@review[:repository_id]), class: "text-decoration-none text-secondary" do
+        = link_to repository_path(@review[:repository_id]), class: 'text-decoration-none text-secondary' do
           i.bi.bi-github.me-1
           = @review[:repository_full_name]
 
@@ -120,7 +120,7 @@
 
         = link_to @review[:repository_name],
             repository_path(@review[:repository_id]),
-            class: "fw-semibold text-decoration-none"
+            class: 'fw-semibold text-decoration-none'
 
       .repository-info-row
         span.text-secondary Pull request
@@ -191,7 +191,7 @@
 
   .review-tab-content
     .review-tab-panel data-review-panel="findings"
-      = render "reviews/tabs/findings"
+      = render 'reviews/tabs/findings'
 
     .review-tab-panel.d-none data-review-panel="changed-files"
-      = render "reviews/tabs/changed_files"
+      = render 'reviews/tabs/changed_files'
