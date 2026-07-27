@@ -1,0 +1,33 @@
+.my-4.text-xl.font-bold.tracking-tight.text-primary
+  | Sign in to your account
+
+= simple_form_for(resource, as: resource_name, url: session_path(resource_name), data: { turbo: false }) do |f|
+  .flex.flex-col.gap-2
+    = f.input :email,
+              required: false,
+              autofocus: true,
+              label: false,
+              placeholder: 'Email',
+              input_html: { autocomplete: 'email', class: 'w-full' }
+    = f.input :password,
+              required: false,
+              label: false,
+              placeholder: 'Password',
+              input_html: { autocomplete: 'current-password', class: 'w-full' }
+    = f.input :remember_me, as: :boolean if devise_mapping.rememberable?
+  .form-actions
+    = f.button :submit, 'Log in', class: 'w-full'
+
+p.mt-4.text-sm.leading-6
+  |  Not a member?
+  a class="font-semibold text-primary hover:text-secondary" href="/users/sign_up"
+    |  Sign up
+
+= button_to user_google_oauth2_omniauth_authorize_path, method: :post, data: { turbo: false }, class: 'btn bg-white text-black border-[#e5e5e5] w-full mt-2' do
+  = vite_image_tag('images/auth/google.svg')
+  | Sign in with Google
+= button_to user_facebook_omniauth_authorize_path, method: :post, data: { turbo: false }, class: 'btn bg-[#1A77F2] text-white border-[#005fd8] w-full mt-2' do
+  = vite_image_tag('images/auth/facebook.svg')
+  | Sign in with Facebook
+
+= render 'devise/shared/links'

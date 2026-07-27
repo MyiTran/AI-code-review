@@ -1,0 +1,30 @@
+.my-4.text-xl.font-bold.tracking-tight.text-primary
+  | Sign up new account
+
+= simple_form_for(resource, as: resource_name, url: users_sign_up_path, data: { turbo: false, method: :post }) do |f|
+  = f.error_notification
+  .flex.flex-col.gap-2
+    = f.input :email,
+      required: true,
+      label: false,
+      placeholder: 'Email',
+      input_html: { autocomplete: 'email', class: 'w-full' }
+    = f.input :password,
+      required: true,
+      label: false,
+      placeholder: 'Password',
+      input_html: { autocomplete: 'new-password', class: 'w-full' }
+    = f.input :password_confirmation,
+      required: true,
+      label: false,
+      placeholder: 'Password confirmation',
+      input_html: { autocomplete: 'new-password', class: 'w-full' }
+  .form-actions
+    = f.button :submit, 'Sign up', class: 'w-full'
+
+p.mt-2.text-sm.leading-6
+  |  Already a member?
+  a class="font-semibold text-primary hover:text-secondary" href="/users/sign_in"
+    |  Sign in
+
+= render 'devise/shared/links'

@@ -1,0 +1,22 @@
+commit-msg:
+  commands:
+    lint-commit-msg:
+      run: yarn commitlint --edit $1
+
+pre-commit:
+  parallel: true
+  commands:
+    zeitwerk:
+      run: bundle exec rails zeitwerk:check
+    rubocop:
+      tags: backend style
+      glob: '{*.{rb,rake,slim},[A-Z]*file}'
+      run: bundle exec rubocop --force-exclusion {staged_files}
+    secrets-detection:
+      tags: secrets
+      files: git diff --name-only --diff-filter=d --staged
+      run: 'if command -v gitleaks > /dev/null 2>&1; then gitleaks protect --no-banner --staged --redact --verbose; else echo "WARNING: gitleaks is not installed. Please install it. See https://github.com/zricethezav/gitleaks#installing."; fi'
+    eslint:
+      tags: frontend style
+      glob: '*.{js}'
+      run: yarn lint {staged_files}
