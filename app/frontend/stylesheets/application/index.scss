@@ -2,7 +2,7 @@
 @use '@/stylesheets/shared/reset';
 @use '@/stylesheets/shared/base';
 @use '@/stylesheets/shared/pagy';
-@use "bootstrap/scss/bootstrap";
+@use 'bootstrap/scss/bootstrap';
 
 @use 'layout';
 @use 'shared';
@@ -12,4 +12,4 @@
 @use 'settings';
 @use 'admin';
 
-@import "bootstrap-icons/font/bootstrap-icons.css";
+@import 'bootstrap-icons/font/bootstrap-icons.css';

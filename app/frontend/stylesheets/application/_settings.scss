@@ -22,7 +22,9 @@
   border-radius: 10px;
   color: #667085;
   text-decoration: none;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .settings-navigation-item:hover,

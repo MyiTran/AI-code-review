@@ -21,13 +21,10 @@ const updateToggleStatus = (toggle) => {
 };
 
 const toggleStatusText = (toggle) => {
-  const repositoryDetail =
-    toggle.dataset.statusTarget === 'repository-auto-review-status';
+  const repositoryDetail = toggle.dataset.statusTarget === 'repository-auto-review-status';
 
   if (repositoryDetail) {
-    return toggle.checked
-      ? 'Automatic review is on'
-      : 'Automatic review is off';
+    return toggle.checked ? 'Automatic review is on' : 'Automatic review is off';
   }
 
   return toggle.checked ? 'On' : 'Off';
