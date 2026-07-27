@@ -4,23 +4,15 @@ class RepositoriesController < ApplicationController
   def index
     repositories = repositories_for_selected_user
 
-    @languages = repositories
-      .pluck(:language)
-      .uniq
-      .sort
+    @languages = repositories.pluck(:language).uniq.sort
 
-    @models = repositories
-      .filter_map { |repository| repository[:ai_model] }
-      .uniq
-      .sort
+    @models = repositories.filter_map { |repository| repository[:ai_model] }.uniq.sort
 
     @repositories = filter_repositories(repositories)
   end
 
   def show
     @repository = Mock::Repositories.find(params.expect(:id))
-
-    raise ActiveRecord::RecordNotFound, 'Repository not found' unless @repository
 
     validate_selected_user_repository!
 
@@ -44,11 +36,9 @@ class RepositoriesController < ApplicationController
   end
 
   def find_selected_user
-    Mock::AdminDashboard
-      .data[:users]
-      .find do |user|
-        user[:id].to_s == params[:user_id].to_s
-      end
+    Mock::AdminDashboard.data[:users].find do |user|
+      user[:id].to_s == params[:user_id].to_s
+    end
   end
 
   def validate_selected_user_repository!

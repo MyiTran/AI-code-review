@@ -1,5 +1,5 @@
 module Admin
-  class UsersController < BaseController
+  class UsersController < ApplicationController
     def index
       @users = Mock::AdminDashboard.data[:users]
 
