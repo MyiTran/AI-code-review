@@ -10,9 +10,13 @@ class ApplicationController < ActionController::Base
   rescue_from ActionController::RoutingError, with: :rescue_routing_error
 
   before_action :authenticate_user!
+  before_action :set_mock_current_user
 
   def self.only_turbo_stream_for(*actions)
-    raise ArgumentError, 'force_turbo_stream_for arguments must have least one item' if actions.blank?
+    if actions.blank?
+      raise ArgumentError,
+            "force_turbo_stream_for arguments must have least one item"
+    end
 
     before_action :ensure_turbo_frame_request, only: actions
   end
@@ -28,12 +32,20 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def set_mock_current_user
+    @current_mock_user = Mock::CurrentUser.call
+  end
+
   def not_authorized
-    redirect_back_or_to(root_path, alert: 'You are not authorized to perform this action.')
+    redirect_back_or_to(
+      root_path,
+      alert: "You are not authorized to perform this action."
+    )
   end
 
   def rescue_routing_error
-    redirect_to root_path, alert: 'Resource not found'
+    redirect_to root_path,
+                alert: "Resource not found"
   end
 
   def ensure_turbo_frame_request

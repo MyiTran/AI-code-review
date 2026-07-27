@@ -1,21 +1,16 @@
 module Admin
   class BaseController < ApplicationController
-    layout 'admin'
+    layout "admin"
 
-    before_action :authenticate_admin!
+    before_action :require_admin!
 
     private
 
-    def policy_scope(scope, policy_scope_class: nil)
-      super([:admin, scope], policy_scope_class:)
-    end
+    def require_admin!
+      return if current_user.admin?
 
-    def authorize(record, query = nil, policy_class: nil)
-      super([:admin, record], query, policy_class:)
-    end
-
-    def authenticate_admin!
-      redirect_to root_path, alert: 'Access denied.' unless current_user&.admin? || current_user&.super_admin?
+      redirect_to dashboard_path,
+                  alert: "You are not authorized to access this page."
     end
   end
 end

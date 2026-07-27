@@ -1,0 +1,160 @@
+.d-flex.flex-column.flex-lg-row.align-items-lg-center.justify-content-between.gap-3.mb-4
+  div
+    h1.page-title AI Reviews
+
+    p.page-description
+      | View pull requests analyzed by AI across all connected repositories.
+
+  .d-flex.align-items-center.gap-2.text-secondary.small
+    i.bi.bi-stars
+    | #{@reviews.count} reviews found
+
+.dashboard-card.mb-4
+  .p-4
+    = form_with url: reviews_path, method: :get, local: true, class: "row g-3 align-items-end" do |form|
+      .col-12.col-xl-4
+        = form.label :query, "Search reviews", class: "form-label small fw-semibold"
+
+        .input-group
+          span.input-group-text.bg-white.border-end-0
+            i.bi.bi-search.text-secondary
+
+          = form.search_field :query,
+              value: params[:query],
+              placeholder: "Search PR title, number or repository...",
+              class: "form-control border-start-0 ps-0"
+
+      .col-6.col-md-4.col-xl-2
+        = form.label :repository, "Repository", class: "form-label small fw-semibold"
+
+        = form.select :repository,
+            options_for_select(@repositories, params[:repository]),
+            { include_blank: "All repositories" },
+            class: "form-select"
+
+      .col-6.col-md-4.col-xl-2
+        = form.label :status, "Status", class: "form-label small fw-semibold"
+
+        = form.select :status,
+            options_for_select(["Completed", "Processing"], params[:status]),
+            { include_blank: "All statuses" },
+            class: "form-select"
+
+      .col-6.col-md-4.col-xl-2
+        = form.label :model, "AI model", class: "form-label small fw-semibold"
+
+        = form.select :model,
+            options_for_select(@models, params[:model]),
+            { include_blank: "All models" },
+            class: "form-select"
+
+      .col-6.col-md-4.col-xl-2
+        .d-flex.gap-2
+          = form.submit "Apply", class: "btn btn-primary flex-grow-1"
+
+          = link_to reviews_path, class: "btn btn-light", title: "Clear filters" do
+            i.bi.bi-arrow-counterclockwise
+
+.dashboard-card
+  .p-4.border-bottom
+    h2.card-title-custom Pull request reviews
+
+    p.mb-0.mt-1.text-secondary.small
+      | AI review results from your repositories.
+
+  - if @reviews.any?
+    .table-responsive
+      table.table.mb-0.review-table
+        thead
+          tr
+            th Pull request
+            th Repository
+            th AI model
+            th Findings
+            th Result
+            th Status
+            th Reviewed
+            th
+
+        tbody
+          - @reviews.each do |review|
+            tr
+              td
+                = link_to review_path(review[:id]), class: "review-title-link" do
+                  p.mb-1.fw-semibold.text-dark
+                    | ##{review[:pull_request_number]} #{review[:title]}
+
+                  .d-flex.flex-wrap.align-items-center.gap-2.text-secondary.small
+                    span
+                      i.bi.bi-git.me-1
+                      = review[:source_branch]
+
+                    i.bi.bi-arrow-right
+
+                    span
+                      = review[:target_branch]
+
+              td
+                = link_to repository_path(review[:repository_id]), class: "repository-small-link" do
+                  i.bi.bi-github.me-2
+                  = review[:repository_name]
+
+              td
+                span.ai-model-badge
+                  i.bi.bi-stars
+                  = review[:model]
+
+              td
+                - if review[:issues_found].positive?
+                  span.finding-count.finding-count-danger
+                    i.bi.bi-exclamation-triangle.me-1
+                    | #{review[:issues_found]} issues
+                - else
+                  span.finding-count.finding-count-success
+                    i.bi.bi-check-circle.me-1
+                    | No issues
+
+              td
+                - if review[:conclusion] == "Approved"
+                  span.badge.badge-soft-success.rounded-pill.px-3.py-2
+                    | Approved
+                - elsif review[:conclusion] == "Approved with suggestions"
+                  span.badge.badge-soft-warning.rounded-pill.px-3.py-2
+                    | Suggestions
+                - elsif review[:conclusion] == "Changes requested"
+                  span.badge.badge-soft-danger.rounded-pill.px-3.py-2
+                    | Changes requested
+                - else
+                  span.badge.bg-light.text-secondary.rounded-pill.px-3.py-2
+                    | In progress
+
+              td
+                - if review[:status] == "Completed"
+                  span.badge.badge-soft-success.rounded-pill.px-3.py-2
+                    i.bi.bi-check-circle.me-1
+                    | Completed
+                - else
+                  span.badge.badge-soft-warning.rounded-pill.px-3.py-2
+                    i.bi.bi-arrow-repeat.me-1
+                    | Processing
+
+              td.text-secondary.small
+                = review[:reviewed_at]
+
+              td.text-end
+                = link_to review_path(review[:id]),
+                    class: "btn btn-sm btn-light",
+                    aria: { label: "View review for pull request #{review[:pull_request_number]}" } do
+                  i.bi.bi-chevron-right
+
+  - else
+    .text-center.p-5
+      span.empty-state-icon.mb-3
+        i.bi.bi-search
+
+      h3.fs-5 No reviews found
+
+      p.text-secondary.mb-4
+        | Try changing or clearing your search filters.
+
+      = link_to "Clear filters", reviews_path, class: "btn btn-primary"

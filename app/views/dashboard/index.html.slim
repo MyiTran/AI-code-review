@@ -1,0 +1,186 @@
+.d-flex.flex-column.flex-md-row.align-items-md-center.justify-content-between.gap-3.mb-4
+  div
+    h1.page-title Dashboard
+
+    p.page-description
+      | Monitor repositories, pull requests and AI review activity.
+
+
+.row.g-4.mb-4
+  - @dashboard[:stats].each do |stat|
+    .col-12.col-sm-6.col-xl-3
+      .dashboard-card.p-4
+        .d-flex.align-items-start.justify-content-between.mb-4
+          div class="stat-icon stat-icon-#{stat[:style]}"
+            i class="bi #{stat[:icon]}"
+
+          i.bi.bi-three-dots.text-secondary
+
+        .stat-value.mb-2
+          = stat[:value]
+
+        .stat-label.mb-2
+          = stat[:label]
+
+        .stat-change
+          = stat[:change]
+
+.row.g-4.mb-4
+  .col-12.col-xl-8
+    .dashboard-card
+      .d-flex.align-items-center.justify-content-between.p-4.border-bottom
+        div
+          h2.card-title-custom Recent repositories
+
+          p.mb-0.mt-1.text-secondary.small
+            | Repositories connected to AI Review
+
+        = link_to "View all",
+            repositories_path,
+            class: "btn btn-sm btn-light"
+
+      .table-responsive
+        table.table.mb-0
+          thead
+            tr
+              th Repository
+              th Language
+              th Reviews
+              th Status
+              th Last activity
+
+          tbody
+            - @dashboard[:repositories].each do |repository|
+              tr
+                td
+                  .d-flex.align-items-center.gap-3
+                    span.repository-icon
+                      i.bi.bi-github
+
+                    .fw-semibold
+                      = repository[:name]
+
+                td
+                  span.small
+                    = repository[:language]
+
+                td
+                  = repository[:reviews]
+
+                td
+                  - if repository[:status] == "Active"
+                    span.badge.badge-soft-success.rounded-pill.px-3.py-2
+                      = repository[:status]
+                  - else
+                    span.badge.badge-soft-warning.rounded-pill.px-3.py-2
+                      = repository[:status]
+
+                td.text-secondary.small
+                  = repository[:updated_at]
+
+  .col-12.col-xl-4
+    .dashboard-card.p-4
+      .d-flex.align-items-center.justify-content-between.mb-4
+        div
+          h2.card-title-custom Monthly usage
+
+          p.mb-0.mt-1.text-secondary.small
+            | AI review allowance
+
+        span.stat-icon.stat-icon-primary
+          i.bi.bi-lightning-charge
+
+      .text-center.py-3
+        .display-5.fw-bold.mb-1
+          = @dashboard[:usage][:used]
+
+        p.text-secondary.mb-4
+          | of #{@dashboard[:usage][:limit]} reviews used
+
+      .progress.mb-3
+        .progress-bar[
+          role="progressbar"
+          style="width: #{@dashboard[:usage][:percentage]}%"
+          aria-valuenow=@dashboard[:usage][:percentage]
+          aria-valuemin="0"
+          aria-valuemax="100"
+        ]
+
+      .d-flex.justify-content-between.text-secondary.small.mb-4
+        span
+          | #{@dashboard[:usage][:percentage]}% used
+
+        span
+          | #{@dashboard[:usage][:limit] - @dashboard[:usage][:used]} remaining
+
+      .p-3.rounded-3.bg-light
+        .d-flex.gap-3
+          i.bi.bi-info-circle.text-primary
+
+          div
+            p.mb-1.fw-semibold.small
+              | Need more reviews?
+
+            p.mb-0.text-secondary.small
+              | Upgrade your plan to increase your monthly AI review limit.
+
+      button.btn.btn-outline-primary.w-100.mt-4.rounded-3 type="button"
+        | Upgrade plan
+
+.row.g-4
+  .col-12
+    .dashboard-card
+      .d-flex.align-items-center.justify-content-between.p-4.border-bottom
+        div
+          h2.card-title-custom Recent AI reviews
+
+          p.mb-0.mt-1.text-secondary.small
+            | Latest pull requests analyzed by AI
+
+        = link_to "View all reviews",
+            reviews_path,
+            class: "btn btn-light"
+
+      .table-responsive
+        table.table.mb-0
+          thead
+            tr
+              th Pull request
+              th Repository
+              th Issues found
+              th Status
+              th Reviewed
+
+          tbody
+            - @dashboard[:recent_reviews].each do |review|
+              tr
+                td
+                  .fw-semibold
+                    = review[:pull_request]
+
+                td
+                  .d-flex.align-items-center.gap-2
+                    i.bi.bi-github
+                    span
+                      = review[:repository]
+
+                td
+                  - if review[:issues].positive?
+                    span.fw-semibold.text-danger
+                      = review[:issues]
+                  - else
+                    span.text-success
+                      | No issues
+
+                td
+                  - if review[:status] == "Completed"
+                    span.badge.badge-soft-success.rounded-pill.px-3.py-2
+                      i.bi.bi-check-circle.me-1
+                      = review[:status]
+                  - else
+                    span.badge.badge-soft-warning.rounded-pill.px-3.py-2
+                      i.bi.bi-arrow-repeat.me-1
+                      = review[:status]
+
+                td.text-secondary.small
+                  = review[:created_at]

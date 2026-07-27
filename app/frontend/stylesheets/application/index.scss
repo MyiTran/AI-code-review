@@ -3,3 +3,6 @@
 @use '@/stylesheets/shared/reset';
 @use '@/stylesheets/shared/base';
 @use '@/stylesheets/shared/pagy';
+@use "bootstrap/scss/bootstrap";
+@use "legacy";
+@import "bootstrap-icons/font/bootstrap-icons.css";

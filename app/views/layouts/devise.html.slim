@@ -1,25 +1,10 @@
 doctype html
-html.h-full.bg-base[lang="en"]
+
+html lang="en"
   head
-    = render 'layouts/head'
+    = render "layouts/head"
 
-  body.h-full.drawer.drawer-end data-controller="icons theme"
-    = render 'shared/flash'
+  body
 
-    input#my-drawer.drawer-toggle[type="checkbox"]
-    div class="flex min-h-full drawer-content"
-      div class="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24"
-        div class="mx-auto w-full max-w-sm lg:w-96"
-          div class="flex items-center"
-            a class="btn btn-ghost btn-circle" href="/" aria-current="page" aria-label="Homepage"
-              = vite_image_tag('images/icons/logo.svg', class: 'size-6')
-            div class="uppercase font-title inline-flex text-lg md:text-2xl"
-              span
-                | daisy
-              span class="text-[#1AD1A5]"
-                | UI
-          .mt-4
-            = yield
-      div class="absolute md:relative flex-1 inset-0 h-96 md:h-full box-content -z-10 w-full"
-        img class="absolute inset-0 w-full h-full bg-top bg-cover object-cover opacity-90 max-w-full" src='https://images.unsplash.com/photo-1656696701010-1b4b17fabd43' alt=""
-        div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-base-100 to-transparent w-full" aria-hidden="true"
+    main.flex.min-h-screen.items-center.justify-center.bg-slate-50.px-6.py-12
+      = yield

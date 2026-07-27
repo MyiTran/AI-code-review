@@ -1,9 +1,16 @@
 doctype html
-html[lang="en"]
+
+html lang="en"
   head
-    = render 'layouts/head'
-  body data-controller="icons theme"
-    = render 'layouts/header'
-    .hero.bg-base-200.min-h-screen
-      = yield
-    = render 'layouts/footer'
+    = render "layouts/head"
+
+  body
+    = render "shared/flash"
+
+    = render "shared/sidebar"
+
+    .app-main
+      = render "shared/navbar"
+
+      main.app-content
+        = yield

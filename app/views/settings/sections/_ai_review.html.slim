@@ -1,0 +1,105 @@
+section.dashboard-card.settings-section
+  .settings-section-header
+    .d-flex.align-items-center.gap-3
+      span.settings-section-icon.settings-section-icon-purple
+        i.bi.bi-stars
+
+      div
+        h2.card-title-custom AI review preferences
+
+        p.mb-0.mt-1.text-secondary.small
+          | Configure the default behavior for newly connected repositories.
+
+  .settings-section-body
+    .settings-option
+      .settings-option-copy
+        label.settings-option-title for="default-auto-review"
+          | Enable automatic AI review
+
+        p.settings-option-description
+          | Automatically analyze new and updated pull requests.
+
+      .form-check.form-switch.mb-0
+        input#default-auto-review.form-check-input.ai-review-toggle type="checkbox" role="switch" checked=@settings[:review][:auto_review_enabled]
+
+    .settings-option
+      .settings-option-copy
+        label.settings-option-title for="review-on-push"
+          | Review after new commits
+
+        p.settings-option-description
+          | Run another review when commits are pushed to an open pull request.
+
+      .form-check.form-switch.mb-0
+        input#review-on-push.form-check-input.ai-review-toggle type="checkbox" role="switch" checked=@settings[:review][:review_on_push]
+
+    .settings-option
+      .settings-option-copy
+        label.settings-option-title for="review-drafts"
+          | Review draft pull requests
+
+        p.settings-option-description
+          | Include pull requests marked as drafts.
+
+      .form-check.form-switch.mb-0
+        input#review-drafts.form-check-input.ai-review-toggle type="checkbox" role="switch" checked=@settings[:review][:review_drafts]
+
+    .settings-option
+      .settings-option-copy
+        label.settings-option-title for="include-suggestions"
+          | Include improvement suggestions
+
+        p.settings-option-description
+          | Show non-blocking suggestions for maintainability and code style.
+
+      .form-check.form-switch.mb-0
+        input#include-suggestions.form-check-input.ai-review-toggle type="checkbox" role="switch" checked=@settings[:review][:include_suggestions]
+
+    .row.g-4.mt-1
+      .col-12.col-md-6
+        label.form-label.fw-semibold for="default-ai-model"
+          | Default AI model
+
+        select#default-ai-model.form-select
+          option selected=(@settings[:review][:default_model] == "Gemini 2.5 Flash")
+            | Gemini 2.5 Flash
+
+          option selected=(@settings[:review][:default_model] == "Claude Sonnet")
+            | Claude Sonnet
+
+          option selected=(@settings[:review][:default_model] == "GPT-4.1 Mini")
+            | GPT-4.1 Mini
+
+        p.form-helper-text
+          | Repositories can override this setting individually.
+
+      .col-12.col-md-6
+        label.form-label.fw-semibold for="severity-threshold"
+          | Minimum finding level
+
+        select#severity-threshold.form-select
+          option selected=(@settings[:review][:severity_threshold] == "Suggestion")
+            | Suggestion
+
+          option selected=(@settings[:review][:severity_threshold] == "Warning")
+            | Warning
+
+          option selected=(@settings[:review][:severity_threshold] == "Critical")
+            | Critical only
+
+        p.form-helper-text
+          | Findings below this level will not be displayed.
+
+      .col-12.col-md-6
+        label.form-label.fw-semibold for="maximum-files"
+          | Maximum files per review
+
+        input#maximum-files.form-control type="number" min="1" max="100" value=@settings[:review][:maximum_files]
+
+        p.form-helper-text
+          | Pull requests above this limit may be partially analyzed.
+
+    .settings-actions
+      button.btn.btn-primary.settings-save-button type="button"
+        i.bi.bi-check-lg.me-2
+        | Save review preferences
