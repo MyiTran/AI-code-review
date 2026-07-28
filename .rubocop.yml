@@ -81,6 +81,7 @@ Metrics/ClassLength:
   Max: 250
   Exclude:
     - test/**/*
+    - 'app/services/mock/**/*.rb'
 
 Metrics/CyclomaticComplexity:
   Enabled: false
@@ -216,6 +217,7 @@ Metrics/MethodLength:
   Max: 30
   Exclude:
     - db/migrate/*.rb
+    - 'app/services/mock/**/*.rb'
 
 Naming/BlockForwarding:
   Enabled: false

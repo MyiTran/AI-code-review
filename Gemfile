@@ -61,6 +61,9 @@ gem 'ransack'
 gem 'enumerize'
 gem 'web-console'
 
+# github
+gem 'omniauth-github'
+
 group :development, :test do
   gem 'rspec-rails'
   gem 'dotenv', '>= 3.0'

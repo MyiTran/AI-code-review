@@ -1,20 +1,16 @@
 module Admin
-  class UsersController < BaseController
-    include Crudable
+  class UsersController < ApplicationController
+    def index
+      @users = Mock::AdminDashboard.data[:users]
 
-    COLLECTION_INCLUDES = [
-      :avatar_attachment
-    ].freeze
+      if params[:query].present?
+        query = params.expect(:query).downcase.strip
 
-    crud_to class: User,
-      searchable: true,
-      collection_variable: :@users,
-      collection_includes: COLLECTION_INCLUDES
-
-    private
-
-    def resource_permitted_params
-      params.expect(user: UserParams.permitted_attributes)
+        @users = @users.select do |user|
+          user[:name].downcase.include?(query) ||
+            user[:email].downcase.include?(query)
+        end
+      end
     end
   end
 end

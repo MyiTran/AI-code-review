@@ -1,0 +1,56 @@
+aside.app-sidebar
+  .d-flex.flex-column.h-100
+    .px-4.pt-4.pb-3
+      = link_to dashboard_path, class: 'brand-logo' do
+        span.brand-icon
+          i.bi.bi-stars
+
+        span AI Review
+
+    nav.flex-grow-1
+      p.sidebar-label Workspace
+
+      = link_to dashboard_path,
+          class: "sidebar-link #{'active' if controller_name == 'dashboard'}" do
+        i.bi.bi-grid
+        span Dashboard
+
+      = link_to repositories_path,
+          class: "sidebar-link #{'active' if controller_name == 'repositories'}" do
+        i.bi.bi-github
+        span Repositories
+
+      = link_to reviews_path,
+          class: "sidebar-link #{'active' if controller_name == 'reviews'}" do
+        i.bi.bi-code-square
+        span AI Reviews
+
+      p.sidebar-label Account
+
+      = link_to settings_path,
+          class: "sidebar-link #{'active' if controller_name == 'settings'}" do
+        i.bi.bi-gear
+        span Settings
+
+      = link_to '#', class: 'sidebar-link' do
+        i.bi.bi-credit-card
+        span Billing
+
+      .sidebar-divider
+
+      = link_to admin_root_path,
+          class: "sidebar-link #{'active' if controller_path.start_with?('admin/')}" do
+        i.bi.bi-shield-lock
+        span Admin
+
+    .sidebar-user
+      .d-flex.align-items-center.gap-3
+        span.avatar
+          = @current_mock_user[:initials]
+
+        .overflow-hidden
+          p.mb-0.text-white.fw-semibold.small.text-truncate
+            = @current_mock_user[:name]
+
+          p.mb-0.text-secondary.small.text-truncate
+            = @current_mock_user[:plan]

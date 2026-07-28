@@ -3,5 +3,6 @@ Rails.application.routes.draw do
 
   draw(:system)
   draw(:user)
+  draw(:application)
   draw(:admin)
 end

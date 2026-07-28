@@ -1,5 +1,15 @@
 @use '@/stylesheets/shared/tailwind';
-
 @use '@/stylesheets/shared/reset';
 @use '@/stylesheets/shared/base';
 @use '@/stylesheets/shared/pagy';
+@use 'bootstrap/scss/bootstrap';
+
+@use 'layout';
+@use 'shared';
+@use 'dashboard';
+@use 'repositories';
+@use 'reviews';
+@use 'settings';
+@use 'admin';
+
+@import 'bootstrap-icons/font/bootstrap-icons.css';

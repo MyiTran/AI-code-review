@@ -1,0 +1,37 @@
+.p-4.border-bottom
+  h2.card-title-custom Changed files
+
+  p.mb-0.mt-1.text-secondary.small
+    | Files analyzed as part of this pull request.
+
+- if @review[:changed_files].any?
+  .list-group.list-group-flush
+    - @review[:changed_files].each do |file|
+      .list-group-item.p-4
+        .d-flex.flex-column.flex-md-row.align-items-md-center.justify-content-between.gap-3
+          .d-flex.align-items-center.gap-3
+            span.changed-file-icon
+              i.bi.bi-file-earmark-code
+
+            div
+              p.mb-1.fw-semibold
+                = file[:path]
+
+              - if file[:findings_count].positive?
+                p.mb-0.text-danger.small
+                  i.bi.bi-exclamation-triangle.me-1
+                  | #{file[:findings_count]} findings
+              - else
+                p.mb-0.text-success.small
+                  i.bi.bi-check-circle.me-1
+                  | No findings
+
+          .d-flex.align-items-center.gap-3.small
+            span.text-success
+              | +#{file[:additions]}
+
+            span.text-danger
+              | -#{file[:deletions]}
+- else
+  .p-5.text-center.text-secondary
+    | File analysis is still in progress.

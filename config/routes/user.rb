@@ -9,8 +9,3 @@ devise_for(
     omniauth_callbacks: 'authentication/omniauth_callbacks'
   }
 )
-
-devise_scope :user do
-  get '/users/sign_up', to: 'authentication/registrations#new'
-  post '/users/sign_up', to: 'authentication/registrations#create'
-end

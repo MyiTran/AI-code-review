@@ -1,0 +1,54 @@
+section.dashboard-card.settings-section
+  .settings-section-header
+    .d-flex.align-items-center.gap-3
+      span.settings-section-icon
+        i.bi.bi-person
+
+      div
+        h2.card-title-custom Profile
+
+        p.mb-0.mt-1.text-secondary.small
+          | Update your personal account information.
+
+  .settings-section-body
+    .d-flex.flex-column.flex-md-row.align-items-md-center.gap-4.mb-4
+      span.settings-avatar
+        = @settings[:profile][:initials]
+
+      div
+        h3.settings-profile-name
+          = @settings[:profile][:name]
+
+        p.mb-2.text-secondary
+          | @#{@settings[:profile][:github_username]}
+
+        button.btn.btn-light.btn-sm type="button"
+          i.bi.bi-upload.me-2
+          | Change avatar
+
+    .row.g-4
+      .col-12.col-md-6
+        label.form-label.fw-semibold for="settings-name"
+          | Full name
+
+        input#settings-name.form-control type="text" value=@settings[:profile][:name]
+
+      .col-12.col-md-6
+        label.form-label.fw-semibold for="settings-email"
+          | Email address
+
+        input#settings-email.form-control type="email" value=@settings[:profile][:email]
+
+      .col-12.col-md-6
+        label.form-label.fw-semibold for="settings-github-username"
+          | GitHub username
+
+        input#settings-github-username.form-control type="text" value=@settings[:profile][:github_username] disabled=true
+
+        p.form-helper-text
+          | Managed by your connected GitHub account.
+
+    .settings-actions
+      button.btn.btn-primary.settings-save-button type="button"
+        i.bi.bi-check-lg.me-2
+        | Save profile

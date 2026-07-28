@@ -12,10 +12,13 @@
   "dependencies": {
     "@hotwired/stimulus": "^3.2.2",
     "@hotwired/turbo-rails": "^8.0.20",
+    "@popperjs/core": "^2.11.8",
     "@stimulus-components/notification": "^3.0.0",
     "@tailwindcss/postcss": "^4.1.17",
     "@tailwindcss/vite": "^4.1.17",
     "apexcharts": "^5.3.6",
+    "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.1",
     "choices.js": "^11.1.0",
     "flatpickr": "^4.6.13",
     "lodash": "^4.17.21",

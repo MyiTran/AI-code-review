@@ -2,7 +2,7 @@
 # rubocop:disable Rails/RenderInline
 
 module Admin
-  class ConsoleController < BaseController
+  class ConsoleController < ApplicationController
     def index
       console
       render inline: <<~HTML

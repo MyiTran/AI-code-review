@@ -1,7 +1,7 @@
 module Admin
-  class DashboardController < BaseController
+  class DashboardController < ApplicationController
     def index
-      @presenter = DashboardPresenter.new(year: Date.current.year)
+      @admin = Mock::AdminDashboard.data
     end
   end
 end
