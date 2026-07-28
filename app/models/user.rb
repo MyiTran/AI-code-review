@@ -50,7 +50,7 @@ class User < ApplicationRecord
     :confirmable,
     :trackable,
     :omniauthable,
-    omniauth_providers: [:github]
+    omniauth_providers: [:google_oauth2, :facebook, :github]
 
   # enums
   enumerize :provider, in: { email: 0, google_oauth2: 1, facebook: 2, github: 3 }, default: :email, scope: true
@@ -68,7 +68,11 @@ class User < ApplicationRecord
 
   # instance methods
   def display_name
-    github_username
+    full_name.presence || github_username
+  end
+
+  def initials
+    display_name.split.filter_map(&:first).join.upcase
   end
 
   def full_name

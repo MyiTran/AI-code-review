@@ -55,7 +55,8 @@ aside.app-sidebar
           p.mb-0.text-white.fw-semibold.small.text-truncate
             = current_user.display_name
 
-      = button_to destroy_user_session_path, method: :delete,
+      = button_to destroy_user_session_path,
+          method: :delete,
           class: 'sidebar-link border-0 bg-transparent w-100 text-start mt-3' do
         i.bi.bi-box-arrow-right
         span Sign out
