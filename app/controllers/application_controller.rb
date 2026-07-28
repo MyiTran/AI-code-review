@@ -13,10 +13,7 @@ class ApplicationController < ActionController::Base
   before_action :set_mock_current_user
 
   def self.only_turbo_stream_for(*actions)
-    if actions.blank?
-      raise ArgumentError,
-        'force_turbo_stream_for arguments must have least one item'
-    end
+    raise ArgumentError, 'force_turbo_stream_for arguments must have least one item' if actions.blank?
 
     before_action :ensure_turbo_frame_request, only: actions
   end
@@ -37,10 +34,7 @@ class ApplicationController < ActionController::Base
   end
 
   def not_authorized
-    redirect_back_or_to(
-      root_path,
-      alert: 'You are not authorized to perform this action.'
-    )
+    redirect_back_or_to(root_path, alert: 'You are not authorized to perform this action.')
   end
 
   def rescue_routing_error
