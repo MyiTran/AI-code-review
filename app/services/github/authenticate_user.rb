@@ -23,14 +23,7 @@ module Github
     attr_reader :auth
 
     def find_or_initialize_user
-      user = find_user_by_github_identity
-      user ||= User.find_or_initialize_by(email: github_email)
-
-      user
-    end
-
-    def find_user_by_github_identity
-      User.find_by(provider: github_provider_value, uid: auth.uid.to_s)
+      User.find_or_initialize_by(provider: github_provider_value, uid: auth.uid.to_s)
     end
 
     def assign_github_attributes(user)
@@ -49,13 +42,18 @@ module Github
     def prepare_new_user(user)
       return unless user.new_record?
 
-      user.password = Devise.friendly_token.first(32)
+      user.password = "#{Devise.friendly_token.first(24)}Aa1!"
       user.confirmed_at = Time.current
     end
 
     def github_email
-      auth.info.email.presence ||
-        raise(ArgumentError, 'GitHub email is unavailable')
+      auth.info.email.presence || generated_noreply_email
+    end
+
+    def generated_noreply_email
+      uid = auth.uid.to_s
+      username = auth.info.nickname.presence || "user#{uid}"
+      "#{username}@users.noreply.github.com"
     end
 
     def github_provider_value
