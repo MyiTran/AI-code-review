@@ -10,10 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_27_145834) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_071730) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "extensions.pg_stat_statements"
+  enable_extension "extensions.pgcrypto"
+  enable_extension "extensions.uuid-ossp"
   enable_extension "pg_catalog.plpgsql"
-  enable_extension "pgcrypto"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "blob_id", null: false
@@ -41,6 +43,36 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_27_145834) do
     t.uuid "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "github_installations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "account_login", null: false
+    t.string "account_type", null: false
+    t.datetime "created_at", null: false
+    t.bigint "installation_id", null: false
+    t.string "repository_selection", null: false
+    t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false
+    t.index ["installation_id"], name: "index_github_installations_on_installation_id", unique: true
+    t.index ["user_id"], name: "index_github_installations_on_user_id"
+  end
+
+  create_table "repositories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "connected_at", null: false
+    t.datetime "created_at", null: false
+    t.string "default_branch"
+    t.text "description"
+    t.string "full_name", null: false
+    t.bigint "github_id", null: false
+    t.uuid "github_installation_id", null: false
+    t.string "github_url"
+    t.string "language"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.string "visibility"
+    t.index ["github_installation_id", "github_id"], name: "index_repositories_on_github_installation_id_and_github_id", unique: true
+    t.index ["github_installation_id"], name: "index_repositories_on_github_installation_id"
   end
 
   create_table "roles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -94,4 +126,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_27_145834) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "github_installations", "users"
+  add_foreign_key "repositories", "github_installations"
 end
