@@ -60,6 +60,8 @@ class User < ApplicationRecord
 
   # associations
   has_one_attached :avatar
+  has_many :github_installations, dependent: :destroy
+  has_many :repositories, through: :github_installations
 
   # validations
   validates :password, password: true
