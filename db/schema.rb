@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_071730) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_31_100820) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "extensions.pg_stat_statements"
   enable_extension "extensions.pgcrypto"
@@ -59,10 +59,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_071730) do
   end
 
   create_table "repositories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.boolean "connected", default: true, null: false
     t.datetime "connected_at", null: false
     t.datetime "created_at", null: false
     t.string "default_branch"
     t.text "description"
+    t.datetime "disconnected_at"
     t.string "full_name", null: false
     t.bigint "github_id", null: false
     t.uuid "github_installation_id", null: false

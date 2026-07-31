@@ -5,7 +5,7 @@ module Authentication
 
       sign_in(user)
 
-      redirect_to(root_path, notice: 'Signed in successfully with GitHub.')
+      redirect_to(dashboard_path, notice: 'Signed in successfully with GitHub.')
     rescue ActiveRecord::RecordInvalid, ArgumentError, KeyError => e
       Rails.logger.error("GitHub authentication failed: #{e.class} - #{e.message}")
 

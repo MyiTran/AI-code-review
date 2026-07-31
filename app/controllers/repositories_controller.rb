@@ -1,6 +1,7 @@
 class RepositoriesController < ApplicationController
   def index
-    @repositories = current_user.repositories.order(created_at: :desc)
+    @repositories = current_user.repositories.order(created_at: :desc).search_by_keyword(params[:query]).by_language(params[:language]).by_connection_status(params[:connection_status])
+    @languages = Repository.available_languages(current_user.repositories)
   end
 
   def show

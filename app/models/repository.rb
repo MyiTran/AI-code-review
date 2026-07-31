@@ -3,9 +3,11 @@
 # Table name: repositories
 #
 #  id                     :uuid             not null, primary key
+#  connected              :boolean          default(TRUE), not null
 #  connected_at           :datetime         not null
 #  default_branch         :string
 #  description            :text
+#  disconnected_at        :datetime
 #  full_name              :string           not null
 #  github_url             :string
 #  language               :string
@@ -34,4 +36,36 @@ class Repository < ApplicationRecord
   validates :github_id, uniqueness: { scope: :github_installation_id }
 
   delegate :user, to: :github_installation
+
+  scope :search_by_keyword,
+    ->(query) {
+      where('name ILIKE :q OR full_name ILIKE :q', q: "%#{query}%") if query.present?
+    }
+
+  scope :by_language,
+    ->(language) {
+      where(language: language) if language.present?
+    }
+
+  scope :by_connection_status,
+    ->(status) {
+      if status.present?
+        case status
+        when 'connected' then where(connected: true)
+        when 'disconnected' then where(connected: false)
+        end
+      end
+    }
+
+  def connected?
+    connected
+  end
+
+  def disconnected?
+    !connected
+  end
+
+  def self.available_languages(repositories_scope)
+    repositories_scope.where.not(language: [nil, '']).distinct.order(:language).pluck(:language)
+  end
 end
