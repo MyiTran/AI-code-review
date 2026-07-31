@@ -1,11 +1,13 @@
 module GithubApp
   class SyncRepositories
     def self.call(installation)
-      repositories = GithubApp::ListRepositories.call(installation)
+      github_repositories = GithubApp::ListRepositories.call(installation)
 
-      repositories.each do |github_repository|
+      github_repositories.each do |github_repository|
         save_repository(installation, github_repository)
       end
+
+      mark_disconnected_repositories(installation, github_repositories)
     end
 
     def self.save_repository(installation, github_repository)
@@ -19,12 +21,24 @@ module GithubApp
         visibility: github_repository.visibility,
         default_branch: github_repository.default_branch,
         github_url: github_repository.html_url,
-        connected_at: repository.connected_at || Time.current
+        connected_at: repository.connected_at || Time.current,
+        connected: true,
+        disconnected_at: nil
       )
 
       repository.save!
     end
 
+    def self.mark_disconnected_repositories(installation, github_repositories)
+      connected_github_ids = github_repositories.map(&:id)
+
+      installation.repositories.where.not(github_id: connected_github_ids).update_all(
+        connected: false,
+        disconnected_at: Time.current
+      )
+    end
+
     private_class_method :save_repository
+    private_class_method :mark_disconnected_repositories
   end
 end

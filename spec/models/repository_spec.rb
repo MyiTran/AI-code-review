@@ -5,9 +5,11 @@ require 'rails_helper'
 # Table name: repositories
 #
 #  id                     :uuid             not null, primary key
+#  connected              :boolean          default(TRUE), not null
 #  connected_at           :datetime         not null
 #  default_branch         :string
 #  description            :text
+#  disconnected_at        :datetime
 #  full_name              :string           not null
 #  github_url             :string
 #  language               :string

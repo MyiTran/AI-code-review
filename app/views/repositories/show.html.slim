@@ -14,9 +14,14 @@
         h1.page-title.mb-0
           = @repository.name
 
-        span.badge.badge-soft-success.rounded-pill.px-3.py-2
-          i.bi.bi-link-45deg.me-1
-          | Connected
+        - if @repository.connected?
+          span.badge.badge-soft-success.rounded-pill.px-3.py-2
+            i.bi.bi-link-45deg.me-1
+            | Connected
+        - else
+          span.badge.bg-light.text-secondary.rounded-pill.px-3.py-2
+            i.bi.bi-link-45deg.me-1
+            | Disconnected
 
       p.page-description.mb-2
         = @repository.description.presence || 'No description'
@@ -35,9 +40,14 @@
       i.bi.bi-box-arrow-up-right.me-2
       | View on GitHub
 
-    button.btn.btn-outline-danger type="button" disabled=true
-      i.bi.bi-link-45deg.me-2
-      | Disconnect
+    - if @repository.connected?
+      = link_to GithubApp::ManageInstallationUrl.call(@repository.github_installation), class: 'btn btn-outline-danger', data: { turbo: false } do
+        i.bi.bi-link-45deg.me-2
+        | Disconnect
+    - else
+      = link_to GithubApp::ManageInstallationUrl.call(@repository.github_installation), class: 'btn btn-primary', data: { turbo: false } do
+        i.bi.bi-link-45deg.me-2
+        | Connect again
 
 .dashboard-card.p-4.mb-4
   h2.card-title-custom.mb-4 Repository information
