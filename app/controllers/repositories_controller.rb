@@ -8,7 +8,12 @@ class RepositoriesController < ApplicationController
     @repository = current_user.repositories.find(params.expect(:id))
   end
 
-  def connect
-    redirect_to GithubApp::InstallUrl.call, allow_other_host: true
+  def update
+    repository = current_user.repositories.find(params.expect(:id))
+    repository.update!(connected: false, disconnected_at: Time.current)
+
+    redirect_to repository_path(repository),
+      notice: 'Repository disconnected in AI Review. To fully revoke GitHub App access, disconnect the installation in GitHub settings.',
+      status: :see_other
   end
 end

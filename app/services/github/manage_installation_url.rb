@@ -1,4 +1,4 @@
-module GithubApp
+module Github
   class ManageInstallationUrl
     def self.call(installation)
       if installation.account_type == 'Organization'

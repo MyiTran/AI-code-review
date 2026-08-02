@@ -1,7 +1,7 @@
-module GithubApp
+module Github
   class SyncRepositories
     def self.call(installation)
-      github_repositories = GithubApp::ListRepositories.call(installation)
+      github_repositories = Github::ListRepositories.call(installation)
 
       github_repositories.each do |github_repository|
         save_repository(installation, github_repository)
@@ -32,7 +32,7 @@ module GithubApp
     def self.mark_disconnected_repositories(installation, github_repositories)
       connected_github_ids = github_repositories.map(&:id)
 
-      installation.repositories.where.not(github_id: connected_github_ids).update_all(
+      installation.repositories.where.not(github_id: connected_github_ids).update_all( # rubocop:disable Rails/SkipsModelValidations
         connected: false,
         disconnected_at: Time.current
       )
