@@ -1,4 +1,4 @@
-module GithubApp
+module Github
   class GenerateJwt
     def self.call
       new.call

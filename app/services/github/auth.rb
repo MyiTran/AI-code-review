@@ -1,5 +1,6 @@
+# GET github/repositories
 module Github
-  class AuthenticateUser
+  class Auth
     def self.call(auth)
       new(auth).call
     end

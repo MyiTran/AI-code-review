@@ -1,4 +1,4 @@
-module GithubApp
+module Github
   class SaveInstallation
     def self.call(user, installation)
       record = find_or_initialize_record(user, installation)

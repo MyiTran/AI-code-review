@@ -41,11 +41,15 @@
       | View on GitHub
 
     - if @repository.connected?
-      = link_to GithubApp::ManageInstallationUrl.call(@repository.github_installation), class: 'btn btn-outline-danger', data: { turbo: false } do
+      = button_to repository_path(@repository),
+          method: :patch,
+          params: { repository: { connected: false } },
+          class: 'btn btn-outline-danger',
+          form: { data: { turbo_confirm: 'Are you sure you want to disconnect this repository?' } } do
         i.bi.bi-link-45deg.me-2
         | Disconnect
     - else
-      = link_to GithubApp::ManageInstallationUrl.call(@repository.github_installation), class: 'btn btn-primary', data: { turbo: false } do
+      = button_to github_connection_path, method: :post, params: { repository_id: @repository.id }, class: 'btn btn-primary', form: { data: { turbo: false } } do
         i.bi.bi-link-45deg.me-2
         | Connect again
 

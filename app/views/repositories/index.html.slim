@@ -5,7 +5,7 @@
     p.page-description
       | Connect repositories and configure automatic AI code review.
 
-  = link_to connect_repositories_path,
+  = link_to Github::InstallUrl.call,
       class: 'btn btn-primary',
       data: { turbo: false } do
     i.bi.bi-plus-lg.me-2
@@ -157,9 +157,10 @@
       p.text-secondary.mb-4
         | Connect a GitHub repository to get started.
 
-      = link_to connect_repositories_path,
+      = link_to Github::InstallUrl.call,
           class: 'btn btn-primary',
           data: { turbo: false } do
         i.bi.bi-plus-lg.me-2
         | Connect repository
+
         
