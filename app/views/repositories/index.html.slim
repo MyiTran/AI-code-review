@@ -37,7 +37,7 @@
             class: 'form-label small fw-semibold'
 
         = form.select :connection_status,
-            options_for_select([['Connected', 'connected'],['Disconnected', 'disconnected']], params[:connection_status]),
+            options_for_select([['Connected', 'connected'], ['Disconnected', 'disconnected']], params[:connection_status]),
             { include_blank: 'All connections' },
             class: 'form-select'
 
@@ -162,5 +162,3 @@
           data: { turbo: false } do
         i.bi.bi-plus-lg.me-2
         | Connect repository
-
-        
