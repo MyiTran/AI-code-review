@@ -18,7 +18,11 @@ module Callback
       repository_id = session.delete(:github_return_repository_id)
       repository = current_user.repositories.find_by(id: repository_id)
 
-      repository ? repository_path(repository) : repositories_path
+      if repository
+        repository_path(repository)
+      else
+        repositories_path
+      end
     end
   end
 end

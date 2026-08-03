@@ -8,6 +8,8 @@ module Github
       end
 
       mark_disconnected_repositories(installation, github_repositories)
+
+      installation.repositories.reload
     end
 
     def self.save_repository(installation, github_repository)
@@ -21,7 +23,7 @@ module Github
         visibility: github_repository.visibility,
         default_branch: github_repository.default_branch,
         github_url: github_repository.html_url,
-        connected_at: repository.connected_at || Time.current,
+        connected_at: connected_at_for(repository),
         connected: true,
         disconnected_at: nil
       )
@@ -29,12 +31,22 @@ module Github
       repository.save!
     end
 
+    def self.connected_at_for(repository)
+      if repository.new_record? || !repository.connected?
+        Time.current
+      else
+        repository.connected_at
+      end
+    end
+
     def self.mark_disconnected_repositories(installation, github_repositories)
       connected_github_ids = github_repositories.map(&:id)
+      current_time = Time.current
 
-      installation.repositories.where.not(github_id: connected_github_ids).update_all( # rubocop:disable Rails/SkipsModelValidations
+      installation.repositories.where(connected: true).where.not(github_id: connected_github_ids).update_all( # rubocop:disable Rails/SkipsModelValidations
         connected: false,
-        disconnected_at: Time.current
+        disconnected_at: current_time,
+        updated_at: current_time
       )
     end
 
