@@ -31,5 +31,13 @@
 #
 FactoryBot.define do
   factory :pull_request do
+    repository
+    sequence(:github_id) { |n| 4_200_000_000 + n }
+    sequence(:number) { |n| n }
+    title { 'Test Pull Request' }
+    author { 'MyiTran' }
+    state { 'open' }
+    source_branch { 'feature/test' }
+    target_branch { 'main' }
   end
 end

@@ -18,5 +18,10 @@
 #
 FactoryBot.define do
   factory :github_webhook_delivery do
+    delivery_id { SecureRandom.uuid }
+    event_name { 'pull_request' }
+    action { 'opened' }
+    status { 'received' }
+    payload { { 'action' => 'opened', 'pull_request' => { 'number' => 1 } } }
   end
 end
