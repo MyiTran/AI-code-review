@@ -29,6 +29,7 @@
 #
 class Repository < ApplicationRecord
   belongs_to :github_installation
+  has_many :pull_requests, dependent: :destroy
 
   validates :github_id, presence: true
   validates :name, presence: true

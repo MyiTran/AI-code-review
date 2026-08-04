@@ -10,10 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_31_100820) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_04_032036) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "extensions.pg_stat_statements"
+  enable_extension "extensions.pgcrypto"
+  enable_extension "extensions.uuid-ossp"
   enable_extension "pg_catalog.plpgsql"
-  enable_extension "pgcrypto"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "blob_id", null: false
@@ -54,6 +56,39 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_31_100820) do
     t.uuid "user_id", null: false
     t.index ["installation_id"], name: "index_github_installations_on_installation_id", unique: true
     t.index ["user_id"], name: "index_github_installations_on_user_id"
+  end
+
+  create_table "github_webhook_deliveries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "action"
+    t.datetime "created_at", null: false
+    t.string "delivery_id", null: false
+    t.string "event_name", null: false
+    t.jsonb "payload", default: {}, null: false
+    t.datetime "processed_at"
+    t.string "status", default: "received", null: false
+    t.datetime "updated_at", null: false
+    t.index ["delivery_id"], name: "index_github_webhook_deliveries_on_delivery_id", unique: true
+  end
+
+  create_table "pull_requests", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "author"
+    t.datetime "closed_at"
+    t.datetime "created_at", null: false
+    t.bigint "github_id", null: false
+    t.string "github_url"
+    t.string "head_commit_sha"
+    t.datetime "merged_at"
+    t.integer "number", null: false
+    t.datetime "opened_at"
+    t.uuid "repository_id", null: false
+    t.string "source_branch"
+    t.string "state", null: false
+    t.string "target_branch"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["repository_id", "github_id"], name: "index_pull_requests_on_repository_id_and_github_id", unique: true
+    t.index ["repository_id", "number"], name: "index_pull_requests_on_repository_id_and_number", unique: true
+    t.index ["repository_id"], name: "index_pull_requests_on_repository_id"
   end
 
   create_table "repositories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -127,5 +162,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_31_100820) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "github_installations", "users"
+  add_foreign_key "pull_requests", "repositories"
   add_foreign_key "repositories", "github_installations"
 end
