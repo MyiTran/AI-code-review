@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   draw(:system)
   draw(:user)
   draw(:application)
+  draw(:webhook)
   draw(:github)
   draw(:admin)
 end
