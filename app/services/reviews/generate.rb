@@ -32,39 +32,27 @@ module Reviews
     end
 
     def self.build_prompt(pull_request, files)
-      formatted_files = files.map do |file|
-        patch = file[:patch].presence || 'Binary file or patch not available. Do not review or guess the file content. Only note the filename and change status.'
+      changes = files.map do |file|
+        patch = file[:patch].presence || 'Binary file or patch not available.'
 
         <<~FILE
           File: #{file[:filename]}
-          Status: #{file[:status]}
-          Additions: #{file[:additions]}
-          Deletions: #{file[:deletions]}
-          Patch:
           #{patch}
         FILE
       end.join("\n")
 
       <<~PROMPT
-        Review the code changes in this pull request.
+        Review this pull request and find bugs or incorrect logic.
+
+        Do not guess missing code.
+        Ignore binary files.
+
+        Return only the issues found.
 
         Pull request: #{pull_request.title}
-        Source branch: #{pull_request.source_branch}
-        Target branch: #{pull_request.target_branch}
-
-        Review rules:
-        - Check for bugs, security risks, incorrect logic and maintainability issues.
-        - Do not guess code that is not included in the patch.
-        - If a file is binary or its patch is unavailable, only mention its filename and change status.
-        - Do not report an issue based only on a binary file name.
-
-        Return:
-        1. Summary
-        2. Issues found
-        3. Suggested improvements
 
         Changes:
-        #{formatted_files}
+        #{changes}
       PROMPT
     end
 
