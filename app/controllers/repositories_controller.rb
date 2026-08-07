@@ -12,8 +12,29 @@ class RepositoriesController < ApplicationController
 
   def update
     repository = current_user.repositories.find(params.expect(:id))
-    repository.update!(connected: false, disconnected_at: Time.current)
+    attributes = repository_params
 
-    redirect_to repository_path(repository), notice: 'Repository disconnected in AI Review. To fully revoke GitHub App access, disconnect the installation in GitHub settings.'
+    if attributes.key?(:connected)
+      connected = ActiveModel::Type::Boolean.new.cast(attributes[:connected])
+      attributes[:disconnected_at] = connected ? nil : Time.current
+    end
+
+    repository.update!(attributes)
+
+    message =
+      if attributes.key?(:auto_review_enabled)
+        status = repository.auto_review_enabled? ? 'enabled' : 'disabled'
+        "Automatic AI review #{status} successfully."
+      else
+        'Repository disconnected successfully.'
+      end
+
+    redirect_to repository_path(repository), notice: message
+  end
+
+  private
+
+  def repository_params
+    params.expect(repository: [:connected, :auto_review_enabled])
   end
 end
