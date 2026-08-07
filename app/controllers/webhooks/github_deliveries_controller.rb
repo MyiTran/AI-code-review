@@ -21,7 +21,7 @@ module Webhooks
         payload: payload
       )
 
-      ProcessGithubWebhookJob.perform_later(delivery.id)
+      Github::ProcessWebhookJob.perform_later(delivery.id)
 
       head :accepted
     rescue JSON::ParserError

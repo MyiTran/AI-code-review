@@ -122,11 +122,24 @@
 
               td
                 .d-flex.align-items-center.gap-2
-                  .form-check.form-switch.mb-0
-                    input.form-check-input.ai-review-toggle type="checkbox" role="switch" disabled=true aria-label="Toggle AI review for #{repository.name}"
+                  = form_with model: repository,
+                      url: repository_path(repository),
+                      method: :patch,
+                      local: true do |form|
+                    .form-check.form-switch.mb-0
+                      = form.check_box :auto_review_enabled,
+                          class: 'form-check-input ai-review-toggle',
+                          role: 'switch',
+                          disabled: !repository.connected?,
+                          aria: { label: "Toggle AI review for #{repository.name}" },
+                          onchange: 'this.form.requestSubmit()'
 
-                  span.small.fw-semibold.text-secondary
-                    | Off
+                  - if repository.auto_review_enabled?
+                    span.small.fw-semibold.text-success
+                      | On
+                  - else
+                    span.small.fw-semibold.text-secondary
+                      | Off
 
               td
                 - if repository.connected?

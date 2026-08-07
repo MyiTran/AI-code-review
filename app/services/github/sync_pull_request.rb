@@ -1,8 +1,10 @@
 module Github
   class SyncPullRequest
+    ACTIONS = ['opened', 'synchronize', 'closed', 'reopened'].freeze
+
     def self.call(delivery)
       return unless delivery.event_name == 'pull_request'
-      return unless ['opened', 'synchronize', 'closed', 'reopened'].include?(delivery.action)
+      return unless ACTIONS.include?(delivery.action)
 
       payload = delivery.payload
       repository = Repository.find_by!(github_id: payload.dig('repository', 'id'))
@@ -23,6 +25,8 @@ module Github
         closed_at: github_pull_request['closed_at'],
         merged_at: github_pull_request['merged_at']
       )
+
+      pull_request
     end
   end
 end

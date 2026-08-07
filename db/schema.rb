@@ -10,10 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_04_032036) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_05_084330) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "extensions.pg_stat_statements"
+  enable_extension "extensions.pgcrypto"
+  enable_extension "extensions.uuid-ossp"
   enable_extension "pg_catalog.plpgsql"
-  enable_extension "pgcrypto"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "blob_id", null: false
@@ -41,6 +43,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_04_032036) do
     t.uuid "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "ai_models", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.boolean "is_default", default: false, null: false
+    t.boolean "is_premium", default: false, null: false
+    t.string "name", null: false
+    t.string "provider", null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_ai_models_on_slug", unique: true
   end
 
   create_table "github_installations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -90,6 +104,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_04_032036) do
   end
 
   create_table "repositories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "ai_model_id"
+    t.boolean "auto_review_enabled", default: false, null: false
     t.boolean "connected", default: true, null: false
     t.datetime "connected_at", null: false
     t.datetime "created_at", null: false
@@ -104,8 +120,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_04_032036) do
     t.string "name", null: false
     t.datetime "updated_at", null: false
     t.string "visibility"
+    t.index ["ai_model_id"], name: "index_repositories_on_ai_model_id"
     t.index ["github_installation_id", "github_id"], name: "index_repositories_on_github_installation_id_and_github_id", unique: true
     t.index ["github_installation_id"], name: "index_repositories_on_github_installation_id"
+  end
+
+  create_table "reviews", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "ai_model_id", null: false
+    t.string "commit_sha", null: false
+    t.datetime "created_at", null: false
+    t.text "error_message"
+    t.integer "issues_found_count", default: 0, null: false
+    t.integer "latency_ms"
+    t.uuid "pull_request_id", null: false
+    t.text "review_content"
+    t.datetime "reviewed_at"
+    t.string "status", default: "processing", null: false
+    t.text "summary"
+    t.integer "tokens_used"
+    t.datetime "updated_at", null: false
+    t.index ["ai_model_id"], name: "index_reviews_on_ai_model_id"
+    t.index ["pull_request_id", "commit_sha", "ai_model_id"], name: "idx_on_pull_request_id_commit_sha_ai_model_id_b6a69c7c0b", unique: true
+    t.index ["pull_request_id"], name: "index_reviews_on_pull_request_id"
   end
 
   create_table "roles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -161,5 +197,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_04_032036) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "github_installations", "users"
   add_foreign_key "pull_requests", "repositories"
+  add_foreign_key "repositories", "ai_models"
   add_foreign_key "repositories", "github_installations"
+  add_foreign_key "reviews", "ai_models"
+  add_foreign_key "reviews", "pull_requests"
 end
