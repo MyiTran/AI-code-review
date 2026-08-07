@@ -30,6 +30,6 @@ require 'rails_helper'
 #  fk_rails_...  (ai_model_id => ai_models.id)
 #  fk_rails_...  (pull_request_id => pull_requests.id)
 #
-RSpec.describe Review, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
-end
+# RSpec.describe Review, type: :model do
+#   pending "add some examples to (or delete) #{__FILE__}"
+# end

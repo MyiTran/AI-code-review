@@ -30,5 +30,7 @@
 #
 FactoryBot.define do
   factory :review do
+    status { 'completed' }
+    content { 'No errors found.' }
   end
 end
