@@ -38,8 +38,7 @@ class ApplicationController < ActionController::Base
   end
 
   def rescue_routing_error
-    redirect_to root_path,
-      alert: 'Resource not found'
+    redirect_to root_path, alert: 'Resource not found'
   end
 
   def ensure_turbo_frame_request
