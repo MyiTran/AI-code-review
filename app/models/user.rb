@@ -53,7 +53,7 @@ class User < ApplicationRecord
     omniauth_providers: [:github]
 
   # enums
-  enumerize :provider, in: { email: 0, github: 3 }, default: :email, scope: true
+  enumerize :provider, in: { email: 0, github: 1 }, default: :email, scope: true
 
   # encrypts
   encrypts :github_access_token
