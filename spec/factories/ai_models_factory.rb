@@ -18,5 +18,7 @@
 #
 FactoryBot.define do
   factory :ai_model do
+    name { 'Gemini Flash' }
+    is_default { true }
   end
 end
