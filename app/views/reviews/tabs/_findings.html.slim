@@ -1,84 +1,20 @@
-.d-flex.flex-column.flex-md-row.align-items-md-center.justify-content-between.gap-3.p-4.border-bottom
-  div
-    h2.card-title-custom Findings
+.p-4.border-bottom
+  h2.card-title-custom AI review
 
-    p.mb-0.mt-1.text-secondary.small
-      | Issues and suggestions detected during the review.
+  p.mb-0.mt-1.text-secondary.small
+    | Issues detected by AI for this review.
 
-  .d-flex.flex-wrap.gap-2
-    - if @review[:critical_count].positive?
-      span.badge.severity-critical
-        | #{@review[:critical_count]} critical
+.p-4
+  - if @review.review_content.present?
+    .ai-review-content
+      = markdown(@review.review_content)
 
-    - if @review[:warning_count].positive?
-      span.badge.severity-warning
-        | #{@review[:warning_count]} warnings
+  - elsif @review.status == 'failed'
+    .alert.alert-danger.mb-0
+      i.bi.bi-exclamation-triangle.me-2
+      = @review.error_message.presence || 'AI review failed.'
 
-    - if @review[:suggestion_count].positive?
-      span.badge.severity-suggestion
-        | #{@review[:suggestion_count]} suggestions
-
-- if @review[:findings].any?
-  .review-findings
-    - @review[:findings].each do |finding|
-      .review-finding-item
-        .d-flex.flex-column.flex-md-row.align-items-md-start.justify-content-between.gap-3.mb-3
-          .d-flex.align-items-start.gap-3
-            - if finding[:severity] == 'Critical'
-              span.finding-severity-icon.finding-severity-critical
-                i.bi.bi-exclamation-octagon
-            - elsif finding[:severity] == 'Warning'
-              span.finding-severity-icon.finding-severity-warning
-                i.bi.bi-exclamation-triangle
-            - else
-              span.finding-severity-icon.finding-severity-suggestion
-                i.bi.bi-lightbulb
-
-            div
-              .d-flex.flex-wrap.align-items-center.gap-2.mb-1
-                h3.finding-title.mb-0
-                  = finding[:title]
-
-                span.finding-category
-                  = finding[:category]
-
-              p.mb-0.text-secondary.small
-                i.bi.bi-file-earmark-code.me-1
-                = finding[:file_path]
-
-                - if finding[:line_number].present?
-                  | :#{finding[:line_number]}
-
-          - if finding[:severity] == 'Critical'
-            span.badge.severity-critical Critical
-          - elsif finding[:severity] == 'Warning'
-            span.badge.severity-warning Warning
-          - else
-            span.badge.severity-suggestion Suggestion
-
-        p.finding-description
-          = finding[:description]
-
-        - if finding[:code].present?
-          pre.finding-code
-            code
-              = finding[:code]
-
-        .finding-suggestion
-          .d-flex.align-items-start.gap-2
-            i.bi.bi-lightbulb.text-warning
-
-            div
-              p.mb-1.fw-semibold Suggested improvement
-
-              p.mb-0.text-secondary
-                = finding[:suggestion]
-- else
-  .text-center.p-5
-    span.empty-state-icon.empty-state-success.mb-3
-      i.bi.bi-check-lg
-
-    h3.fs-5 No issues found
-
-    p.text-secondary.mb-0
-      | The AI review did not detect any significant issues in this pull request.
+  - else
+    .text-center.text-secondary.py-4
+      i.bi.bi-hourglass-split.fs-3.d-block.mb-2
+      | AI review is processing.

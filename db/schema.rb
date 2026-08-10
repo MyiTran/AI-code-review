@@ -10,10 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_05_084330) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_10_030433) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "extensions.pg_stat_statements"
+  enable_extension "extensions.pgcrypto"
+  enable_extension "extensions.uuid-ossp"
   enable_extension "pg_catalog.plpgsql"
-  enable_extension "pgcrypto"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "blob_id", null: false
@@ -125,9 +127,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_05_084330) do
 
   create_table "reviews", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "ai_model_id", null: false
+    t.string "base_commit_sha"
+    t.datetime "commented_at"
     t.string "commit_sha", null: false
     t.datetime "created_at", null: false
     t.text "error_message"
+    t.bigint "github_comment_id"
     t.integer "issues_found_count", default: 0, null: false
     t.integer "latency_ms"
     t.uuid "pull_request_id", null: false

@@ -3,6 +3,8 @@
 # Table name: reviews
 #
 #  id                 :uuid             not null, primary key
+#  base_commit_sha    :string
+#  commented_at       :datetime
 #  commit_sha         :string           not null
 #  error_message      :text
 #  issues_found_count :integer          default(0), not null
@@ -15,6 +17,7 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  ai_model_id        :uuid             not null
+#  github_comment_id  :bigint
 #  pull_request_id    :uuid             not null
 #
 # Indexes
@@ -34,4 +37,24 @@ class Review < ApplicationRecord
 
   validates :commit_sha, presence: true
   validates :status, presence: true
+
+  scope :by_user, ->(user) { joins(pull_request: { repository: :github_installation }).where(github_installations: { user_id: user.id }) }
+  scope :by_repository, ->(repo_id) { where(pull_requests: { repository_id: repo_id }) if repo_id.present? }
+  scope :by_status, ->(status) { where(status: status) if status.present? }
+  scope :by_ai_model, ->(model_id) { where(ai_model_id: model_id) if model_id.present? }
+  scope :search_by_query,
+    ->(query_string) {
+      return all if query_string.blank?
+
+      query = "%#{query_string.strip}%"
+      where('pull_requests.title ILIKE :query OR repositories.name ILIKE :query OR CAST(pull_requests.number AS TEXT) ILIKE :query', query: query)
+    }
+
+  def previous_review
+    pull_request.reviews
+      .where(ai_model: ai_model)
+      .where(created_at: ...created_at)
+      .order(created_at: :desc)
+      .first
+  end
 end

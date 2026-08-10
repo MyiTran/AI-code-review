@@ -5,6 +5,8 @@ require 'rails_helper'
 # Table name: reviews
 #
 #  id                 :uuid             not null, primary key
+#  base_commit_sha    :string
+#  commented_at       :datetime
 #  commit_sha         :string           not null
 #  error_message      :text
 #  issues_found_count :integer          default(0), not null
@@ -17,6 +19,7 @@ require 'rails_helper'
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  ai_model_id        :uuid             not null
+#  github_comment_id  :bigint
 #  pull_request_id    :uuid             not null
 #
 # Indexes

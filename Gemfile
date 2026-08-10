@@ -60,6 +60,7 @@ gem 'ransack'
 # Others
 gem 'enumerize'
 gem 'web-console'
+gem 'commonmarker'
 
 # github
 gem 'omniauth-github'

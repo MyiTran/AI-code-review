@@ -2,11 +2,11 @@
   h2.card-title-custom Changed files
 
   p.mb-0.mt-1.text-secondary.small
-    | Files analyzed as part of this pull request.
+    | Files analyzed by AI for this review.
 
-- if @review[:changed_files].any?
+- if @changed_files.any?
   .list-group.list-group-flush
-    - @review[:changed_files].each do |file|
+    - @changed_files.each do |file|
       .list-group-item.p-4
         .d-flex.flex-column.flex-md-row.align-items-md-center.justify-content-between.gap-3
           .d-flex.align-items-center.gap-3
@@ -15,16 +15,10 @@
 
             div
               p.mb-1.fw-semibold
-                = file[:path]
+                = file[:filename]
 
-              - if file[:findings_count].positive?
-                p.mb-0.text-danger.small
-                  i.bi.bi-exclamation-triangle.me-1
-                  | #{file[:findings_count]} findings
-              - else
-                p.mb-0.text-success.small
-                  i.bi.bi-check-circle.me-1
-                  | No findings
+              p.mb-0.text-secondary.small
+                = file[:status].to_s.capitalize
 
           .d-flex.align-items-center.gap-3.small
             span.text-success
@@ -34,4 +28,5 @@
               | -#{file[:deletions]}
 - else
   .p-5.text-center.text-secondary
-    | File analysis is still in progress.
+    i.bi.bi-file-earmark.fs-3.d-block.mb-2
+    | No changed files found for this review.
