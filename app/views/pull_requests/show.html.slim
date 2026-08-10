@@ -1,3 +1,4 @@
+= turbo_stream_from @pull_request
 .mb-4
   = link_to repository_path(params[:repository_id] || @pull_request.repository_id), class: 'text-decoration-none text-secondary small' do
     i.bi.bi-arrow-left.me-2
@@ -53,8 +54,8 @@
             th Commit
             th AI model
             th Status
-            th Reviewed
-            th
+            th Reviewed at
+            th.text-end style='width: 80px'
 
         tbody
           - @reviews.each do |review|
@@ -83,14 +84,14 @@
                     i.bi.bi-arrow-repeat.me-1
                     | Processing
 
-              td.text-secondary.small
+              td.text-secondary.small.py-2
                 - if review.reviewed_at.present?
                   = l(review.reviewed_at, format: :short)
                 - else
                   | -
 
-              td.text-end
-                = link_to review_path(review, repository_id: @pull_request.repository_id, pull_request_id: @pull_request.id), class: 'btn.btn-sm.btn-light' do
+              td.text-end.py-2.pe-2
+                = link_to review_path(review, repository_id: @pull_request.repository_id, pull_request_id: @pull_request.id), class: 'btn btn-sm btn-light px-2 py-1 text-nowrap' do
                   | View
 
   - else
