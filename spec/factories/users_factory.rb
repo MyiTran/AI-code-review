@@ -3,6 +3,7 @@
 # Table name: users
 #
 #  id                     :uuid             not null, primary key
+#  avatar_url             :string
 #  confirmation_sent_at   :datetime
 #  confirmation_token     :string
 #  confirmed_at           :datetime
@@ -11,6 +12,8 @@
 #  email                  :string           default(""), not null
 #  encrypted_password     :string           default(""), not null
 #  first_name             :string
+#  github_access_token    :text
+#  github_username        :string
 #  last_name              :string
 #  last_sign_in_at        :datetime
 #  last_sign_in_ip        :string
@@ -28,6 +31,8 @@
 #
 #  index_users_on_confirmation_token    (confirmation_token) UNIQUE
 #  index_users_on_email                 (email) UNIQUE
+#  index_users_on_github_username       (github_username)
+#  index_users_on_provider_and_uid      (provider,uid) UNIQUE WHERE ((provider IS NOT NULL) AND (uid IS NOT NULL))
 #  index_users_on_reset_password_token  (reset_password_token) UNIQUE
 #
 FactoryBot.define do

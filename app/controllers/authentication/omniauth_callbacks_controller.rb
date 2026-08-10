@@ -1,50 +1,25 @@
 module Authentication
   class OmniauthCallbacksController < Devise::OmniauthCallbacksController
-    before_action :set_user
+    def github
+      user = Github::AuthenticateUser.call(omniauth_auth)
 
-    def google_oauth2
-      oauth_callback('google')
+      sign_in(user)
+
+      redirect_to(dashboard_path, notice: 'Signed in successfully with GitHub.')
+    rescue ActiveRecord::RecordInvalid, ArgumentError, KeyError => e
+      Rails.logger.error("GitHub authentication failed: #{e.class} - #{e.message}")
+
+      redirect_to(new_user_session_path, alert: 'Could not sign in with GitHub.')
     end
 
-    def facebook
-      oauth_callback('facebook')
+    def failure
+      redirect_to(new_user_session_path, alert: 'GitHub authentication failed or was cancelled.')
     end
 
     private
 
-    def auth
-      @auth ||= request.env['omniauth.auth']
-    end
-
-    def set_user
-      @user ||= User.find_by(uid: auth.uid, provider: auth.provider) || User.find_by(email: auth.info.email)
-    end
-
-    def oauth_callback(provider)
-      unless auth
-        flash[:alert] = t('devise.omniauth_callbacks.failure', kind: provider.capitalize, reason: 'Authentication data is missing')
-        return redirect_to root_path
-      end
-
-      user = @user || find_or_create_user
-
-      if user&.persisted?
-        flash[:notice] = t('devise.omniauth_callbacks.success', kind: provider.capitalize)
-        sign_in_and_redirect user, event: :authentication
-      else
-        flash[:alert] = t('devise.omniauth_callbacks.failure', kind: provider.capitalize, reason: 'User does not belong to the organization')
-        redirect_to root_path
-      end
-    end
-
-    def find_or_create_user
-      User.create(
-        uid: auth.uid,
-        provider: auth.provider,
-        email: auth.info.email.presence || "#{auth.provider}_#{Devise.friendly_token[8, 11]}@gmail.com",
-        password: "#{Devise.friendly_token[0, 20]}A@1a",
-        confirmed_at: Time.current
-      )
+    def omniauth_auth
+      request.env.fetch('omniauth.auth')
     end
   end
 end

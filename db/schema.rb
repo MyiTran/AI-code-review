@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2024_10_04_100359) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_27_145834) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -54,6 +54,7 @@ ActiveRecord::Schema[8.1].define(version: 2024_10_04_100359) do
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "avatar_url"
     t.datetime "confirmation_sent_at"
     t.string "confirmation_token"
     t.datetime "confirmed_at"
@@ -63,6 +64,8 @@ ActiveRecord::Schema[8.1].define(version: 2024_10_04_100359) do
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "first_name"
+    t.text "github_access_token"
+    t.string "github_username"
     t.string "last_name"
     t.datetime "last_sign_in_at"
     t.string "last_sign_in_ip"
@@ -76,6 +79,8 @@ ActiveRecord::Schema[8.1].define(version: 2024_10_04_100359) do
     t.datetime "updated_at", null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["github_username"], name: "index_users_on_github_username"
+    t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true, where: "((provider IS NOT NULL) AND (uid IS NOT NULL))"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
