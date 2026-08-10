@@ -2,21 +2,18 @@ module Github
   class ProcessWebhookJob
     include Sidekiq::Job
 
-    sidekiq_options queue: :default
-
     REVIEW_ACTIONS = ['opened', 'synchronize'].freeze
+
+    sidekiq_options queue: :default, retry: 3
 
     def perform(delivery_id)
       delivery = GithubWebhookDelivery.find(delivery_id)
       delivery.processing!
 
-<<<<<<< HEAD
       pull_request = Github::SyncPullRequestService.call(delivery)
-      Reviews::GenerateService.call(pull_request) if review_required?(delivery, pull_request)
-=======
-      pull_request = Github::SyncPullRequestService.call(delivery)
-      enqueue_review(pull_request, delivery) if review_required?(delivery, pull_request)
->>>>>>> 6056129 (feat: add comment review by AI on pull request)
+      Realtime::BroadcastPullRequestService.call(pull_request) if pull_request.present?
+
+      enqueue_review(pull_request) if review_required?(delivery, pull_request)
 
       delivery.processed!
     rescue StandardError => e
@@ -27,25 +24,21 @@ module Github
 
     private
 
-    def enqueue_review(pull_request, delivery)
+    def enqueue_review(pull_request)
       ai_model = pull_request.repository.ai_model || AiModel.find_by!(is_default: true, active: true)
-      review = find_or_create_review(pull_request, ai_model, delivery)
+      review = find_or_create_review(pull_request, ai_model)
 
-      Reviews::GenerateJob.perform_later(review.id)
+      Realtime::BroadcastReviewService.call(review)
+      Reviews::GenerateJob.perform_async(review.id)
     end
 
-    def find_or_create_review(pull_request, ai_model, delivery)
-      review = pull_request.reviews.find_or_initialize_by(
-        commit_sha: pull_request.head_commit_sha,
-        ai_model: ai_model
-      )
+    def find_or_create_review(pull_request, ai_model)
+      review = pull_request.reviews.find_or_initialize_by(commit_sha: pull_request.head_commit_sha, ai_model: ai_model)
+      return review if review.persisted?
 
-      if review.new_record?
-        review.base_commit_sha = previous_commit_sha(pull_request) || delivery.payload.dig('pull_request', 'base', 'sha')
-        review.status = 'processing'
-        review.save!
-      end
-
+      review.base_commit_sha = previous_commit_sha(pull_request)
+      review.status = 'processing'
+      review.save!
       review
     end
 

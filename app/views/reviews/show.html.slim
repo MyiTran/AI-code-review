@@ -1,6 +1,7 @@
 - pull_request = @review.pull_request
 - repository = pull_request.repository
 
+= turbo_stream_from @review
 .mb-4
   - if params[:pull_request_id].present?
     - back_path = pull_request_path(params[:pull_request_id], repository_id: params[:repository_id])

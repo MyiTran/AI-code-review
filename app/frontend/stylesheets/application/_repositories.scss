@@ -116,12 +116,12 @@
 
 .repository-information-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(130px, 1fr));
+  grid-template-columns: 1fr 1fr 1fr 1.35fr 1.35fr;
   width: 100%;
-  max-width: 900px;
 }
 
 .repository-information-item {
+  min-width: 0;
   padding: 4px 24px;
   border-left: 1px solid #e5e7eb;
 }
@@ -179,24 +179,22 @@
   min-width: 44px;
   border-radius: 0 8px 8px 0;
 }
-
 @media (max-width: 1199.98px) {
-  .repository-information-grid {
-    grid-template-columns: repeat(3, minmax(140px, 1fr));
-    gap: 20px 0;
-  }
-}
-
+        .repository-information-grid {
+            grid-template-columns: repeat(3, minmax(140px, 1fr));
+            gap: 20px 0;
+        }
+        }
 @media (max-width: 767.98px) {
-  .repository-information-grid {
-    grid-template-columns: 1fr 1fr;
-  }
+        .repository-information-grid {
+            grid-template-columns: 1fr 1fr;
+        }
 
-  .repository-information-item {
-    padding: 4px 16px;
-  }
+        .repository-information-item {
+            padding: 4px 16px;
+        }
 
-  .repository-review-search-form {
-    width: 100%;
-  }
-}
+        .repository-review-search-form {
+            width: 100%;
+        }
+    }

@@ -1,30 +1,15 @@
 module Reviews
-<<<<<<< HEAD:app/services/reviews/generate_service.rb
   class GenerateService < ApplicationService
-    def initialize(pull_request)
-      @pull_request = pull_request
+    def initialize(review)
+      @review = review
     end
 
     def call
-      ai_model = pull_request.repository.ai_model || AiModel.find_by!(is_default: true, active: true)
-      review = find_or_initialize_review(ai_model)
-
-      return review if review.persisted? && review.status == 'completed'
-
       started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      files = Github::FetchPullRequestDiffService.call(pull_request)
-      result = Ai::Providers::GeminiService.call(model: ai_model.slug, prompt: build_prompt(files))
-=======
-  class Generate
-    def self.call(review)
-      pull_request = review.pull_request
-      started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-
-      files = Github::FetchPullRequestDiff.call(pull_request, base_sha: review.base_commit_sha, head_sha: review.commit_sha)
-      result = Ai::Providers::Gemini.call(model: review.ai_model.slug, prompt: build_prompt(pull_request, files))
+      files = Github::FetchPullRequestDiffService.call(pull_request, base_sha: review.base_commit_sha, head_sha: review.commit_sha)
+      result = Ai::Providers::GeminiService.call(model: review.ai_model.slug, prompt: build_prompt(files))
 
       summary, review_content = parse_response(result[:content])
->>>>>>> 6056129 (feat: add comment review by AI on pull request):app/services/reviews/generate.rb
 
       review.update!(
         status: 'completed',
@@ -38,20 +23,14 @@ module Reviews
       )
 
       review
-<<<<<<< HEAD:app/services/reviews/generate_service.rb
-    rescue StandardError => e
-      review&.update!(status: 'failed', error_message: e.message)
-      raise
     end
 
     private
 
-    attr_reader :pull_request
+    attr_reader :review
 
-    def find_or_initialize_review(ai_model)
-      pull_request.reviews.find_or_initialize_by(commit_sha: pull_request.head_commit_sha, ai_model: ai_model)
-=======
->>>>>>> 6056129 (feat: add comment review by AI on pull request):app/services/reviews/generate.rb
+    def pull_request
+      @pull_request ||= review.pull_request
     end
 
     def build_prompt(files)
@@ -107,27 +86,19 @@ module Reviews
       PROMPT
     end
 
-<<<<<<< HEAD:app/services/reviews/generate_service.rb
-    def elapsed_milliseconds(started_at)
-      ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000).round
-    end
-=======
-    def self.parse_response(content)
+    def parse_response(content)
       summary = content[/## Summary\s*(.*?)(?=## Review|\z)/m, 1]&.strip
       review_content = content[/## Review\s*(.*)\z/m, 1]&.strip
 
       [summary.presence || 'Review completed.', review_content.presence || content]
     end
 
-    def self.count_issues(content)
+    def count_issues(content)
       content.scan(/^### Issue/).count
     end
 
-    def self.elapsed_milliseconds(started_at)
+    def elapsed_milliseconds(started_at)
       ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000).round
     end
-
-    private_class_method :build_prompt, :parse_response, :count_issues, :elapsed_milliseconds
->>>>>>> 6056129 (feat: add comment review by AI on pull request):app/services/reviews/generate.rb
   end
 end

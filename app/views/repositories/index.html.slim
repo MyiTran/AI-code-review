@@ -5,13 +5,9 @@
     p.page-description
       | Connect repositories and configure automatic AI code review.
 
-<<<<<<< HEAD
   = link_to github_app_installation_url,
       class: 'btn btn-primary',
       data: { turbo: false } do
-=======
-  = link_to Github::InstallUrl.call, class: 'btn btn-primary', data: { turbo: false } do
->>>>>>> 6056129 (feat: add comment review by AI on pull request)
     i.bi.bi-plus-lg.me-2
     | Connect repository
 
@@ -33,29 +29,11 @@
 
       .col-6.col-md-4.col-xl-2
         = form.label :language, 'Language', class: 'form-label small fw-semibold'
-<<<<<<< HEAD
-
-        = form.select :language,
-            options_for_select(@languages, params[:language]),
-            { include_blank: 'All languages' },
-            class: 'form-select'
-
-      .col-6.col-md-4.col-xl-2
-        = form.label :ai_model,
-            'AI model',
-            class: 'form-label small fw-semibold'
-
-        = form.select :ai_model,
-            options_for_select(@models, params[:ai_model]),
-            { include_blank: 'All models' },
-            class: 'form-select'
-=======
         = form.select :language, options_for_select(Array(@languages), params[:language]), { include_blank: 'All languages' }, class: 'form-select'
 
       .col-6.col-md-4.col-xl-2
         = form.label :ai_model, 'AI model', class: 'form-label small fw-semibold'
         = form.select :ai_model, options_for_select([], params[:ai_model]), { include_blank: 'All models' }, class: 'form-select', disabled: true
->>>>>>> 6056129 (feat: add comment review by AI on pull request)
 
       .col-6.col-md-4.col-xl-2
         .d-flex.gap-2
@@ -158,13 +136,9 @@
       p.text-secondary.mb-4
         | Connect a GitHub repository to get started.
 
-<<<<<<< HEAD
       = link_to github_app_installation_url,
           class: 'btn btn-primary',
           data: { turbo: false } do
-=======
-      = link_to Github::InstallUrl.call, class: 'btn btn-primary', data: { turbo: false } do
->>>>>>> 6056129 (feat: add comment review by AI on pull request)
         i.bi.bi-plus-lg.me-2
         | Connect repository
         

@@ -17,7 +17,7 @@ class ReviewsController < ApplicationController
       .includes(:ai_model, pull_request: :repository)
       .find(params.expect(:id))
 
-    @changed_files = Github::FetchPullRequestDiff.call(
+    @changed_files = Github::FetchPullRequestDiffService.call(
       @review.pull_request,
       base_sha: @review.base_commit_sha,
       head_sha: @review.commit_sha
