@@ -1,13 +1,16 @@
 class RepositoriesController < ApplicationController
   helper GithubHelper
   def index
-    @repositories = current_user.repositories.order(created_at: :desc).by_keyword(params[:query]).by_language(params[:language]).by_connection_status(params[:connection_status])
+    @repositories = current_user.repositories.includes(:ai_model).order(created_at: :desc).search_by_keyword(params[:query]).by_language(params[:language]).by_connection_status(params[:connection_status])
     @languages = Repository.available_languages(current_user.repositories)
-    @models = []
+    @default_ai_model = AiModel.find_by(is_default: true, active: true)
   end
 
   def show
     @repository = current_user.repositories.find(params.expect(:id))
+    @ai_models = AiModel.where(active: true).order(:name)
+    @pull_requests = @repository.pull_requests.includes(:reviews).order(updated_at: :desc)
+    @reviews = Review.joins(:pull_request).where(pull_requests: { repository_id: @repository.id }).includes(:ai_model, :pull_request).order(created_at: :desc)
   end
 
   def update
@@ -21,22 +24,25 @@ class RepositoriesController < ApplicationController
 
     repository.update!(attributes)
 
-    message =
-      if attributes.key?(:auto_review_enabled)
-        status = repository.auto_review_enabled? ? 'enabled' : 'disabled'
-        "Automatic AI review #{status} successfully."
-      else
-        'Repository disconnected successfully.'
-      end
-
-    redirect_to repository_path(repository), notice: message
-  rescue ActiveRecord::RecordInvalid
-    redirect_to repository_path(repository), alert: 'Repository could not be updated.'
+    redirect_to request.referer.presence || repository_path(repository), notice: update_message(repository, attributes), status: :see_other
   end
 
   private
 
   def repository_params
-    params.expect(repository: [:connected, :auto_review_enabled])
+    params.expect(repository: [:connected, :auto_review_enabled, :ai_model_id])
+  end
+
+  def update_message(repository, attributes)
+    return auto_review_message(repository) if attributes.key?(:auto_review_enabled)
+    return 'AI model updated successfully.' if attributes.key?(:ai_model_id)
+
+    'Repository disconnected successfully.'
+  end
+
+  def auto_review_message(repository)
+    return 'Automatic AI review enabled successfully.' if repository.auto_review_enabled?
+
+    'Automatic AI review disabled successfully.'
   end
 end

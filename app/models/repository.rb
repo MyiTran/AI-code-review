@@ -62,6 +62,13 @@ class Repository < ApplicationRecord
     !connected
   end
 
+  def latest_review
+    Review.joins(:pull_request)
+      .where(pull_requests: { repository_id: id })
+      .order(reviewed_at: :desc)
+      .first
+  end
+
   def self.available_languages(repositories_scope)
     repositories_scope.where.not(language: [nil, '']).distinct.order(:language).pluck(:language)
   end

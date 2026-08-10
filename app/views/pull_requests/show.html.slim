@@ -1,0 +1,104 @@
+.mb-4
+  = link_to repository_path(params[:repository_id] || @pull_request.repository_id), class: 'text-decoration-none text-secondary small' do
+    i.bi.bi-arrow-left.me-2
+    | Back to repository
+
+.d-flex.flex-column.flex-lg-row.align-items-lg-start.justify-content-between.gap-3.mb-4
+  div
+    .d-flex.flex-wrap.align-items-center.gap-2.mb-2
+      h1.page-title.mb-0
+        | ##{@pull_request.number} #{@pull_request.title}
+
+      - if @pull_request.merged_at.present?
+        span.badge.bg-light.text-secondary.rounded-pill.px-3.py-2
+          | Merged
+      - else
+        span.badge.badge-soft-success.rounded-pill.px-3.py-2
+          = @pull_request.state.capitalize
+
+    .d-flex.flex-wrap.align-items-center.gap-3.text-secondary.small
+      span
+        i.bi.bi-github.me-1
+        = @pull_request.repository.full_name
+
+      span
+        i.bi.bi-git.me-1
+        = @pull_request.source_branch
+
+      i.bi.bi-arrow-right
+
+      span
+        = @pull_request.target_branch
+
+      span
+        i.bi.bi-person.me-1
+        = @pull_request.author.presence || 'Unknown'
+
+  a.btn.btn-light href=@pull_request.github_url target="_blank" rel="noopener"
+    i.bi.bi-box-arrow-up-right.me-2
+    | View on GitHub
+
+.dashboard-card
+  .p-4.border-bottom
+    h2.card-title-custom AI review history
+
+    p.mb-0.mt-1.text-secondary.small
+      | #{@reviews.count} AI reviews created for this pull request.
+
+  - if @reviews.any?
+    .table-responsive
+      table.table.mb-0
+        thead
+          tr
+            th Commit
+            th AI model
+            th Status
+            th Reviewed
+            th
+
+        tbody
+          - @reviews.each do |review|
+            tr
+              td
+                code
+                  = review.commit_sha.first(8)
+
+              td
+                span.ai-model-badge
+                  i.bi.bi-stars
+                  = review.ai_model.name
+
+              td
+                - case review.status
+                - when 'completed'
+                  span.badge.badge-soft-success.rounded-pill.px-3.py-2
+                    i.bi.bi-check-circle.me-1
+                    | Completed
+                - when 'failed'
+                  span.badge.badge-soft-danger.rounded-pill.px-3.py-2
+                    i.bi.bi-x-circle.me-1
+                    | Failed
+                - else
+                  span.badge.badge-soft-warning.rounded-pill.px-3.py-2
+                    i.bi.bi-arrow-repeat.me-1
+                    | Processing
+
+              td.text-secondary.small
+                - if review.reviewed_at.present?
+                  = l(review.reviewed_at, format: :short)
+                - else
+                  | -
+
+              td.text-end
+                = link_to review_path(review, repository_id: @pull_request.repository_id, pull_request_id: @pull_request.id), class: 'btn.btn-sm.btn-light' do
+                  | View
+
+  - else
+    .text-center.p-5
+      span.empty-state-icon.mb-3
+        i.bi.bi-stars
+
+      h3.fs-5 No AI reviews
+
+      p.text-secondary.mb-0
+        | This pull request has not been reviewed by AI yet.
