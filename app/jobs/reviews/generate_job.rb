@@ -7,9 +7,12 @@ module Reviews
     def perform(review_id)
       review = Review.find(review_id)
       review.update!(status: 'processing', error_message: nil)
+      Realtime::BroadcastReviewService.call(review)
 
       Reviews::GenerateService.call(review)
       Github::CreatePullRequestCommentService.call(review)
+
+      Realtime::BroadcastReviewService.call(review.reload)
     end
 
     sidekiq_retries_exhausted do |job, error|
