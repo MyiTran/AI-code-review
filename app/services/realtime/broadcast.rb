@@ -1,6 +1,10 @@
 module Realtime
   class Broadcast
     def self.pull_request(pull_request)
+      repository = pull_request.repository
+      user = repository.github_installation.user
+
+      Turbo::StreamsChannel.broadcast_refresh_to(user, :dashboard)
       Turbo::StreamsChannel.broadcast_refresh_to(pull_request.repository)
       Turbo::StreamsChannel.broadcast_refresh_to(pull_request)
     end
@@ -10,6 +14,7 @@ module Realtime
       repository = pull_request.repository
       user = repository.github_installation.user
 
+      Turbo::StreamsChannel.broadcast_refresh_to(user, :dashboard)
       Turbo::StreamsChannel.broadcast_refresh_to(user, :reviews)
       Turbo::StreamsChannel.broadcast_refresh_to(repository)
       Turbo::StreamsChannel.broadcast_refresh_to(pull_request)
