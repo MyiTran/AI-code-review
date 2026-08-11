@@ -1,4 +1,5 @@
 = turbo_stream_from current_user, :dashboard
+
 .d-flex.flex-column.flex-md-row.align-items-md-center.justify-content-between.gap-3.mb-4
   div
     h1.page-title Dashboard
@@ -15,47 +16,51 @@
       .stat-value.mb-2
         = @repository_count
 
-      .stat-label Repositories
+      .stat-label.mb-2
+        | Repositories
 
   .col-12.col-sm-6.col-xl-3
     .dashboard-card.p-4
       .stat-icon.stat-icon-primary.mb-4
-        i.bi.bi-git
+        i.bi.bi-github
 
       .stat-value.mb-2
         = @pull_request_count
 
-      .stat-label Pull Requests
+      .stat-label.mb-2
+        | Pull Requests
 
   .col-12.col-sm-6.col-xl-3
     .dashboard-card.p-4
-      .stat-icon.stat-icon-success.mb-4
-        i.bi.bi-stars
+      .stat-icon.stat-icon-primary.mb-4
+        i.bi.bi-github
 
       .stat-value.mb-2
         = @review_count
 
-      .stat-label AI Reviews
+      .stat-label.mb-2
+        | AI Reviews
 
   .col-12.col-sm-6.col-xl-3
     .dashboard-card.p-4
-      .stat-icon.stat-icon-danger.mb-4
-        i.bi.bi-bug
+      .stat-icon.stat-icon-primary.mb-4
+        i.bi.bi-github
 
       .stat-value.mb-2
         = @issues_found_count
 
-      .stat-label Issues Found
+      .stat-label.mb-2
+        | Issues Found
 
 .row.g-4.mb-4
-  .col-12
+  .col-12.col-xl-8
     .dashboard-card
       .d-flex.align-items-center.justify-content-between.p-4.border-bottom
         div
           h2.card-title-custom Recent repositories
 
           p.mb-0.mt-1.text-secondary.small
-            | Recently updated repositories
+            | Repositories connected to AI Review
 
         = link_to 'View all', repositories_path, class: 'btn btn-sm btn-light'
 
@@ -67,9 +72,8 @@
                 th Repository
                 th Language
                 th AI model
-                th Connection
+                th Status
                 th Last activity
-                th
 
             tbody
               - @repositories.each do |repository|
@@ -96,21 +100,64 @@
                       span.badge.badge-soft-success.rounded-pill.px-3.py-2
                         | Connected
                     - else
-                      span.badge.bg-light.text-secondary.rounded-pill.px-3.py-2
+                      span.badge.badge-soft-warning.rounded-pill.px-3.py-2
                         | Disconnected
 
                   td.text-secondary.small
                     = l(repository.updated_at, format: :short)
-
-                  td.text-end
-                    = link_to repository_path(repository), class: 'btn btn-sm btn-light' do
-                      i.bi.bi-chevron-right
       - else
         .text-center.p-5
-          h3.fs-5 No repositories found
-
           p.text-secondary.mb-0
-            | Connect a repository to get started.
+            | No repositories found.
+
+  .col-12.col-xl-4
+    .dashboard-card.p-4
+      .d-flex.align-items-center.justify-content-between.mb-4
+        div
+          h2.card-title-custom Monthly usage
+
+          p.mb-0.mt-1.text-secondary.small
+            | #{@plan_name} plan AI review allowance
+
+        span.stat-icon.stat-icon-primary
+          i.bi.bi-lightning-charge
+
+      .text-center.py-3
+        .display-5.fw-bold.mb-1
+          = @monthly_review_count
+
+        p.text-secondary.mb-4
+          | of #{@monthly_review_limit} reviews used
+
+      .progress.mb-3
+        .progress-bar[
+          role="progressbar"
+          style="width: #{@monthly_usage_percent}%"
+          aria-valuenow=@monthly_usage_percent
+          aria-valuemin="0"
+          aria-valuemax="100"
+        ]
+
+      .d-flex.justify-content-between.text-secondary.small.mb-4
+        span
+          | #{@monthly_usage_percent}% used
+
+        span
+          | #{@monthly_review_remaining} remaining
+
+      .p-3.rounded-3.bg-light
+        .d-flex.gap-3
+          i.bi.bi-info-circle.text-primary
+
+          div
+            p.mb-1.fw-semibold.small
+              | Current plan: #{@plan_name}
+
+            p.mb-0.text-secondary.small
+              | Upgrade your plan to increase your monthly AI review limit.
+
+      button.btn.btn-outline-primary.w-100.mt-4.rounded-3 type="button" disabled=true
+        | Upgrade plan
 
 .row.g-4
   .col-12
@@ -135,7 +182,6 @@
                 th Issues found
                 th Status
                 th Reviewed
-                th
 
             tbody
               - @recent_reviews.each do |review|
@@ -144,7 +190,7 @@
 
                 tr
                   td
-                    .fw-semibold
+                    = link_to review_path(review), class: 'text-decoration-none text-dark fw-semibold' do
                       | ##{pull_request.number} #{pull_request.title}
 
                   td
@@ -185,13 +231,7 @@
                       = l(review.reviewed_at, format: :short)
                     - else
                       | -
-
-                  td.text-end
-                    = link_to review_path(review), class: 'btn btn-sm btn-light' do
-                      i.bi.bi-chevron-right
       - else
         .text-center.p-5
-          h3.fs-5 No AI reviews yet
-
           p.text-secondary.mb-0
-            | AI review activity will appear here.
+            | No AI reviews yet.
