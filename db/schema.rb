@@ -12,10 +12,8 @@
 
 ActiveRecord::Schema[8.1].define(version: 2026_08_10_030433) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension "extensions.pg_stat_statements"
-  enable_extension "extensions.pgcrypto"
-  enable_extension "extensions.uuid-ossp"
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pgcrypto"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "blob_id", null: false
