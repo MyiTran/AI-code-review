@@ -41,8 +41,17 @@ class Repository < ApplicationRecord
 
   delegate :user, to: :github_installation
 
-  scope :by_keyword, ->(query) { where('name ILIKE :q OR full_name ILIKE :q', q: "%#{query}%") if query.present? }
+  scope :search_by_keyword, ->(query) { where('name ILIKE :q OR full_name ILIKE :q', q: "%#{query}%") if query.present? }
   scope :by_language, ->(language) { where(language: language) if language.present? }
+  scope :by_ai_model,
+    ->(ai_model_id) do
+      next all if ai_model_id.blank?
+
+      model = AiModel.find_by(id: ai_model_id)
+      next none unless model
+
+      model.is_default? ? where(ai_model_id: [ai_model_id, nil]) : where(ai_model_id: ai_model_id)
+    end
 
   scope :by_connection_status,
     ->(status) {
