@@ -618,6 +618,7 @@ DEPENDENCIES
   good_migrations
   i18n-tasks
   image_processing (~> 2.0)
+  jwt
   lefthook
   letter_opener
   letter_opener_web
