@@ -5,7 +5,6 @@ module Github
     end
 
     def call
-      private_key = OpenSSL::PKey::RSA.new(File.read(private_key_path))
       JWT.encode(payload, private_key, 'RS256')
     end
 
@@ -16,8 +15,10 @@ module Github
       { iat: now - 60, exp: now + 9.minutes.to_i, iss: ENV.fetch('GITHUB_APP_ID') }
     end
 
-    def private_key_path
-      Rails.root.join(ENV.fetch('GITHUB_APP_PRIVATE_KEY_PATH'))
+    def private_key
+      key_content = ENV.fetch('GITHUB_APP_PRIVATE_KEY').to_s.gsub('\\n', "\n")
+
+      OpenSSL::PKey::RSA.new(key_content)
     end
   end
 end
