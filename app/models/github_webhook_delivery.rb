@@ -18,6 +18,5 @@
 #
 class GithubWebhookDelivery < ApplicationRecord
   validates :delivery_id, presence: true, uniqueness: true
-  validates :event_name, presence: true
-  validates :status, presence: true
+  validates :event_name, :status, presence: true
 end

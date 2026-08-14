@@ -1,13 +1,16 @@
 module Github
-  class SyncPullRequest
-    def self.call(delivery)
+  class SyncPullRequestService < ApplicationService
+    def initialize(delivery)
+      @delivery = delivery
+    end
+
+    def call
       return unless delivery.event_name == 'pull_request'
       return unless ['opened', 'synchronize', 'closed', 'reopened'].include?(delivery.action)
 
       payload = delivery.payload
       repository = Repository.find_by!(github_id: payload.dig('repository', 'id'))
       github_pull_request = payload.fetch('pull_request')
-
       pull_request = repository.pull_requests.find_or_initialize_by(github_id: github_pull_request.fetch('id'))
 
       pull_request.update!(
@@ -23,6 +26,12 @@ module Github
         closed_at: github_pull_request['closed_at'],
         merged_at: github_pull_request['merged_at']
       )
+
+      pull_request
     end
+
+    private
+
+    attr_reader :delivery
   end
 end

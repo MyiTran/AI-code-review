@@ -34,6 +34,5 @@ class PullRequest < ApplicationRecord
 
   validates :github_id, presence: true, uniqueness: { scope: :repository_id }
   validates :number, presence: true, uniqueness: { scope: :repository_id }
-  validates :title, presence: true
-  validates :state, presence: true
+  validates :title, :state, presence: true
 end

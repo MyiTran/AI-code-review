@@ -1,6 +1,11 @@
 module Github
-  class VerifyWebhookSignature
-    def self.call(payload, signature)
+  class VerifyWebhookSignatureService < ApplicationService
+    def initialize(payload, signature)
+      @payload = payload
+      @signature = signature
+    end
+
+    def call
       return false if signature.blank?
 
       secret = ENV.fetch('GITHUB_WEBHOOK_SECRET')
@@ -11,5 +16,9 @@ module Github
 
       ActiveSupport::SecurityUtils.secure_compare(signature, expected_signature)
     end
+
+    private
+
+    attr_reader :payload, :signature
   end
 end
