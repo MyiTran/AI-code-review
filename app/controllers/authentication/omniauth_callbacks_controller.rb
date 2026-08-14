@@ -1,7 +1,7 @@
 module Authentication
   class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     def github
-      user = Github::AuthenticateUser.call(omniauth_auth)
+      user = Github::AuthenticateUserService.call(omniauth_auth)
 
       sign_in(user)
 

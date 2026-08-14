@@ -1,5 +1,5 @@
 .mb-4
-  = link_to repositories_path(user_id: params[:user_id]),
+  = link_to repositories_path,
       class: 'text-decoration-none text-secondary small' do
     i.bi.bi-arrow-left.me-2
     | Back to repositories
@@ -12,38 +12,46 @@
     div
       .d-flex.flex-wrap.align-items-center.gap-2.mb-1
         h1.page-title.mb-0
-          = @repository[:name]
+          = @repository.name
 
-        - if @repository[:connection_status] == 'Connected'
+        - if @repository.connected?
           span.badge.badge-soft-success.rounded-pill.px-3.py-2
             i.bi.bi-link-45deg.me-1
             | Connected
         - else
-          span.badge.badge-soft-danger.rounded-pill.px-3.py-2
+          span.badge.bg-light.text-secondary.rounded-pill.px-3.py-2
             i.bi.bi-link-45deg.me-1
             | Disconnected
 
       p.page-description.mb-2
-        = @repository[:description]
+        = @repository.description.presence || 'No description'
 
       .d-flex.flex-wrap.align-items-center.gap-3.text-secondary.small
         span
           i.bi.bi-github.me-1
-          = @repository[:full_name]
-
+          = @repository.full_name
 
   .d-flex.flex-wrap.gap-2
     a.btn.btn-light[
-      href=@repository[:github_url]
+      href=@repository.github_url
       target="_blank"
       rel="noopener"
     ]
       i.bi.bi-box-arrow-up-right.me-2
       | View on GitHub
 
-    button.btn.btn-outline-danger type="button"
-      i.bi.bi-link-45deg.me-2
-      | Disconnect
+    - if @repository.connected?
+      = button_to repository_path(@repository),
+          method: :patch,
+          params: { repository: { connected: false } },
+          class: 'btn btn-outline-danger',
+          form: { data: { turbo_confirm: 'Are you sure you want to disconnect this repository?' } } do
+        i.bi.bi-link-45deg.me-2
+        | Disconnect
+    - else
+      = button_to github_connection_path, method: :post, params: { repository_id: @repository.id }, class: 'btn btn-primary', form: { data: { turbo: false } } do
+        i.bi.bi-link-45deg.me-2
+        | Connect again
 
 .dashboard-card.p-4.mb-4
   h2.card-title-custom.mb-4 Repository information
@@ -54,32 +62,35 @@
 
       span.repository-information-value
         i.bi.bi-diagram-3.me-2
-        = @repository[:default_branch]
+        = @repository.default_branch
 
     .repository-information-item
       span.repository-information-label Language
 
       span.repository-information-value
-        = @repository[:language]
+        = @repository.language.presence || 'Unknown'
 
     .repository-information-item
       span.repository-information-label Visibility
 
       span.repository-information-value
-        = @repository[:visibility]
+        = @repository.visibility.presence || 'Unknown'
 
     .repository-information-item
       span.repository-information-label Connected on
 
       span.repository-information-value
-        = @repository[:connected_at]
+        - if @repository.connected_at.present?
+          = l(@repository.connected_at, format: :long)
+        - else
+          | Unknown
 
     .repository-information-item
       span.repository-information-label Last reviewed
 
       span.repository-information-value
-        = @repository[:last_reviewed_at]
-        
+        | Never
+
 .row.g-4.mb-4
   .col-12.col-sm-6.col-xl-3
     .dashboard-card.p-4
@@ -87,7 +98,7 @@
         i.bi.bi-git
 
       .stat-value.mb-2
-        = @repository[:pull_requests_count]
+        | 0
 
       .stat-label
         | Pull Requests
@@ -98,7 +109,7 @@
         i.bi.bi-stars
 
       .stat-value.mb-2
-        = @repository[:ai_reviews_count]
+        | 0
 
       .stat-label
         | AI Reviews
@@ -109,7 +120,7 @@
         i.bi.bi-bug
 
       .stat-value.mb-2
-        = @repository[:issues_found_count]
+        | 0
 
       .stat-label
         | Issues Found
@@ -120,7 +131,7 @@
         i.bi.bi-people
 
       .stat-value.mb-2
-        = @repository[:contributors_count]
+        | 0
 
       .stat-label
         | Contributors
@@ -135,13 +146,10 @@
           p.mb-0.mt-1.text-secondary.small
             | Pull requests analyzed by AI for this repository.
 
-        = form_with url: repository_path(@repository[:id]),
+        = form_with url: repository_path(@repository),
             method: :get,
             local: true,
             class: 'repository-review-search-form' do |form|
-          - if params[:user_id].present?
-            = form.hidden_field :user_id, value: params[:user_id]
-
           .input-group.repository-review-search
             span.input-group-text.bg-white.border-end-0
               i.bi.bi-search.text-secondary
@@ -152,88 +160,19 @@
                 class: 'form-control border-start-0 ps-0'
 
             - if params[:review_query].present?
-              = link_to repository_path(@repository[:id], user_id: params[:user_id]),
+              = link_to repository_path(@repository),
                   class: 'btn btn-light border',
                   title: 'Clear search' do
                 i.bi.bi-x-lg
 
-      - if @review_history.any?
-        .table-responsive
-          table.table.mb-0
-            thead
-              tr
-                th Pull request
-                th Branch
-                th Author
-                th AI model
-                th Findings
-                th Status
-                th Reviewed
+      .text-center.p-5
+        span.empty-state-icon.mb-3
+          i.bi.bi-search
 
-            tbody
-              - @review_history.each do |review|
-                tr
-                  td
-                    = link_to review_path(review[:id], repository_id: @repository[:id], user_id: params[:user_id]),
-                        class: 'text-decoration-none text-dark' do
-                      p.mb-1.fw-semibold
-                        | ##{review[:pull_request_number]} #{review[:title]}
+        h3.fs-5 No pull requests found
 
-                      p.mb-0.text-secondary.small
-                        | View AI review details
-
-                  td
-                    .branch-name
-                      i.bi.bi-git.me-1
-                      = review[:source_branch]
-
-                    .text-secondary.mt-1 style="font-size: 11px;"
-                      | into #{review[:target_branch]}
-
-                  td
-                    = review[:author]
-
-                  td
-                    span.ai-model-badge
-                      i.bi.bi-stars
-                      = review[:model]
-
-                  td
-                    - if review[:issues_found].positive?
-                      span.finding-count.finding-count-danger
-                        i.bi.bi-exclamation-triangle.me-1
-                        | #{review[:issues_found]} issues
-                    - else
-                      span.finding-count.finding-count-success
-                        i.bi.bi-check-circle.me-1
-                        | No issues
-
-                  td
-                    - if review[:status] == 'Completed'
-                      span.badge.badge-soft-success.rounded-pill.px-3.py-2
-                        i.bi.bi-check-circle.me-1
-                        | Completed
-                    - else
-                      span.badge.badge-soft-warning.rounded-pill.px-3.py-2
-                        i.bi.bi-arrow-repeat.me-1
-                        | Processing
-
-                  td.text-secondary.small
-                    = review[:reviewed_at]
-
-      - else
-        .text-center.p-5
-            span.empty-state-icon.mb-3
-            i.bi.bi-search
-
-            h3.fs-5 No pull requests found
-
-            p.text-secondary.mb-4
-            | No pull request matches your search.
-
-            = link_to 'Clear search',
-                repository_path(@repository[:id]),
-                class: 'btn btn-primary'
+        p.text-secondary.mb-4
+          | No pull requests have been synchronized yet.
 
   .col-12.col-xl-4
     .dashboard-card.p-4.mb-4
@@ -252,45 +191,26 @@
               | Review new and updated pull requests automatically.
 
           .form-check.form-switch
-            input#repository-auto-review.form-check-input.ai-review-toggle type="checkbox" role="switch" checked=@repository[:auto_review_enabled] disabled=(@repository[:connection_status] == 'Disconnected') data-status-target="repository-auto-review-status"
+            input#repository-auto-review.form-check-input.ai-review-toggle type="checkbox" role="switch" disabled=true data-status-target="repository-auto-review-status"
 
-          - review_status_class = @repository[:auto_review_enabled] ? 'text-success' : 'text-secondary'
-          - review_status_text = @repository[:auto_review_enabled] ? 'Automatic review is on' : 'Automatic review is off'
-
-          p#repository-auto-review-status.mt-3.mb-0.small.fw-semibold class=review_status_class
-           = review_status_text
+        p#repository-auto-review-status.mt-3.mb-0.small.fw-semibold.text-secondary
+          | Automatic review is off
 
       .setting-section
         label.form-label.fw-semibold for="repository-ai-model"
           | AI model
 
-        select#repository-ai-model.form-select
-          option[
-            value="Gemini 2.5 Flash"
-            selected=(@repository[:ai_model] == 'Gemini 2.5 Flash')
-          ]
-            | Gemini 2.5 Flash
-
-          option[
-            value="Claude Sonnet"
-            selected=(@repository[:ai_model] == 'Claude Sonnet')
-          ]
-            | Claude Sonnet
-
-          option[
-            value="GPT-4.1 Mini"
-            selected=(@repository[:ai_model] == 'GPT-4.1 Mini')
-          ]
-            | GPT-4.1 Mini
+        select#repository-ai-model.form-select disabled=true
+          option selected=true
+            | Not selected
 
         p.text-secondary.small.mt-2.mb-0
           | This model will analyze pull requests for this repository.
 
-      button.btn.btn-primary.w-100 type="button"
+      button.btn.btn-primary.w-100 type="button" disabled=true
         i.bi.bi-check-lg.me-2
         | Save settings
 
       p.text-center.text-secondary.mt-3.mb-0 style="font-size: 12px;"
         | Frontend preview only. Changes are not saved yet.
-
-    
+        

@@ -1,7 +1,7 @@
 aside.app-sidebar
   .d-flex.flex-column.h-100
     .px-4.pt-4.pb-3
-      = link_to dashboard_path, class: 'brand-logo' do
+      = link_to root_path, class: 'brand-logo' do
         span.brand-icon
           i.bi.bi-stars
 
@@ -9,6 +9,11 @@ aside.app-sidebar
 
     nav.flex-grow-1
       p.sidebar-label Workspace
+
+      = link_to root_path,
+          class: "sidebar-link #{'active' if current_page?(root_path)}" do
+        i.bi.bi-house
+        span Home
 
       = link_to dashboard_path,
           class: "sidebar-link #{'active' if controller_name == 'dashboard'}" do
@@ -43,20 +48,26 @@ aside.app-sidebar
         i.bi.bi-shield-lock
         span Admin
 
-    .sidebar-user
-      .d-flex.align-items-center.gap-2
-        - if current_user.avatar_url.present?
-          img.avatar src=current_user.avatar_url alt=current_user.full_name
-        - else
-          span.avatar
-            = current_user.initials
+    - if user_signed_in?
+      .sidebar-user
+        .d-flex.align-items-center.gap-3
+          - if current_user.avatar_url.present?
+            img.avatar src=current_user.avatar_url alt=current_user.full_name
+          - else
+            span.avatar
+              = current_user.initials
 
-        .overflow-hidden
-          p.mb-0.text-white.fw-semibold.small.text-truncate
-            = current_user.display_name
+          .overflow-hidden
+            p.mb-0.text-white.fw-semibold.small.text-truncate
+              = current_user.display_name
 
-      = button_to destroy_user_session_path,
-          method: :delete,
-          class: 'sidebar-link border-0 bg-transparent w-100 text-start mt-2' do
-        i.bi.bi-box-arrow-right
-        span Sign out
+        = button_to destroy_user_session_path,
+            method: :delete,
+            class: 'sidebar-link border-0 bg-transparent w-100 text-start mt-3' do
+          i.bi.bi-box-arrow-right
+          span Sign out
+    - else
+      .sidebar-user
+        = link_to new_user_session_path, class: 'sidebar-link text-decoration-none' do
+          i.bi.bi-box-arrow-in-right
+          span Sign in

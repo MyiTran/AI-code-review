@@ -64,6 +64,8 @@ gem 'web-console'
 
 # github
 gem 'omniauth-github'
+gem 'octokit'
+gem 'jwt'
 
 group :development, :test do
   gem 'rspec-rails'
