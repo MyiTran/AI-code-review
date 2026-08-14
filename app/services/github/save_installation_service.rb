@@ -19,9 +19,7 @@ module Github
     attr_reader :user, :installation
 
     def find_or_initialize_record
-      user.github_installations.find_or_initialize_by(
-        installation_id: installation.id
-      )
+      user.github_installations.find_or_initialize_by(installation_id: installation.id)
     end
 
     def assign_attributes(record)

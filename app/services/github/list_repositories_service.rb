@@ -2,6 +2,8 @@ module Github
   class ListRepositoriesService < ApplicationService
     def initialize(installation)
       @installation = installation
+      token = Github::GenerateInstallationTokenService.call(installation.installation_id)
+      @client = Octokit::Client.new(access_token: token, auto_paginate: true)
     end
 
     def call
@@ -12,12 +14,6 @@ module Github
 
     private
 
-    attr_reader :installation
-
-    def client
-      token = Github::GenerateInstallationTokenService.call(installation.installation_id)
-
-      Octokit::Client.new(access_token: token, auto_paginate: true)
-    end
+    attr_reader :installation, :client
   end
 end
