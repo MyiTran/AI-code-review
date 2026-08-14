@@ -1,18 +1,24 @@
 module Github
-  class SyncRepositories
-    def self.call(installation)
-      github_repositories = Github::ListRepositories.call(installation)
+  class SyncRepositoriesService < ApplicationService
+    def initialize(installation)
+      @installation = installation
+    end
 
-      github_repositories.each do |github_repository|
-        save_repository(installation, github_repository)
-      end
+    def call
+      github_repositories = Github::ListRepositoriesService.call(installation)
 
-      mark_disconnected_repositories(installation, github_repositories)
+      github_repositories.each { |github_repository| save_repository(github_repository) }
+
+      mark_disconnected_repositories(github_repositories)
 
       installation.repositories.reload
     end
 
-    def self.save_repository(installation, github_repository)
+    private
+
+    attr_reader :installation
+
+    def save_repository(github_repository)
       repository = installation.repositories.find_or_initialize_by(github_id: github_repository.id)
 
       repository.assign_attributes(
@@ -31,15 +37,13 @@ module Github
       repository.save!
     end
 
-    def self.connected_at_for(repository)
-      if repository.new_record? || !repository.connected?
-        Time.current
-      else
-        repository.connected_at
-      end
+    def connected_at_for(repository)
+      return Time.current if repository.new_record? || !repository.connected?
+
+      repository.connected_at
     end
 
-    def self.mark_disconnected_repositories(installation, github_repositories)
+    def mark_disconnected_repositories(github_repositories)
       connected_github_ids = github_repositories.map(&:id)
       current_time = Time.current
 
@@ -49,8 +53,5 @@ module Github
         updated_at: current_time
       )
     end
-
-    private_class_method :save_repository
-    private_class_method :mark_disconnected_repositories
   end
 end

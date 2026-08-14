@@ -1,8 +1,8 @@
 module Callback
   class GithubController < ApplicationController
     def create
-      github_installation = Github::FetchInstallation.call(params.expect(:installation_id))
-      installation = Github::SaveInstallation.call(current_user, github_installation)
+      github_installation = Github::FetchInstallationService.call(params.expect(:installation_id))
+      installation = Github::SaveInstallationService.call(current_user, github_installation)
 
       Github::SyncRepositories.call(installation)
 

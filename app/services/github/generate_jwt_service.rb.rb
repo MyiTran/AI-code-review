@@ -1,9 +1,5 @@
 module Github
-  class GenerateJwt
-    def self.call
-      new.call
-    end
-
+  class GenerateJwtService < ApplicationService
     def call
       JWT.encode(payload, private_key, 'RS256')
     end

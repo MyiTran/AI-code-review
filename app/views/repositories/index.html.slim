@@ -5,7 +5,7 @@
     p.page-description
       | Connect repositories and configure automatic AI code review.
 
-  = link_to Github::InstallUrl.call,
+  = link_to github_app_installation_url,
       class: 'btn btn-primary',
       data: { turbo: false } do
     i.bi.bi-plus-lg.me-2
@@ -45,7 +45,7 @@
         = form.label :language, 'Language', class: 'form-label small fw-semibold'
 
         = form.select :language,
-            options_for_select(Array(@languages), params[:language]),
+            options_for_select(@languages, params[:language]),
             { include_blank: 'All languages' },
             class: 'form-select'
 
@@ -55,7 +55,7 @@
             class: 'form-label small fw-semibold'
 
         = form.select :ai_model,
-            options_for_select(Array(@models), params[:ai_model]),
+            options_for_select(@models, params[:ai_model]),
             { include_blank: 'All models' },
             class: 'form-select'
 
@@ -157,7 +157,7 @@
       p.text-secondary.mb-4
         | Connect a GitHub repository to get started.
 
-      = link_to Github::InstallUrl.call,
+      = link_to github_app_installation_url,
           class: 'btn btn-primary',
           data: { turbo: false } do
         i.bi.bi-plus-lg.me-2

@@ -34,22 +34,13 @@
 class Repository < ApplicationRecord
   belongs_to :github_installation
 
-  validates :github_id, presence: true
-  validates :name, presence: true
-  validates :full_name, presence: true
+  validates :github_id, :name, :full_name, presence: true
   validates :github_id, uniqueness: { scope: :github_installation_id }
 
   delegate :user, to: :github_installation
 
-  scope :search_by_keyword,
-    ->(query) {
-      where('name ILIKE :q OR full_name ILIKE :q', q: "%#{query}%") if query.present?
-    }
-
-  scope :by_language,
-    ->(language) {
-      where(language: language) if language.present?
-    }
+  scope :by_keyword, ->(query) { where('name ILIKE :q OR full_name ILIKE :q', q: "%#{query}%") if query.present? }
+  scope :by_language, ->(language) { where(language: language) if language.present? }
 
   scope :by_connection_status,
     ->(status) {

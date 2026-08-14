@@ -1,10 +1,6 @@
 # GET github/repositories
 module Github
-  class Auth
-    def self.call(auth)
-      new(auth).call
-    end
-
+  class AuthenticateUserService < ApplicationService
     def initialize(auth)
       @auth = auth
     end
