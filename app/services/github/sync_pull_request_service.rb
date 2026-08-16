@@ -7,17 +7,16 @@ module Github
       @delivery = delivery
     end
 
-    def call
+    def call # rubocop:disable Metrics/AbcSize
       return unless delivery.event_name == EVENT_NAME
       return unless ACTIONS.include?(delivery.action)
 
       payload = delivery.payload
       repository = Repository.find_by!(github_id: payload.dig('repository', 'id'))
       github_pull_request = payload.fetch('pull_request')
+      pull_request = repository.pull_requests.find_or_initialize_by(github_id: github_pull_request.fetch('id'))
 
-      pull_request = repository.pull_requests.find_or_initialize_by(
-        github_id: github_pull_request.fetch('id')
-      )
+      return if pull_request.new_record? && pull_request_limit_reached?(repository)
 
       pull_request.update!(
         number: github_pull_request.fetch('number'),
@@ -39,8 +38,12 @@ module Github
       raise
     end
 
-    private
+    def self.pull_request_limit_reached?(repository)
+      user = repository.github_installation.user
+      limit = Subscriptions::GetPlanLimitsService.call(user)[:pull_requests]
+      user.repositories.joins(:pull_requests).where(pull_requests: { created_at: Time.current.all_month }).count >= limit
+    end
 
-    attr_reader :delivery
+    private_class_method :pull_request_limit_reached?
   end
 end

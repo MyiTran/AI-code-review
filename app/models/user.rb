@@ -17,6 +17,7 @@
 #  last_name              :string
 #  last_sign_in_at        :datetime
 #  last_sign_in_ip        :string
+#  plan                   :string           default("free"), not null
 #  provider               :integer
 #  remember_created_at    :datetime
 #  reset_password_sent_at :datetime
@@ -67,6 +68,7 @@ class User < ApplicationRecord
   validates :password, password: true
   validates :avatar, content_type: Constants::IMAGE_CONTENT_TYPES, size: { less_than: Constants::IMAGE_MAX_SIZE }
   validates :email, presence: true, uniqueness: { case_sensitive: false }, format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :plan, inclusion: { in: ['free', 'pro'] }
 
   # instance methods
   def display_name
@@ -91,6 +93,10 @@ class User < ApplicationRecord
 
   def employee?
     has_role?(:employee)
+  end
+
+  def pro?
+    plan == 'pro'
   end
 
   # class methods

@@ -3,15 +3,15 @@ ai_models = [
     name: 'Gemini Flash',
     slug: ENV.fetch('GEMINI_FLASH_MODEL'),
     provider: 'google',
-    is_default: true,
-    is_premium: false,
+    is_default: false,
+    is_premium: true,
     active: true
   },
   {
     name: 'Gemini Flash Lite',
     slug: ENV.fetch('GEMINI_FLASH_LITE_MODEL'),
     provider: 'google',
-    is_default: false,
+    is_default: true,
     is_premium: false,
     active: true
   }

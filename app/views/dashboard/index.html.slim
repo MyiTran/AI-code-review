@@ -14,15 +14,15 @@
         i.bi.bi-github
 
       .stat-value.mb-2
-        = @dashboard.repository_count
+        | #{@dashboard.repository_count} / #{@dashboard.repository_limit}
 
       .stat-label.mb-2
-        | Repositories
+        | Connected repositories
 
   .col-12.col-sm-6.col-xl-3
     .dashboard-card.p-4
       .stat-icon.stat-icon-primary.mb-4
-        i.bi.bi-github
+        i.bi.bi-git
 
       .stat-value.mb-2
         = @dashboard.pull_request_count
@@ -33,7 +33,7 @@
   .col-12.col-sm-6.col-xl-3
     .dashboard-card.p-4
       .stat-icon.stat-icon-primary.mb-4
-        i.bi.bi-github
+        i.bi.bi-stars
 
       .stat-value.mb-2
         = @dashboard.review_count
@@ -44,7 +44,7 @@
   .col-12.col-sm-6.col-xl-3
     .dashboard-card.p-4
       .stat-icon.stat-icon-primary.mb-4
-        i.bi.bi-github
+        i.bi.bi-bug
 
       .stat-value.mb-2
         = @dashboard.issues_found_count
@@ -154,10 +154,10 @@
               | Current plan: #{@dashboard.plan_name}
 
             p.mb-0.text-secondary.small
-              | Upgrade your plan to increase your monthly AI review limit.
+              = current_user.pro? ? 'You are using the Pro plan.' : 'Upgrade your plan to increase your monthly AI review limit.'
 
-      button.btn.btn-outline-primary.w-100.mt-4.rounded-3 type="button" disabled=true
-        | Upgrade plan
+      - unless current_user.pro?
+        = link_to 'Upgrade plan', account_path, class: 'btn btn-outline-primary w-100 mt-4 rounded-3'
 
 .row.g-4
   .col-12

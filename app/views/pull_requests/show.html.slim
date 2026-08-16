@@ -53,6 +53,7 @@
           tr
             th Commit
             th AI model
+            th Triggered by
             th Status
             th Reviewed at
             th.text-end style='width: 80px'
@@ -68,6 +69,9 @@
                 span.ai-model-badge
                   i.bi.bi-stars
                   = review.ai_model.name
+
+              td
+                = review.triggered_by.presence || 'Unknown'
 
               td
                 - case review.status
