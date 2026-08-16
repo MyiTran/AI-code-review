@@ -32,21 +32,9 @@ aside.app-sidebar
 
       p.sidebar-label Account
 
-      = link_to settings_path,
-          class: "sidebar-link #{'active' if controller_name == 'settings'}" do
-        i.bi.bi-gear
-        span Settings
-
-      = link_to '#', class: 'sidebar-link' do
-        i.bi.bi-credit-card
-        span Billing
-
-      .sidebar-divider
-
-      = link_to admin_root_path,
-          class: "sidebar-link #{'active' if controller_path.start_with?('admin/')}" do
-        i.bi.bi-shield-lock
-        span Admin
+      = link_to account_path, class: "sidebar-link #{'active' if controller_name == 'accounts'}" do
+        i.bi.bi-person-circle
+        span Account
 
     - if user_signed_in?
       .sidebar-user

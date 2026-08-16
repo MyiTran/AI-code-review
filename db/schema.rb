@@ -10,10 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_10_030433) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_15_093533) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "extensions.pg_stat_statements"
+  enable_extension "extensions.pgcrypto"
+  enable_extension "extensions.uuid-ossp"
   enable_extension "pg_catalog.plpgsql"
-  enable_extension "pgcrypto"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "blob_id", null: false
@@ -139,6 +141,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_030433) do
     t.string "status", default: "processing", null: false
     t.text "summary"
     t.integer "tokens_used"
+    t.string "triggered_by"
     t.datetime "updated_at", null: false
     t.index ["ai_model_id"], name: "index_reviews_on_ai_model_id"
     t.index ["pull_request_id", "commit_sha", "ai_model_id"], name: "idx_on_pull_request_id_commit_sha_ai_model_id_b6a69c7c0b", unique: true
@@ -171,6 +174,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_030433) do
     t.string "last_name"
     t.datetime "last_sign_in_at"
     t.string "last_sign_in_ip"
+    t.string "plan", default: "free", null: false
     t.integer "provider"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"

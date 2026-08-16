@@ -655,7 +655,7 @@ DEPENDENCIES
   rails-controller-testing
   rails-mermaid_erd
   ransack
-  redis
+  redis (< 6.0)
   rolify
   rspec-rails
   rubocop

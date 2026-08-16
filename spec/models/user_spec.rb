@@ -17,6 +17,7 @@
 #  last_name              :string
 #  last_sign_in_at        :datetime
 #  last_sign_in_ip        :string
+#  plan                   :string           default("free"), not null
 #  provider               :integer
 #  remember_created_at    :datetime
 #  reset_password_sent_at :datetime
