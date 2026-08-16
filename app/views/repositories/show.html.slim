@@ -31,19 +31,26 @@
           i.bi.bi-github.me-1
           = @repository.full_name
 
-  .d-flex.flex-wrap.gap-2
-    a.btn.btn-light href=@repository.github_url target="_blank" rel="noopener"
-      i.bi.bi-box-arrow-up-right.me-2
-      | View on GitHub
+  .d-flex.flex-column.align-items-lg-end.gap-2
+    .d-flex.flex-wrap.gap-2
+      a.btn.btn-light href=@repository.github_url target="_blank" rel="noopener"
+        i.bi.bi-box-arrow-up-right.me-2
+        | View on GitHub
+
+      - if @repository.connected?
+        = button_to repository_path(@repository), method: :patch, params: { repository: { connected: false } }, class: 'btn btn-outline-danger', form: { data: { turbo_confirm: 'Are you sure you want to disconnect this repository?' } } do
+          i.bi.bi-link-45deg.me-2
+          | Disconnect
+      - else
+        = button_to github_connection_path, method: :post, params: { repository_id: @repository.id }, class: 'btn btn-primary', form: { data: { turbo: false } } do
+          i.bi.bi-link-45deg.me-2
+          | Connect again
 
     - if @repository.connected?
-      = button_to repository_path(@repository), method: :patch, params: { repository: { connected: false } }, class: 'btn btn-outline-danger', form: { data: { turbo_confirm: 'Are you sure you want to disconnect this repository?' } } do
-        i.bi.bi-link-45deg.me-2
-        | Disconnect
-    - else
-      = button_to github_connection_path, method: :post, params: { repository_id: @repository.id }, class: 'btn btn-primary', form: { data: { turbo: false } } do
-        i.bi.bi-link-45deg.me-2
-        | Connect again
+      p.mb-0.text-secondary.small.text-lg-end
+        | Disconnecting only stops this repository from AI Review.
+        br
+        | To fully revoke access, manage the GitHub App on GitHub.
 
 .dashboard-card.p-4.mb-4
   h2.card-title-custom.mb-4 Repository information
@@ -207,5 +214,5 @@
           = form.label :ai_model_id, 'AI model', class: 'form-label fw-semibold'
           = form.collection_select :ai_model_id, @ai_models, :id, :name, { include_blank: 'Use default model' }, class: 'form-select', disabled: !@repository.connected?, onchange: 'this.form.requestSubmit()'
 
-        p.text-secondary.small.mt-2.mb-0
-          | This model will analyze pull requests for this repository.
+          p.text-secondary.small.mt-2.mb-0
+            = current_user.pro? ? 'Pro plan: All AI models are available.' : 'Free plan: Gemini Flash Lite only.'

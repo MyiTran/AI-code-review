@@ -9,7 +9,7 @@ class RepositoriesController < ApplicationController
 
   def show
     @repository = current_user.repositories.find(params.expect(:id))
-    @ai_models = AiModel.active.order(:name)
+    @ai_models = available_ai_models.order(:name)
     @pull_requests = @repository.pull_requests.includes(:reviews).order(updated_at: :desc)
     @reviews = Review.by_repository(@repository.id).includes(:ai_model, :pull_request).order(created_at: :desc)
   end
@@ -17,6 +17,8 @@ class RepositoriesController < ApplicationController
   def update
     repository = current_user.repositories.find(params.expect(:id))
     attributes = repository_params
+
+    return redirect_to repository_path(repository), alert: 'AI model is not available for your plan.' if invalid_ai_model?(attributes)
 
     if attributes.key?(:connected)
       connected = ActiveModel::Type::Boolean.new.cast(attributes[:connected])
@@ -32,6 +34,16 @@ class RepositoriesController < ApplicationController
 
   def repository_params
     params.expect(repository: [:connected, :auto_review_enabled, :ai_model_id])
+  end
+
+  def available_ai_models
+    return AiModel.where(active: true) if current_user.pro?
+
+    AiModel.where(active: true, is_premium: false)
+  end
+
+  def invalid_ai_model?(attributes)
+    attributes[:ai_model_id].present? && !available_ai_models.exists?(id: attributes[:ai_model_id])
   end
 
   def update_message(repository, attributes)
