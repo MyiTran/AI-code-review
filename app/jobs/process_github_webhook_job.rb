@@ -7,7 +7,7 @@ class ProcessGithubWebhookJob
 
     delivery.processing!
     Github::SyncPullRequestService.call(delivery)
-    delivery.update!(status: :processed, processed_at: Time.current)
+    delivery.processed!
   rescue StandardError => e
     delivery.presence&.failed!
 

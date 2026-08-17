@@ -21,4 +21,8 @@ class GithubWebhookDelivery < ApplicationRecord
   validates :event_name, :status, presence: true
 
   enum :status, { processing: 'processing', processed: 'processed', failed: 'failed' }
+
+  def processed!
+    update!(status: :processed, processed_at: Time.current)
+  end
 end
