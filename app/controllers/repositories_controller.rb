@@ -30,6 +30,8 @@ class RepositoriesController < ApplicationController
       end
 
     redirect_to repository_path(repository), notice: message
+  rescue ActiveRecord::RecordInvalid
+    redirect_to repository_path(repository), alert: 'Repository could not be updated.'
   end
 
   private

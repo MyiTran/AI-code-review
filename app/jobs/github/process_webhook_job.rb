@@ -2,15 +2,16 @@ module Github
   class ProcessWebhookJob
     include Sidekiq::Job
 
+    sidekiq_options queue: :default
+
     REVIEW_ACTIONS = ['opened', 'synchronize'].freeze
 
-    sidekiq_options queue: :default
     def perform(delivery_id)
       delivery = GithubWebhookDelivery.find(delivery_id)
       delivery.processing!
 
       pull_request = Github::SyncPullRequestService.call(delivery)
-      Reviews::Generate.call(pull_request) if review_required?(delivery, pull_request)
+      Reviews::GenerateService.call(pull_request) if review_required?(delivery, pull_request)
 
       delivery.processed!
     rescue StandardError => e
