@@ -3,7 +3,7 @@ module Webhooks
     skip_before_action :authenticate_user!
     skip_forgery_protection
 
-    def create
+    def create # rubocop:disable Metrics/AbcSize
       signature = request.headers['X-Hub-Signature-256']
       return head :unauthorized unless Github::VerifyWebhookSignatureService.call(request.raw_post, signature)
 
@@ -18,11 +18,14 @@ module Webhooks
         payload: payload
       )
 
-      Github::SyncPullRequestService.call(delivery)
+      ProcessGithubWebhookJob.perform_async(delivery.id)
+
       head :accepted
-    rescue JSON::ParserError
+    rescue JSON::ParserError => e
+      Rails.logger.error(e.message)
       head :bad_request
-    rescue ActiveRecord::RecordNotUnique
+    rescue ActiveRecord::RecordNotUnique => e
+      Rails.logger.error(e.message)
       head :ok
     end
   end
