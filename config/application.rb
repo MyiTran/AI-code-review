@@ -24,9 +24,6 @@ module RailsBoilerplate
     config.active_record.encryption.deterministic_key = ENV['ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY']
     config.active_record.encryption.key_derivation_salt = ENV['ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT']
 
-    # Use Sidekiq for Active Job
-    config.active_job.queue_adapter = :sidekiq
-
     # Prevents Rails from trying to eager-load the contents of app/frontend
     config.javascript_path = 'frontend'
 
