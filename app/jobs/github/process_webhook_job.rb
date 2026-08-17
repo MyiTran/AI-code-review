@@ -9,7 +9,7 @@ module Github
       delivery = GithubWebhookDelivery.find(delivery_id)
       delivery.processing!
 
-      pull_request = Github::SyncPullRequest.call(delivery)
+      pull_request = Github::SyncPullRequestService.call(delivery)
       Reviews::Generate.call(pull_request) if review_required?(delivery, pull_request)
 
       delivery.processed!

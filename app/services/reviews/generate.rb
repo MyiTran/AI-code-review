@@ -7,7 +7,7 @@ module Reviews
       return review if review.persisted? && review.status == 'completed'
 
       started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      files = Github::FetchPullRequestDiff.call(pull_request)
+      files = Github::FetchPullRequestDiffService.call(pull_request)
       result = Ai::Providers::Gemini.call(model: ai_model.slug, prompt: build_prompt(pull_request, files))
       latency_ms = elapsed_milliseconds(started_at)
 
