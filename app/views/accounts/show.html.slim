@@ -87,7 +87,7 @@
             | 60 AI reviews / month
 
           - if @user.pro?
-            = button_to 'Switch to Free', account_path, method: :patch, params: { plan: 'free' }, class: 'btn btn-outline-primary w-100'
+            = button_to 'Switch to Free', account_path, method: :patch, params: { plan: 'free', user_id: @user.id }, class: 'btn btn-outline-primary w-100'
           - else
             button.btn.btn-light.w-100 type="button" disabled=true
               | Current plan
@@ -118,7 +118,7 @@
             button.btn.btn-light.w-100 type="button" disabled=true
               | Current plan
           - else
-            = button_to 'Upgrade to Pro', account_path, method: :patch, params: { plan: 'pro' }, class: 'btn btn-primary w-100'
+            = button_to 'Upgrade to Pro', account_path, method: :patch, params: { plan: 'pro', user_id: @user.id }, class: 'btn btn-primary w-100'
 
 .dashboard-card
   .p-4.border-bottom
