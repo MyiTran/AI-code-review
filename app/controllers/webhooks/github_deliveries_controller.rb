@@ -3,7 +3,7 @@ module Webhooks
     skip_before_action :authenticate_user!
     skip_forgery_protection
 
-    def create
+    def create # rubocop:disable Metrics/AbcSize
       signature = request.headers['X-Hub-Signature-256']
       return head :unauthorized unless Github::VerifyWebhookSignatureService.call(request.raw_post, signature)
 
