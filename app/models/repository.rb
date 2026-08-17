@@ -33,6 +33,7 @@
 #
 class Repository < ApplicationRecord
   belongs_to :github_installation
+  has_many :pull_requests, dependent: :destroy
 
   validates :github_id, :name, :full_name, presence: true
   validates :github_id, uniqueness: { scope: :github_installation_id }

@@ -4,7 +4,7 @@ module Callback
       github_installation = Github::FetchInstallationService.call(params.expect(:installation_id))
       installation = Github::SaveInstallationService.call(current_user, github_installation)
 
-      Github::SyncRepositories.call(installation)
+      Github::SyncRepositoriesService.call(installation)
 
       redirect_to return_path, notice: 'GitHub repositories synced successfully.'
     rescue StandardError => e
