@@ -2,11 +2,14 @@ class DashboardController < ApplicationController
   def index # rubocop:disable Metrics/AbcSize
     repositories = current_user.repositories
     reviews = Review.by_user(current_user)
+    limits = Subscriptions::GetPlanLimitsService.call(current_user)
 
     @repository_count = repositories.where(connected: true).count
-    @repository_limit = Subscriptions::GetPlanLimitsService.call(current_user)[:repositories]
-    @pull_request_count = PullRequest.where(repository: repositories).count
-    @review_count = reviews.count
+    @repository_limit = limits[:repositories]
+    @pull_request_count = PullRequest.where(repository: repositories, created_at: Time.current.all_month).count
+    @pull_request_limit = limits[:pull_requests]
+    @review_count = reviews.where(created_at: Time.current.all_month).count
+    @review_limit = limits[:reviews]
     @issues_found_count = reviews.sum(:issues_found_count)
 
     @plan_name = current_user.pro? ? 'Pro' : 'Free'
