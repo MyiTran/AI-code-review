@@ -1,24 +1,24 @@
-.d-flex.align-items-center.justify-content-between.mb-4
+.d-flex.flex-column.flex-md-row.align-items-md-center.justify-content-between.gap-3.mb-4
   div
     h1.page-title Users
     p.page-description.mb-0
-      | View and manage user subscriptions
+      | View and manage user subscriptions.
 
 .dashboard-card.mb-4
   .p-4
     = form_with url: admin_users_path, method: :get, data: { turbo: false } do |form|
       .row.g-3.align-items-end
-        .col-md-10
+        .col
           = form.text_field :q,
             value: params[:q],
             placeholder: 'Search by name, email or GitHub username...',
             class: 'form-control'
 
-        .col-md-1
-          = form.submit 'Search', class: 'btn btn-primary w-100'
-        
-        .col-md-1
-          = link_to 'Clear', admin_users_path, class: 'btn btn-secondary w-100'
+        .col-md-auto
+          = form.submit 'Search', class: 'btn btn-primary'
+
+        .col-md-auto
+          = link_to 'Clear', admin_users_path, class: 'btn btn-light'
 
 .dashboard-card
   .table-responsive
@@ -30,21 +30,32 @@
           th.text-center Plan
           th Repositories
           th Joined
-          th
+          th.text-end Actions
 
       tbody
         - @users.each do |user|
           tr
             td
-              span.fw-semibold
-                = user.display_name.presence || 'Unknown'
+              .d-flex.align-items-center.gap-3
+                - if user.avatar_url.present?
+                  img.admin-user-avatar src=user.avatar_url alt=user.display_name
+                - else
+                  span.admin-user-avatar
+                    = user.initials
+
+                span.fw-semibold
+                  = user.display_name.presence || 'Unknown'
 
             td
               = user.email
 
             td.text-center
-              span.badge class=(user.plan == 'pro' ? 'admin-plan-pro' : 'bg-secondary')
-                = user.plan.titleize
+              - if user.pro?
+                span.badge.admin-plan-pro.rounded-pill.px-3.py-2
+                  | Pro
+              - else
+                span.badge.bg-light.text-secondary.rounded-pill.px-3.py-2
+                  | Free
 
             td
               = @repository_counts[user.id].to_i
@@ -53,8 +64,11 @@
               = user.created_at.strftime('%d/%m/%Y')
 
             td.text-end
-              = link_to 'View', admin_user_path(user), class: 'btn btn-sm btn-outline-primary'
+              = link_to admin_user_path(user), class: 'btn btn-sm btn-light' do
+                i.bi.bi-eye.me-1
+                | View
 
   - if @pagy.pages > 1
     .d-flex.justify-content-center.p-4
       == @pagy.series_nav
+      
