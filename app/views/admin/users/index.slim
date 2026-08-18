@@ -1,34 +1,8 @@
-.d-flex.flex-column.flex-lg-row.align-items-lg-center.justify-content-between.gap-3.mb-4
+.d-flex.align-items-center.justify-content-between.mb-4
   div
     h1.page-title Users
-
-    p.page-description
-      | Manage all users in the application.
-
-  = link_to 'Back to dashboard',
-      admin_root_path,
-      class: 'btn btn-light'
-
-.dashboard-card.mb-4
-  .p-4
-    = form_with url: admin_users_path,
-        method: :get,
-        local: true,
-        class: 'd-flex.flex-column.flex-md-row.gap-2' do |form|
-
-      .input-group
-        span.input-group-text.bg-white.border-end-0
-          i.bi.bi-search.text-secondary
-
-        = form.search_field :query,
-            value: params[:query],
-            placeholder: 'Search by name or email',
-            class: 'form-control border-start-0 ps-0'
-
-      - if params[:query].present?
-        = link_to 'Clear',
-            admin_users_path,
-            class: 'btn btn-light'
+    p.page-description.mb-0
+      | View and manage user subscriptions.
 
 .dashboard-card
   .table-responsive
@@ -36,48 +10,31 @@
       thead
         tr
           th User
-          th Plan
+          th Email
+          th.text-center Plan
           th Repositories
-          th Reviews
-          th Status
           th Joined
+          th
 
       tbody
-        - if @users.any?
-          - @users.each do |user|
-            tr
-              td
-                = link_to repositories_path(user_id: user[:id]),
-                    class: 'text-decoration-none' do
-                  p.mb-1.fw-semibold.text-dark
-                    = user[:name]
-
-                  p.mb-0.text-secondary.small
-                    = user[:email]
-
-              td
-                = user[:plan]
-
-              td
-                = user[:repositories]
-
-              td
-                = user[:reviews]
-
-              td
-                = user[:status]
-
-              td
-                = user[:joined_at]
-
-        - else
+        - @users.each do |user|
           tr
-            td.text-center.py-5.text-secondary colspan="6"
-              i.bi.bi-search.fs-3.d-block.mb-2
+            td
+              span.fw-semibold
+                = user.display_name.presence || 'Unknown'
 
-              p.mb-3
-                | No users found.
+            td
+              = user.email
 
-              = link_to 'Clear search',
-                  admin_users_path,
-                  class: 'btn btn-primary btn-sm'
+            td.text-center
+              span.badge class=(user.plan == 'pro' ? 'admin-plan-pro' : 'bg-secondary')
+                = user.plan.titleize
+
+            td
+              = @repository_counts[user.id].to_i
+
+            td
+              = user.created_at.strftime('%d/%m/%Y')
+
+            td.text-end
+              = link_to 'View', admin_user_path(user), class: 'btn btn-sm btn-outline-primary'

@@ -1,61 +1,64 @@
 aside.app-sidebar
   .d-flex.flex-column.h-100
     .px-4.pt-4.pb-3
-      = link_to root_path, class: 'brand-logo' do
+      = link_to (current_user&.admin? || current_user&.super_admin? ? admin_root_path : root_path), class: 'brand-logo' do
         span.brand-icon
           i.bi.bi-stars
 
         span AI Review
 
     nav.flex-grow-1
-      p.sidebar-label Workspace
+      - if current_user&.admin? || current_user&.super_admin?
+        p.sidebar-label Admin
 
-      = link_to root_path,
-          class: "sidebar-link #{'active' if current_page?(root_path)}" do
-        i.bi.bi-house
-        span Home
+        = link_to admin_users_path, class: "sidebar-link #{'active' if controller_name == 'users'}" do
+          i.bi.bi-people
+          span Users
 
-      = link_to dashboard_path,
-          class: "sidebar-link #{'active' if controller_name == 'dashboard'}" do
-        i.bi.bi-grid
-        span Dashboard
+        - if current_user.super_admin?
+          = link_to admin_admins_path, class: "sidebar-link #{'active' if controller_name == 'admins'}" do
+            i.bi.bi-shield-lock
+            span Admins
 
-      = link_to repositories_path,
-          class: "sidebar-link #{'active' if controller_name == 'repositories'}" do
-        i.bi.bi-github
-        span Repositories
+      - else
+        p.sidebar-label Workspace
 
-      = link_to reviews_path,
-          class: "sidebar-link #{'active' if controller_name == 'reviews'}" do
-        i.bi.bi-code-square
-        span AI Reviews
+        = link_to root_path, class: "sidebar-link #{'active' if current_page?(root_path)}" do
+          i.bi.bi-house
+          span Home
 
-      p.sidebar-label Account
+        = link_to dashboard_path, class: "sidebar-link #{'active' if controller_name == 'dashboard'}" do
+          i.bi.bi-grid
+          span Dashboard
 
-      = link_to account_path, class: "sidebar-link #{'active' if controller_name == 'accounts'}" do
-        i.bi.bi-person-circle
-        span Account
+        = link_to repositories_path, class: "sidebar-link #{'active' if controller_name == 'repositories'}" do
+          i.bi.bi-github
+          span Repositories
+
+        = link_to reviews_path, class: "sidebar-link #{'active' if controller_name == 'reviews'}" do
+          i.bi.bi-code-square
+          span AI Reviews
+
+        p.sidebar-label Account
+
+        = link_to account_path, class: "sidebar-link #{'active' if controller_name == 'accounts'}" do
+          i.bi.bi-person-circle
+          span Account
 
     - if user_signed_in?
       .sidebar-user
         .d-flex.align-items-center.gap-3
           - if current_user.avatar_url.present?
-            img.avatar src=current_user.avatar_url alt=current_user.full_name
+            img.avatar src=current_user.avatar_url alt=(current_user.display_name.presence || current_user.email)
           - else
             span.avatar
               = current_user.initials
 
           .overflow-hidden
             p.mb-0.text-white.fw-semibold.small.text-truncate
-              = current_user.display_name
+              = current_user.display_name.presence || current_user.email
 
-        = button_to destroy_user_session_path,
-            method: :delete,
-            class: 'sidebar-link border-0 bg-transparent w-100 text-start mt-3' do
+        = button_to destroy_user_session_path, method: :delete, class: 'sidebar-link border-0 bg-transparent w-100 text-start mt-3' do
           i.bi.bi-box-arrow-right
           span Sign out
-    - else
-      .sidebar-user
-        = link_to new_user_session_path, class: 'sidebar-link text-decoration-none' do
-          i.bi.bi-box-arrow-in-right
-          span Sign in
+  

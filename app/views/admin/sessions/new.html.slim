@@ -1,0 +1,19 @@
+.container.py-5
+  .row.justify-content-center
+    .col-12.col-md-6.col-lg-4
+      .dashboard-card
+        .p-4
+          h1.page-title.mb-2 Admin login
+          p.text-secondary.mb-4
+            | Sign in with your admin account.
+
+          = form_for(resource, as: resource_name, url: admin_session_path, html: { data: { turbo: false } }) do |form|
+            .mb-3
+                = form.label :email, class: 'form-label'
+                = form.email_field :email, autofocus: true, autocomplete: 'email', class: 'form-control'
+
+            .mb-4
+                = form.label :password, class: 'form-label'
+                = form.password_field :password, autocomplete: 'current-password', class: 'form-control'
+
+            = form.submit 'Sign in', class: 'btn btn-primary w-100'

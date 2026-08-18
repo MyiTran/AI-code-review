@@ -1,59 +1,76 @@
-- provide(:title, 'User Detail')
+.d-flex.align-items-center.justify-content-between.mb-4
+  div
+    h1.page-title
+      = @user.display_name.presence || @user.email
 
-= render 'admin/shared/breadcrumb', breadcrumbs: [{ name: 'Dashboard', path: admin_root_path }, { name: 'Users', path: admin_users_path }, { name: 'User Detail' }]
+    p.page-description.mb-0
+      = @user.email
 
-.min-h-screen.p-6 data-controller="icons"
-  .max-w-6xl.mx-auto
-    .bg-base-200.border.border-base-200.rounded-3xl.overflow-hidden.mb-8
-      .relative.p-8
-        .flex.flex-col.lg:flex-row.items-start.gap-8
-          .flex-1.text-center.lg:text-left
-            .text-4xl.font-bold.mb-2
-              = display_text(@user.full_name)
-            .mb-4.text-xl.break-words.overflow-wrap-anywhere = @user.email
+  = link_to 'Back', admin_users_path, class: 'btn btn-light'
 
-            .flex.flex-wrap.justify-center.lg:justify-start.gap-3.mb-6
-              - @user.roles.each do |role|
-                span.inline-flex.items-center.px-4.py-2.rounded-full.text-sm.font-semibold class="#{role.name == 'admin' ? 'bg-red-100 text-red-800 border border-red-200' : role.name == 'coach' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-green-100 text-green-800 border border-green-200'}"
-                  = role.name.titleize
+.dashboard-card.mb-4
+  .p-4
+    h2.card-title-custom.mb-4 User information
 
-              span.inline-flex.items-center.px-4.py-2.rounded-full.text-sm.font-semibold class="bg-green-100 text-green-800 border border-green-200"
-                = 'Active Account'
+    .row.g-4
+      .col-md-4
+        p.text-secondary.small.mb-1 Email
+        p.fw-semibold.mb-0
+          = @user.email
 
-          .flex-shrink-0.flex.gap-2
-            = link_to admin_users_path, class: 'inline-flex items-center px-3 py-1 border-2 border-slate-300 rounded-xl shadow-sm text-base font-medium text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-400' do
-              = lucide_icon('arrow-left', class: 'w-5 h-5 mr-2')
-              | Back
-            = link_to edit_admin_user_path(@user), class: 'inline-flex items-center px-3 py-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-indigo-700 hover:to-purple-700' do
-              = lucide_icon('edit', class: 'w-5 h-5 mr-2')
-              | Edit
+      .col-md-4
+        p.text-secondary.small.mb-1 Current plan
+        p.fw-semibold.mb-0
+          = @user.plan.titleize
 
-    .bg-white.backdrop-blur-sm.bg-opacity-95.border.border-white.border-opacity-20.rounded-3xl.shadow-xl.shadow-slate-200/50.overflow-hidden data-controller="tabs" data-tabs-active-value="personal"
-      .border-b.border-slate-200.bg-gradient-to-r.from-slate-50.to-slate-100
-        nav.flex.space-x-8.px-8
-          button.py-4.px-2.border-b-2.font-medium.text-sm.transition-all.duration-300.border-indigo-500.text-indigo-600 data-tabs-target="tab" data-tab="personal" data-action="click->tabs#switch"
-            | Personal Information
+      .col-md-4
+        p.text-secondary.small.mb-1 Joined
+        p.fw-semibold.mb-0
+          = @user.created_at.strftime('%d/%m/%Y')
 
-      .p-8
-        #personal-content
-          .grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-3.gap-6
-            .bg-gradient-to-br.from-blue-50.to-indigo-50.rounded-xl.p-6.border.border-blue-100.hover:shadow-lg.transition-all.duration-300
-              .flex.items-center.mb-4
-                .w-10.h-10.bg-blue-100.rounded-lg.flex.items-center.justify-center.mr-3
-                  = lucide_icon('user', class: 'w-5 h-5 text-blue-600')
-                h3.text-lg.font-semibold.text-blue-800 Full Name
-              p.text-base.font-medium.text-slate-800.break-words.overflow-wrap-anywhere = display_text(@user.full_name)
+.dashboard-card.mb-4
+  .p-4
+    h2.card-title-custom.mb-4 Subscription
 
-            .bg-gradient-to-br.from-green-50.to-emerald-50.rounded-xl.p-6.border.border-green-100.hover:shadow-lg.transition-all.duration-300
-              .flex.items-center.mb-4
-                .w-10.h-10.bg-green-100.rounded-lg.flex.items-center.justify-center.mr-3
-                  = lucide_icon('mail', class: 'w-5 h-5 text-green-600')
-                h3.text-lg.font-semibold.text-green-800 Email Address
-              p.text-base.font-medium.text-slate-800.break-words.overflow-wrap-anywhere = display_text(@user.email)
+    = form_with model: [:admin, @user], method: :patch do |form|
+      .row.g-3.align-items-end
+        .col-md-4
+          = form.label :plan, 'Plan', class: 'form-label'
+          = form.select :plan, options_for_select([['Free', 'free'], ['Pro', 'pro']], @user.plan), {}, class: 'form-select'
 
-            .bg-gradient-to-br.from-indigo-50.to-blue-50.rounded-xl.p-6.border.border-indigo-100.hover:shadow-lg.transition-all.duration-300
-              .flex.items-center.mb-4
-                .w-10.h-10.bg-indigo-100.rounded-lg.flex.items-center.justify-center.mr-3
-                  = lucide_icon('calendar', class: 'w-5 h-5 text-indigo-600')
-                h3.text-lg.font-semibold.text-indigo-800 Member Since
-              p.text-base.font-medium.text-slate-800 = display_datetime(@user.created_at)
+        .col-md-auto
+          = form.submit 'Update plan', class: 'btn btn-primary'
+
+.dashboard-card
+  .p-4.border-bottom
+    h2.card-title-custom.mb-0 Repositories
+
+  .table-responsive
+    table.table.mb-0
+      thead
+        tr
+          th Repository
+          th Status
+          th AI model
+          th
+
+      tbody
+        - @repositories.each do |repository|
+          tr
+            td
+              span.fw-semibold
+                = repository.name
+
+            td
+              - if repository.connected?
+                span.badge.badge-soft-success.rounded-pill
+                  | Connected
+              - else
+                span.badge.bg-light.text-secondary.rounded-pill
+                  | Disconnected
+
+            td
+              = repository.ai_model&.name || 'Default'
+
+            td.text-end
+              = link_to 'View', admin_user_repository_path(@user, repository), class: 'btn btn-sm btn-light'
