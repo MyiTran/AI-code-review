@@ -190,11 +190,24 @@
             p.mb-0.text-secondary.small
               | Review new and updated pull requests automatically.
 
-          .form-check.form-switch
-            input#repository-auto-review.form-check-input.ai-review-toggle type="checkbox" role="switch" disabled=true data-status-target="repository-auto-review-status"
+          = form_with model: @repository,
+              url: repository_path(@repository),
+              method: :patch,
+              local: true do |form|
+            .form-check.form-switch
+              = form.check_box :auto_review_enabled,
+                  id: 'repository-auto-review',
+                  class: 'form-check-input ai-review-toggle',
+                  role: 'switch',
+                  disabled: !@repository.connected?,
+                  onchange: 'this.form.requestSubmit()'
 
-        p#repository-auto-review-status.mt-3.mb-0.small.fw-semibold.text-secondary
-          | Automatic review is off
+        - if @repository.auto_review_enabled?
+          p#repository-auto-review-status.mt-3.mb-0.small.fw-semibold.text-success
+            | Automatic review is on
+        - else
+          p#repository-auto-review-status.mt-3.mb-0.small.fw-semibold.text-secondary
+            | Automatic review is off
 
       .setting-section
         label.form-label.fw-semibold for="repository-ai-model"
@@ -206,11 +219,3 @@
 
         p.text-secondary.small.mt-2.mb-0
           | This model will analyze pull requests for this repository.
-
-      button.btn.btn-primary.w-100 type="button" disabled=true
-        i.bi.bi-check-lg.me-2
-        | Save settings
-
-      p.text-center.text-secondary.mt-3.mb-0 style="font-size: 12px;"
-        | Frontend preview only. Changes are not saved yet.
-        
