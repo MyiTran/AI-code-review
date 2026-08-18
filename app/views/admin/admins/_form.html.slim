@@ -1,0 +1,53 @@
+= form_with model: admin,
+  url: admin.persisted? ? admin_admin_path(admin) : admin_admins_path,
+  method: admin.persisted? ? :patch : :post,
+  data: { turbo: false } do |form|
+
+  - if admin.errors.any?
+    .alert.alert-danger.mb-4
+      ul.mb-0
+        - admin.errors.full_messages.each do |message|
+          li = message
+
+  .row.g-4
+    .col-12.col-md-6
+      = form.label :first_name, 'First name', class: 'form-label'
+      = form.text_field :first_name, class: 'form-control'
+
+    .col-12.col-md-6
+      = form.label :last_name, 'Last name', class: 'form-label'
+      = form.text_field :last_name, class: 'form-control'
+
+    .col-12
+      = form.label :email, class: 'form-label'
+      = form.email_field :email, class: 'form-control', required: true
+
+    .col-12.col-md-6
+      = form.label :password, class: 'form-label'
+
+      .input-group
+        = form.password_field :password,
+          class: 'form-control',
+          autocomplete: 'new-password',
+          id: 'admin-password',
+          required: true
+
+        button.btn.btn-outline-secondary type="button" onclick="togglePassword('admin-password', this)"
+          i.bi.bi-eye
+
+    .col-12.col-md-6
+      = form.label :password_confirmation, 'Confirm password', class: 'form-label'
+
+      .input-group
+        = form.password_field :password_confirmation,
+          class: 'form-control',
+          autocomplete: 'new-password',
+          id: 'admin-password-confirmation',
+          required: true
+
+        button.btn.btn-outline-secondary type="button" onclick="togglePassword('admin-password-confirmation', this)"
+          i.bi.bi-eye
+
+  .d-flex.flex-column-reverse.flex-sm-row.justify-content-end.gap-2.mt-4
+    = link_to 'Cancel', admin_admins_path, class: 'btn btn-light'
+    = form.submit admin.persisted? ? 'Update admin' : 'Create admin', class: 'btn btn-primary'

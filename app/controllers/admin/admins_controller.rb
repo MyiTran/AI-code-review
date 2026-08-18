@@ -24,6 +24,11 @@ module Admin
       @admin.provider = :email
       @admin.confirmed_at = Time.current
 
+      if admin_params[:password].blank?
+        @admin.errors.add(:password, "can't be blank")
+        return render :new, status: :unprocessable_content
+      end
+
       if @admin.save
         @admin.add_role(:admin)
         redirect_to admin_admins_path, notice: 'Admin created!'

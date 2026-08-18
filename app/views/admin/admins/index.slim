@@ -1,0 +1,81 @@
+.d-flex.flex-column.flex-md-row.align-items-md-center.justify-content-between.gap-3.mb-4
+  div
+    h1.page-title Admins
+    p.page-description
+      | Manage administrator accounts and permissions.
+
+  = link_to new_admin_admin_path, class: 'btn btn-primary' do
+    i.bi.bi-plus-lg.me-2
+    | Add admin
+
+.dashboard-card.mb-4
+  .p-4
+    = form_with url: admin_admins_path, method: :get, data: { turbo: false } do |form|
+      .row.g-3.align-items-end
+        .col
+          = form.label :q, 'Search admins', class: 'form-label'
+          = form.text_field :q,
+            value: params[:q],
+            placeholder: 'Search by name or email...',
+            class: 'form-control'
+
+        .col-md-auto
+          = form.submit 'Search', class: 'btn btn-primary'
+
+        .col-md-auto
+          = link_to 'Clear', admin_admins_path, class: 'btn btn-light'
+
+.dashboard-card
+  .table-responsive
+    table.table.mb-0
+      thead
+        tr
+          th Admin
+          th Email
+          th.text-center Role
+          th Joined
+          th.text-end Actions
+
+      tbody
+        - @admins.each do |admin|
+          tr
+            td
+              .d-flex.align-items-center.gap-3
+                span.admin-user-avatar
+                  = admin.initials
+
+                div
+                  p.mb-0.fw-semibold
+                    = admin.display_name
+
+            td
+              = admin.email
+
+            td.text-center
+              - if admin.super_admin?
+                span.badge.admin-badge.rounded-pill
+                  | Super Admin
+              - else
+                span.badge.bg-light.text-secondary.rounded-pill.px-3.py-2
+                  | Admin
+
+            td
+              = admin.created_at.strftime('%d/%m/%Y')
+
+            td.text-end
+                - unless admin.super_admin?
+                    .d-inline-flex.align-items-center.gap-2
+                    = link_to edit_admin_admin_path(admin), class: 'btn btn-sm btn-light' do
+                        i.bi.bi-pencil.me-1
+                        | Edit
+
+                    = button_to admin_admin_path(admin),
+                        method: :delete,
+                        class: 'btn btn-sm btn-outline-danger',
+                        form: { data: { turbo: false }, class: 'd-inline-block m-0' } do
+                        i.bi.bi-trash.me-1
+                        | Delete
+
+  - if @pagy.pages > 1
+    .d-flex.justify-content-center.p-4
+      == @pagy.series_nav

@@ -1,29 +1,31 @@
-.d-flex.align-items-center.justify-content-between.mb-4
-  div
-    h1.page-title
-      = @user.display_name.presence || @user.email
+.mb-4
+  = link_to admin_users_path, class: 'text-decoration-none text-secondary small' do
+    i.bi.bi-arrow-left.me-2
+    | Back to users
 
-    p.page-description.mb-0
-      = @user.email
+.mb-4
+  h1.page-title.mb-1
+    = @user.display_name.presence || @user.email
 
-  = link_to 'Back', admin_users_path, class: 'btn btn-light'
-
+  p.page-description.mb-0
+    = @user.email
+  
 .dashboard-card.mb-4
   .p-4
     h2.card-title-custom.mb-4 User information
 
     .row.g-4
-      .col-md-4
+      .col-12.col-md-4
         p.text-secondary.small.mb-1 Email
         p.fw-semibold.mb-0
           = @user.email
 
-      .col-md-4
+      .col-12.col-md-4
         p.text-secondary.small.mb-1 Current plan
         p.fw-semibold.mb-0
           = @user.plan.titleize
 
-      .col-md-4
+      .col-12.col-md-4
         p.text-secondary.small.mb-1 Joined
         p.fw-semibold.mb-0
           = @user.created_at.strftime('%d/%m/%Y')
@@ -34,43 +36,72 @@
 
     = form_with model: [:admin, @user], method: :patch, data: { turbo: false } do |form|
       .row.g-3.align-items-end
-        .col-md-4
+        .col-12.col-md-4
           = form.label :plan, 'Plan', class: 'form-label'
-          = form.select :plan, options_for_select([['Free', 'free'], ['Pro', 'pro']], @user.plan), {}, class: 'form-select'
+          = form.select :plan,
+            options_for_select([['Free', 'free'], ['Pro', 'pro']], @user.plan),
+            {},
+            class: 'form-select'
 
-        .col-md-auto
+        .col-12.col-md-auto
           = form.submit 'Update plan', class: 'btn btn-primary'
 
-.dashboard-card
-  .p-4.border-bottom
-    h2.card-title-custom.mb-0 Repositories
+= turbo_frame_tag 'user_repositories' do
+  .dashboard-card
+    .p-4.border-bottom
+      .d-flex.flex-column.flex-md-row.align-items-md-center.justify-content-between.gap-3
 
-  .table-responsive
-    table.table.mb-0
-      thead
-        tr
-          th Repository
-          th Status
-          th AI model
-          th
+        = form_with url: admin_user_path(@user),
+          method: :get,
+          data: { turbo_frame: 'user_repositories' },
+          class: 'd-flex gap-2' do |form|
 
-      tbody
-        - @repositories.each do |repository|
+          = form.text_field :q,
+            value: params[:q],
+            placeholder: 'Search repositories...',
+            class: 'form-control',
+            style: 'min-width: 400px;'
+
+          = form.submit 'Search', class: 'btn btn-primary'
+
+          - if params[:q].present?
+            = link_to 'Clear',
+              admin_user_path(@user),
+              class: 'btn btn-light',
+              data: { turbo_frame: 'user_repositories' }
+
+    .table-responsive
+      table.table.mb-0
+        thead
           tr
-            td
-              span.fw-semibold
-                = repository.name
+            th Repository
+            th Status
+            th AI model
+            th.text-end Actions
 
-            td
-              - if repository.connected?
-                span.badge.badge-soft-success.rounded-pill
-                  | Connected
-              - else
-                span.badge.bg-light.text-secondary.rounded-pill
-                  | Disconnected
+        tbody
+          - @repositories.each do |repository|
+            tr
+              td
+                span.fw-semibold
+                  = repository.name
 
-            td
-              = repository.ai_model&.name || 'Default'
+              td
+                - if repository.connected?
+                  span.badge.badge-soft-success.rounded-pill
+                    | Connected
+                - else
+                  span.badge.bg-light.text-secondary.rounded-pill
+                    | Disconnected
 
-            td.text-end
-              = link_to 'View', admin_user_repository_path(@user, repository), class: 'btn btn-sm btn-light'
+              td
+                = repository.ai_model&.name || 'Default'
+
+              td.text-end
+                = link_to 'View',
+                  admin_user_repository_path(@user, repository),
+                  class: 'btn btn-sm btn-light',
+                  data: { turbo_frame: '_top' }
+    - if @pagy.pages > 1
+    .d-flex.justify-content-center.p-4.border-top
+      == @pagy.series_nav
