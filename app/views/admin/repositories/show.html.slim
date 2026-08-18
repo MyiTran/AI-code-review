@@ -1,0 +1,10 @@
+= turbo_stream_from @repository
+
+= render 'shared/repository_details',
+  repository: @repository,
+  pull_requests: @pull_requests,
+  reviews: @reviews,
+  ai_models: [],
+  readonly: true,
+  back_path: admin_user_path(@user),
+  pull_request_path_for: ->(pull_request) { admin_user_repository_pull_request_path(@user, @repository, pull_request) }

@@ -1,0 +1,219 @@
+.mb-4
+  = link_to back_path, class: 'text-decoration-none text-secondary small' do
+    i.bi.bi-arrow-left.me-2
+    | Back to repositories
+
+.d-flex.flex-column.flex-lg-row.align-items-lg-start.justify-content-between.gap-4.mb-4
+  .d-flex.align-items-start.gap-3
+    span.repository-detail-icon
+      i.bi.bi-github
+
+    div
+      .d-flex.flex-wrap.align-items-center.gap-2.mb-1
+        h1.page-title.mb-0
+          = repository.name
+
+        - if repository.connected?
+          span.badge.badge-soft-success.rounded-pill.px-3.py-2
+            i.bi.bi-link-45deg.me-1
+            | Connected
+        - else
+          span.badge.bg-light.text-secondary.rounded-pill.px-3.py-2
+            i.bi.bi-link-45deg.me-1
+            | Disconnected
+
+      p.page-description.mb-2
+        = repository.description.presence || 'No description'
+
+      .d-flex.flex-wrap.align-items-center.gap-3.text-secondary.small
+        span
+          i.bi.bi-github.me-1
+          = repository.full_name
+
+  .d-flex.flex-column.align-items-lg-end.gap-2
+    .d-flex.flex-wrap.gap-2
+      a.btn.btn-light href=repository.github_url target="_blank" rel="noopener"
+        i.bi.bi-box-arrow-up-right.me-2
+        | View on GitHub
+
+      - unless readonly
+        - if repository.connected?
+          = button_to repository_path(repository), method: :patch, params: { repository: { connected: false } }, class: 'btn btn-outline-danger', form: { data: { turbo_confirm: 'Are you sure you want to disconnect this repository?' } } do
+            i.bi.bi-link-45deg.me-2
+            | Disconnect
+        - else
+          = button_to github_connection_path, method: :post, params: { repository_id: repository.id }, class: 'btn btn-primary', form: { data: { turbo: false } } do
+            i.bi.bi-link-45deg.me-2
+            | Connect again
+
+    - if !readonly && repository.connected?
+      p.mb-0.text-secondary.small.text-lg-end
+        | Disconnecting only stops this repository from AI Review.
+        br
+        | To fully revoke access, manage the GitHub App on GitHub.
+
+.dashboard-card.p-4.mb-4
+  h2.card-title-custom.mb-4 Repository information
+
+  .repository-information-grid
+    .repository-information-item
+      span.repository-information-label Default branch
+      span.repository-information-value
+        i.bi.bi-diagram-3.me-2
+        = repository.default_branch
+
+    .repository-information-item
+      span.repository-information-label Language
+      span.repository-information-value
+        = repository.language.presence || 'Unknown'
+
+    .repository-information-item
+      span.repository-information-label Visibility
+      span.repository-information-value
+        = repository.visibility.presence || 'Unknown'
+
+    .repository-information-item
+      span.repository-information-label Connected on
+      span.repository-information-value
+        - if repository.connected_at.present?
+          = l(repository.connected_at, format: :long)
+        - else
+          | Unknown
+
+    .repository-information-item
+      span.repository-information-label Last reviewed
+      span.repository-information-value
+        - if repository.latest_review&.reviewed_at.present?
+          = l(repository.latest_review.reviewed_at, format: :long)
+        - else
+          | Never
+
+.row.g-4.mb-4
+  .col-12.col-sm-6.col-xl-3
+    .dashboard-card.p-4
+      .stat-icon.stat-icon-primary.mb-4
+        i.bi.bi-git
+
+      .stat-value.mb-2
+        = pull_requests.size
+
+      .stat-label Pull Requests
+
+  .col-12.col-sm-6.col-xl-3
+    .dashboard-card.p-4
+      .stat-icon.stat-icon-success.mb-4
+        i.bi.bi-stars
+
+      .stat-value.mb-2
+        = reviews.size
+
+      .stat-label AI Reviews
+
+  .col-12.col-sm-6.col-xl-3
+    .dashboard-card.p-4
+      .stat-icon.stat-icon-danger.mb-4
+        i.bi.bi-bug
+
+      .stat-value.mb-2
+        = reviews.sum(&:issues_found_count)
+
+      .stat-label Issues Found
+
+  .col-12.col-sm-6.col-xl-3
+    .dashboard-card.p-4
+      .stat-icon.stat-icon-warning.mb-4
+        i.bi.bi-people
+
+      .stat-value.mb-2
+        = pull_requests.map(&:author).compact_blank.uniq.size
+
+      .stat-label Contributors
+
+.row.g-4
+  .col-12 class=(readonly ? '' : 'col-xl-8')
+    .dashboard-card
+      .d-flex.flex-column.flex-md-row.align-items-md-center.justify-content-between.gap-3.p-4.border-bottom
+        div
+          h2.card-title-custom Pull request review history
+
+          p.mb-0.mt-1.text-secondary.small
+            | Pull requests analyzed by AI for this repository.
+
+      - if pull_requests.any?
+        .table-responsive
+          table.table.mb-0
+            thead
+              tr
+                th Pull request
+                th Status
+                th Reviews
+                th Updated
+                th
+
+            tbody
+              - pull_requests.each do |pull_request|
+                tr
+                  td
+                    p.mb-1.fw-semibold
+                      | ##{pull_request.number} #{pull_request.title}
+
+                    p.mb-0.text-secondary.small
+                      = pull_request.author.presence || 'Unknown'
+
+                  td
+                    span.badge.bg-light.text-secondary.rounded-pill
+                      = pull_request.merged_at.present? ? 'Merged' : pull_request.state.capitalize
+
+                  td
+                    = pull_request.reviews.size
+
+                  td.text-secondary.small
+                    = l(pull_request.updated_at, format: :short)
+
+                  td.text-end
+                    - if pull_request.reviews.any?
+                      = link_to pull_request_path_for.call(pull_request), class: 'btn btn-sm btn-light' do
+                        | View reviews
+      - else
+        .text-center.p-5
+          span.empty-state-icon.mb-3
+            i.bi.bi-search
+
+          h3.fs-5 No pull requests found
+
+          p.text-secondary.mb-4
+            | No pull requests have been synchronized yet.
+
+  - unless readonly
+    .col-12.col-xl-4
+      .dashboard-card.p-4.mb-4
+        h2.card-title-custom.mb-1 AI review settings
+
+        p.text-secondary.small.mb-4
+          | Configure how this repository is automatically reviewed.
+
+        .setting-section
+          .d-flex.align-items-start.justify-content-between.gap-3
+            div
+              p.mb-1.fw-semibold Automatic AI review
+              p.mb-0.text-secondary.small
+                | Review new and updated pull requests automatically.
+
+            = form_with model: repository, url: repository_path(repository), method: :patch, local: true do |form|
+              .form-check.form-switch
+                = form.check_box :auto_review_enabled, id: 'repository-auto-review', class: 'form-check-input ai-review-toggle', role: 'switch', disabled: !repository.connected?, onchange: 'this.form.requestSubmit()'
+
+          - if repository.auto_review_enabled?
+            p.mt-3.mb-0.small.fw-semibold.text-success
+              | Automatic review is on
+          - else
+            p.mt-3.mb-0.small.fw-semibold.text-secondary
+              | Automatic review is off
+
+        .setting-section.mt-4
+          = form_with model: repository, url: repository_path(repository), method: :patch, local: true do |form|
+            = form.label :ai_model_id, 'AI model', class: 'form-label fw-semibold'
+            = form.collection_select :ai_model_id, ai_models, :id, :name, { include_blank: 'Use default model' }, class: 'form-select', disabled: !repository.connected?, onchange: 'this.form.requestSubmit()'
+
+            p.text-secondary.small.mt-2.mb-0
+              = current_user.pro? ? 'Pro plan: All AI models are available.' : 'Free plan: Gemini Flash Lite only.'
