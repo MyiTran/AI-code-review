@@ -72,11 +72,11 @@ class User < ApplicationRecord
 
   # instance methods
   def display_name
-    full_name.presence || github_username
+    full_name.presence || github_username.presence || email.split('@').first
   end
 
   def initials
-    display_name.split.filter_map(&:first).join.upcase
+    (display_name.presence || email).split.filter_map(&:first).join.upcase
   end
 
   def full_name

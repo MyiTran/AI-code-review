@@ -1,0 +1,9 @@
+= turbo_stream_from @review
+
+= render 'shared/review_details',
+  review: @review,
+  changed_files: @changed_files,
+  readonly: true,
+  back_path: admin_user_repository_pull_request_path(@user, @repository, @pull_request),
+  back_text: 'Back to pull request',
+  repository_path_for: ->(_repository) { admin_user_repository_path(@user, @repository) }
