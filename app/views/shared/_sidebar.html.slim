@@ -58,7 +58,7 @@ aside.app-sidebar
             p.mb-0.text-white.fw-semibold.small.text-truncate
               = current_user.display_name.presence || current_user.email
 
-        = button_to destroy_user_session_path, method: :delete, class: 'sidebar-link border-0 bg-transparent w-100 text-start mt-3' do
+        = button_to destroy_user_session_path, method: :delete, class: 'sidebar-link border-0 bg-transparent w-100 text-start mt-1' do
           i.bi.bi-box-arrow-right
           span Sign out
   

@@ -3,7 +3,9 @@ module Admin
     def index
       authorize User, policy_class: Admin::UserPolicy
 
-      @users = User.order(created_at: :desc)
+      users = policy_scope(User, policy_scope_class: Admin::UserPolicy::Scope).search(params[:q])
+      @pagy, @users = pagy(users, limit: 10)
+
       @repository_counts = Repository.joins(:github_installation).group('github_installations.user_id').count
     end
 
@@ -19,8 +21,11 @@ module Admin
       @user = User.find(params.expect(:id))
       authorize @user, policy_class: Admin::UserPolicy
 
-      @user.update!(user_params)
-      redirect_to admin_user_path(@user), notice: 'Plan updated'
+      if @user.update(user_params)
+        redirect_to admin_user_path(@user), notice: 'Plan updated successfully.'
+      else
+        redirect_to admin_user_path(@user), alert: 'Failed to update plan.'
+      end
     end
 
     private

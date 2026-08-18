@@ -13,11 +13,15 @@ header.app-navbar.d-flex.align-items-center
             = controller_path.start_with?('admin/') ? 'Administration' : 'Automated code review powered by AI'
 
       - unless controller_path.start_with?('admin/')
-        button.btn.btn-light.position-relative.rounded-circle.p-0[
-          type="button"
-          aria-label="Notifications"
-          style="width: 40px; height: 40px;"
-        ]
-          i.bi.bi-bell
+        .d-flex.align-items-center.gap-2
+          - if user_signed_in?
+            button.btn.btn-light.position-relative.rounded-circle.p-0[
+              type="button"
+              aria-label="Notifications"
+              style="width: 40px; height: 40px;"
+            ]
+              i.bi.bi-bell
 
-          span.position-absolute.top-0.start-100.translate-middle.p-1.bg-danger.border.border-light.rounded-circle
+              span.position-absolute.top-0.start-100.translate-middle.p-1.bg-danger.border.border-light.rounded-circle
+          - else
+            = link_to 'Log in', new_user_session_path, class: 'btn btn-primary'

@@ -3,7 +3,10 @@ module Admin
     before_action :require_super_admin!
 
     def index
-      @admins = User.with_any_role(:admin, :super_admin).sort_by(&:email)
+      authorize User, policy_class: Admin::AdminPolicy
+
+      admins = policy_scope(User, policy_scope_class: Admin::AdminPolicy::Scope).search(params[:q])
+      @pagy, @admins = pagy(admins, limit: 10)
     end
 
     def new
