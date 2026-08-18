@@ -99,6 +99,9 @@ class User < ApplicationRecord
     plan == 'pro'
   end
 
+  # scopes
+  scope :search, ->(keyword) { keyword.blank? ? all : where('first_name ILIKE :kw OR last_name ILIKE :kw OR email ILIKE :kw OR github_username ILIKE :kw', kw: "%#{keyword}%") }
+
   # class methods
   def self.ransackable_attributes(_auth_object = nil)
     %w[first_name last_name email]
