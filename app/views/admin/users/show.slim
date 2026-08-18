@@ -32,7 +32,7 @@
   .p-4
     h2.card-title-custom.mb-4 Subscription
 
-    = form_with model: [:admin, @user], method: :patch do |form|
+    = form_with model: [:admin, @user], method: :patch, data: { turbo: false } do |form|
       .row.g-3.align-items-end
         .col-md-4
           = form.label :plan, 'Plan', class: 'form-label'
