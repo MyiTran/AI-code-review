@@ -13,60 +13,33 @@
 
 .dashboard-card.mb-4
   .p-4
-    = form_with url: repositories_path,
-        method: :get,
-        local: true,
-        class: 'row g-3 align-items-end' do |form|
+    = form_with url: repositories_path, method: :get, local: true, class: 'row g-3 align-items-end' do |form|
       .col-12.col-xl-4
-        = form.label :query,
-            'Search repositories',
-            class: 'form-label small fw-semibold'
+        = form.label :query, 'Search repositories', class: 'form-label small fw-semibold'
 
         .input-group
           span.input-group-text.bg-white.border-end-0
             i.bi.bi-search.text-secondary
 
-          = form.search_field :query,
-              value: params[:query],
-              placeholder: 'Search by repository name...',
-              class: 'form-control border-start-0 ps-0'
+          = form.search_field :query, value: params[:query], placeholder: 'Search by repository name...', class: 'form-control border-start-0 ps-0'
 
       .col-6.col-md-4.col-xl-2
-        = form.label :connection_status,
-            'Connection',
-            class: 'form-label small fw-semibold'
-
-        = form.select :connection_status,
-            options_for_select([['Connected', 'connected'], ['Disconnected', 'disconnected']], params[:connection_status]),
-            { include_blank: 'All connections' },
-            class: 'form-select'
+        = form.label :connection_status, 'Connection', class: 'form-label small fw-semibold'
+        = form.select :connection_status, options_for_select([['Connected', 'connected'], ['Disconnected', 'disconnected']], params[:connection_status]), { include_blank: 'All connections' }, class: 'form-select'
 
       .col-6.col-md-4.col-xl-2
         = form.label :language, 'Language', class: 'form-label small fw-semibold'
-
-        = form.select :language,
-            options_for_select(@languages, params[:language]),
-            { include_blank: 'All languages' },
-            class: 'form-select'
+        = form.select :language, options_for_select(Array(@languages), params[:language]), { include_blank: 'All languages' }, class: 'form-select'
 
       .col-6.col-md-4.col-xl-2
-        = form.label :ai_model,
-            'AI model',
-            class: 'form-label small fw-semibold'
-
-        = form.select :ai_model,
-            options_for_select(@models, params[:ai_model]),
-            { include_blank: 'All models' },
-            class: 'form-select'
+        = form.label :ai_model, 'AI model', class: 'form-label small fw-semibold'
+        = form.select :ai_model, options_for_select([], params[:ai_model]), { include_blank: 'All models' }, class: 'form-select', disabled: true
 
       .col-6.col-md-4.col-xl-2
         .d-flex.gap-2
-          = form.submit 'Apply',
-              class: 'btn btn-primary flex-grow-1'
+          = form.submit 'Apply', class: 'btn btn-primary flex-grow-1'
 
-          = link_to repositories_path,
-              class: 'btn btn-light',
-              title: 'Clear filters' do
+          = link_to repositories_path, class: 'btn btn-light', title: 'Clear filters' do
             i.bi.bi-arrow-counterclockwise
 
 .dashboard-card
@@ -98,8 +71,7 @@
           - @repositories.each do |repository|
             tr
               td
-                = link_to repository_path(repository),
-                    class: 'repository-name-link' do
+                = link_to repository_path(repository), class: 'repository-name-link' do
                   .d-flex.align-items-center.gap-3
                     span.repository-icon
                       i.bi.bi-github
@@ -117,22 +89,15 @@
                   = repository.language.presence || 'Unknown'
 
               td
-                span.text-secondary.small
-                  | Not selected
+                span.ai-model-badge
+                  i.bi.bi-stars
+                  = repository.ai_model&.name || @default_ai_model&.name || 'Not selected'
 
               td
                 .d-flex.align-items-center.gap-2
-                  = form_with model: repository,
-                      url: repository_path(repository),
-                      method: :patch,
-                      local: true do |form|
+                  = form_with model: repository, url: repository_path(repository), method: :patch, local: true do |form|
                     .form-check.form-switch.mb-0
-                      = form.check_box :auto_review_enabled,
-                          class: 'form-check-input ai-review-toggle',
-                          role: 'switch',
-                          disabled: !repository.connected?,
-                          aria: { label: "Toggle AI review for #{repository.name}" },
-                          onchange: 'this.form.requestSubmit()'
+                      = form.check_box :auto_review_enabled, class: 'form-check-input ai-review-toggle', role: 'switch', disabled: !repository.connected?, aria: { label: "Toggle AI review for #{repository.name}" }, onchange: 'this.form.requestSubmit()'
 
                   - if repository.auto_review_enabled?
                     span.small.fw-semibold.text-success
@@ -152,12 +117,13 @@
                     | Disconnected
 
               td.text-secondary.small
-                | Never
+                - if repository.latest_review&.reviewed_at.present?
+                  = l(repository.latest_review.reviewed_at, format: :short)
+                - else
+                  | Never
 
               td.text-end
-                = link_to repository_path(repository),
-                    class: 'btn btn-sm btn-light',
-                    aria: { label: "View #{repository.name}" } do
+                = link_to repository_path(repository), class: 'btn btn-sm btn-light', aria: { label: "View #{repository.name}" } do
                   i.bi.bi-chevron-right
 
   - else
@@ -175,3 +141,4 @@
           data: { turbo: false } do
         i.bi.bi-plus-lg.me-2
         | Connect repository
+        

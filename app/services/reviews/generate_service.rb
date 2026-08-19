@@ -1,23 +1,21 @@
 module Reviews
   class GenerateService < ApplicationService
-    def initialize(pull_request)
-      @pull_request = pull_request
+    def initialize(review)
+      @review = review
     end
 
     def call
-      ai_model = pull_request.repository.ai_model || AiModel.find_by!(is_default: true, active: true)
-      review = find_or_initialize_review(ai_model)
-
-      return review if review.persisted? && review.status == 'completed'
-
       started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      files = Github::FetchPullRequestDiffService.call(pull_request)
-      result = Ai::Providers::GeminiService.call(model: ai_model.slug, prompt: build_prompt(files))
+      files = Github::FetchPullRequestDiffService.call(pull_request, base_sha: review.base_commit_sha, head_sha: review.commit_sha)
+      result = Ai::Providers::GeminiService.call(model: review.ai_model.slug, prompt: build_prompt(files))
+
+      summary, review_content = parse_response(result[:content])
 
       review.update!(
         status: 'completed',
-        summary: result[:content],
-        review_content: result[:content],
+        summary: summary,
+        review_content: review_content,
+        issues_found_count: count_issues(review_content),
         tokens_used: result[:tokens_used],
         latency_ms: elapsed_milliseconds(started_at),
         reviewed_at: Time.current,
@@ -25,17 +23,14 @@ module Reviews
       )
 
       review
-    rescue StandardError => e
-      review&.update!(status: 'failed', error_message: e.message)
-      raise
     end
 
     private
 
-    attr_reader :pull_request
+    attr_reader :review
 
-    def find_or_initialize_review(ai_model)
-      pull_request.reviews.find_or_initialize_by(commit_sha: pull_request.head_commit_sha, ai_model: ai_model)
+    def pull_request
+      @pull_request ||= review.pull_request
     end
 
     def build_prompt(files)
@@ -54,13 +49,52 @@ module Reviews
         Do not guess missing code.
         Ignore binary files.
 
-        Return only the issues found.
+        Return markdown using exactly this format:
+
+        ## Summary
+        Write one short sentence summarizing the result.
+
+        ## Review
+        For each issue, use:
+
+        ### Issue 1
+
+        - File:
+        - Problem:
+        - Suggestion:
+
+        ### Issue 2
+
+        ...
+
+        ### Issue 3
+
+        ...
+
+        If there are no issues, return:
+
+        ## Summary
+        No issues detected.
+
+        ## Review
+        No issues found.
 
         Pull request: #{pull_request.title}
 
         Changes:
         #{changes}
       PROMPT
+    end
+
+    def parse_response(content)
+      summary = content[/## Summary\s*(.*?)(?=## Review|\z)/m, 1]&.strip
+      review_content = content[/## Review\s*(.*)\z/m, 1]&.strip
+
+      [summary.presence || 'Review completed.', review_content.presence || content]
+    end
+
+    def count_issues(content)
+      content.scan(/^### Issue/).count
     end
 
     def elapsed_milliseconds(started_at)

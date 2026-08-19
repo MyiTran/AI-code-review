@@ -22,4 +22,7 @@ class AiModel < ApplicationRecord
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
   validates :provider, presence: true
+
+  scope :default, -> { where(is_default: true) }
+  scope :active, -> { where(active: true) }
 end

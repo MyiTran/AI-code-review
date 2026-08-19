@@ -1,6 +1,6 @@
+= turbo_stream_from @repository
 .mb-4
-  = link_to repositories_path,
-      class: 'text-decoration-none text-secondary small' do
+  = link_to repositories_path, class: 'text-decoration-none text-secondary small' do
     i.bi.bi-arrow-left.me-2
     | Back to repositories
 
@@ -32,20 +32,12 @@
           = @repository.full_name
 
   .d-flex.flex-wrap.gap-2
-    a.btn.btn-light[
-      href=@repository.github_url
-      target="_blank"
-      rel="noopener"
-    ]
+    a.btn.btn-light href=@repository.github_url target="_blank" rel="noopener"
       i.bi.bi-box-arrow-up-right.me-2
       | View on GitHub
 
     - if @repository.connected?
-      = button_to repository_path(@repository),
-          method: :patch,
-          params: { repository: { connected: false } },
-          class: 'btn btn-outline-danger',
-          form: { data: { turbo_confirm: 'Are you sure you want to disconnect this repository?' } } do
+      = button_to repository_path(@repository), method: :patch, params: { repository: { connected: false } }, class: 'btn btn-outline-danger', form: { data: { turbo_confirm: 'Are you sure you want to disconnect this repository?' } } do
         i.bi.bi-link-45deg.me-2
         | Disconnect
     - else
@@ -59,26 +51,22 @@
   .repository-information-grid
     .repository-information-item
       span.repository-information-label Default branch
-
       span.repository-information-value
         i.bi.bi-diagram-3.me-2
         = @repository.default_branch
 
     .repository-information-item
       span.repository-information-label Language
-
       span.repository-information-value
         = @repository.language.presence || 'Unknown'
 
     .repository-information-item
       span.repository-information-label Visibility
-
       span.repository-information-value
         = @repository.visibility.presence || 'Unknown'
 
     .repository-information-item
       span.repository-information-label Connected on
-
       span.repository-information-value
         - if @repository.connected_at.present?
           = l(@repository.connected_at, format: :long)
@@ -87,9 +75,11 @@
 
     .repository-information-item
       span.repository-information-label Last reviewed
-
       span.repository-information-value
-        | Never
+        - if @repository.latest_review&.reviewed_at.present?
+          = l(@repository.latest_review.reviewed_at, format: :long)
+        - else
+          | Never
 
 .row.g-4.mb-4
   .col-12.col-sm-6.col-xl-3
@@ -98,10 +88,9 @@
         i.bi.bi-git
 
       .stat-value.mb-2
-        | 0
+        = @pull_requests.count
 
-      .stat-label
-        | Pull Requests
+      .stat-label Pull Requests
 
   .col-12.col-sm-6.col-xl-3
     .dashboard-card.p-4
@@ -109,10 +98,9 @@
         i.bi.bi-stars
 
       .stat-value.mb-2
-        | 0
+        = @reviews.count
 
-      .stat-label
-        | AI Reviews
+      .stat-label AI Reviews
 
   .col-12.col-sm-6.col-xl-3
     .dashboard-card.p-4
@@ -120,10 +108,9 @@
         i.bi.bi-bug
 
       .stat-value.mb-2
-        | 0
+        = @reviews.sum(:issues_found_count)
 
-      .stat-label
-        | Issues Found
+      .stat-label Issues Found
 
   .col-12.col-sm-6.col-xl-3
     .dashboard-card.p-4
@@ -131,10 +118,9 @@
         i.bi.bi-people
 
       .stat-value.mb-2
-        | 0
+        = @pull_requests.where.not(author: [nil, '']).distinct.count(:author)
 
-      .stat-label
-        | Contributors
+      .stat-label Contributors
 
 .row.g-4
   .col-12.col-xl-8
@@ -146,33 +132,50 @@
           p.mb-0.mt-1.text-secondary.small
             | Pull requests analyzed by AI for this repository.
 
-        = form_with url: repository_path(@repository),
-            method: :get,
-            local: true,
-            class: 'repository-review-search-form' do |form|
-          .input-group.repository-review-search
-            span.input-group-text.bg-white.border-end-0
-              i.bi.bi-search.text-secondary
+      - if @pull_requests.any?
+        .table-responsive
+          table.table.mb-0
+            thead
+              tr
+                th Pull request
+                th Status
+                th Reviews
+                th Updated
+                th
 
-            = form.search_field :review_query,
-                value: params[:review_query],
-                placeholder: 'Search pull requests',
-                class: 'form-control border-start-0 ps-0'
+            tbody
+              - @pull_requests.each do |pull_request|
+                tr
+                  td
+                    p.mb-1.fw-semibold
+                      | ##{pull_request.number} #{pull_request.title}
 
-            - if params[:review_query].present?
-              = link_to repository_path(@repository),
-                  class: 'btn btn-light border',
-                  title: 'Clear search' do
-                i.bi.bi-x-lg
+                    p.mb-0.text-secondary.small
+                      = pull_request.author.presence || 'Unknown'
 
-      .text-center.p-5
-        span.empty-state-icon.mb-3
-          i.bi.bi-search
+                  td
+                    span.badge.bg-light.text-secondary.rounded-pill
+                      = pull_request.merged_at.present? ? 'Merged' : pull_request.state.capitalize
 
-        h3.fs-5 No pull requests found
+                  td
+                    = pull_request.reviews.size
 
-        p.text-secondary.mb-4
-          | No pull requests have been synchronized yet.
+                  td.text-secondary.small
+                    = l(pull_request.updated_at, format: :short)
+
+                  td.text-end
+                    - if pull_request.reviews.any?
+                      = link_to pull_request_path(pull_request, repository_id: @repository.id), class: 'btn btn-sm btn-light' do
+                        | View reviews
+      - else
+        .text-center.p-5
+          span.empty-state-icon.mb-3
+            i.bi.bi-search
+
+          h3.fs-5 No pull requests found
+
+          p.text-secondary.mb-4
+            | No pull requests have been synchronized yet.
 
   .col-12.col-xl-4
     .dashboard-card.p-4.mb-4
@@ -184,38 +187,25 @@
       .setting-section
         .d-flex.align-items-start.justify-content-between.gap-3
           div
-            p.mb-1.fw-semibold
-              | Automatic AI review
-
+            p.mb-1.fw-semibold Automatic AI review
             p.mb-0.text-secondary.small
               | Review new and updated pull requests automatically.
 
-          = form_with model: @repository,
-              url: repository_path(@repository),
-              method: :patch,
-              local: true do |form|
+          = form_with model: @repository, url: repository_path(@repository), method: :patch, local: true do |form|
             .form-check.form-switch
-              = form.check_box :auto_review_enabled,
-                  id: 'repository-auto-review',
-                  class: 'form-check-input ai-review-toggle',
-                  role: 'switch',
-                  disabled: !@repository.connected?,
-                  onchange: 'this.form.requestSubmit()'
+              = form.check_box :auto_review_enabled, id: 'repository-auto-review', class: 'form-check-input ai-review-toggle', role: 'switch', disabled: !@repository.connected?, onchange: 'this.form.requestSubmit()'
 
         - if @repository.auto_review_enabled?
-          p#repository-auto-review-status.mt-3.mb-0.small.fw-semibold.text-success
+          p.mt-3.mb-0.small.fw-semibold.text-success
             | Automatic review is on
         - else
-          p#repository-auto-review-status.mt-3.mb-0.small.fw-semibold.text-secondary
+          p.mt-3.mb-0.small.fw-semibold.text-secondary
             | Automatic review is off
 
-      .setting-section
-        label.form-label.fw-semibold for="repository-ai-model"
-          | AI model
-
-        select#repository-ai-model.form-select disabled=true
-          option selected=true
-            | Not selected
+      .setting-section.mt-4
+        = form_with model: @repository, url: repository_path(@repository), method: :patch, local: true do |form|
+          = form.label :ai_model_id, 'AI model', class: 'form-label fw-semibold'
+          = form.collection_select :ai_model_id, @ai_models, :id, :name, { include_blank: 'Use default model' }, class: 'form-select', disabled: !@repository.connected?, onchange: 'this.form.requestSubmit()'
 
         p.text-secondary.small.mt-2.mb-0
           | This model will analyze pull requests for this repository.
