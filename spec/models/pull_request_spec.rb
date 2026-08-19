@@ -32,5 +32,29 @@ require 'rails_helper'
 #  fk_rails_...  (repository_id => repositories.id)
 #
 RSpec.describe PullRequest, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe 'associations' do
+    it { is_expected.to belong_to(:repository) }
+    it { is_expected.to have_many(:reviews).dependent(:destroy) }
+  end
+
+  describe 'validations' do
+    subject(:pull_request) { build(:pull_request, repository: create(:repository)) }
+
+    it { is_expected.to validate_presence_of(:github_id) }
+    it { is_expected.to validate_presence_of(:number) }
+    it { is_expected.to validate_presence_of(:title) }
+    it { is_expected.to validate_presence_of(:state) }
+
+    it do
+      expect(pull_request)
+        .to validate_uniqueness_of(:github_id)
+        .scoped_to(:repository_id)
+    end
+
+    it do
+      expect(pull_request)
+        .to validate_uniqueness_of(:number)
+        .scoped_to(:repository_id)
+    end
+  end
 end

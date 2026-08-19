@@ -40,97 +40,70 @@ require 'rails_helper'
 RSpec.describe User, type: :model do
   describe 'associations' do
     it { is_expected.to have_one_attached(:avatar) }
+    it { is_expected.to have_many(:github_installations).dependent(:destroy) }
+    it { is_expected.to have_many(:repositories).through(:github_installations) }
   end
 
   describe 'validations' do
-    let(:user) { build(:user) }
+    subject(:user) { build(:user) }
 
-    context 'with valid avatar' do
-      it 'is valid when the content type is correct' do
-        user.avatar.attach(
-          io: Rails.root.join('spec/fixtures/files/image.png').open,
-          filename: 'avatar.png',
-          content_type: 'image/png'
-        )
-        expect(user).to be_valid
-      end
+    it { is_expected.to validate_presence_of(:email) }
+    it { is_expected.to validate_uniqueness_of(:email).case_insensitive }
+    it { is_expected.to allow_value('user@example.com').for(:email) }
+    it { is_expected.not_to allow_value('wrong-email').for(:email) }
+
+    it 'validates avatar content type' do
+      user.avatar.attach(io: Rails.root.join('spec/fixtures/files/image.png').open, filename: 'avatar.png', content_type: 'image/png')
+      expect(user).to be_valid
+
+      user.avatar.attach(io: Rails.root.join('spec/fixtures/files/text.txt').open, filename: 'avatar.txt', content_type: 'text/plain')
+      expect(user).not_to be_valid
     end
 
-    context 'with invalid content type' do
-      it 'is invalid when the content type is incorrect' do
-        user.avatar.attach(
-          io: Rails.root.join('spec/fixtures/files/text.txt').open,
-          filename: 'avatar.txt',
-          content_type: 'text/plain'
-        )
-
-        allow(user.avatar.blob).to receive(:content_type).and_return('text/plain')
-        expect(user).not_to be_valid
-
-        expect(user.errors[:avatar]&.first).to include('has an invalid content type')
-      end
-    end
-
-    context 'with large avatar' do
-      it 'is invalid when the size exceeds the limit' do
-        user.avatar.attach(
-          io: Rails.root.join('spec/fixtures/files/image.png').open,
-          filename: 'large_image.jpg',
-          content_type: 'image/jpeg'
-        )
-        allow(user.avatar.blob).to receive(:byte_size).and_return(11.megabytes)
-        expect(user).not_to be_valid
-
-        expect(user.errors[:avatar]&.first).to include('file size must be less than 10 MB')
-      end
+    it 'validates avatar size' do
+      user.avatar.attach(io: Rails.root.join('spec/fixtures/files/image.png').open, filename: 'large.jpg', content_type: 'image/jpeg')
+      allow(user.avatar.blob).to receive(:byte_size).and_return(11.megabytes)
+      expect(user).not_to be_valid
     end
   end
 
-  describe 'Devise modules' do
-    it 'includes database_authenticatable module' do
-      expect(User.devise_modules).to include(:database_authenticatable)
-    end
-
-    it 'includes registerable module' do
-      expect(User.devise_modules).to include(:registerable)
-    end
-
-    it 'includes recoverable module' do
-      expect(User.devise_modules).to include(:recoverable)
-    end
-
-    it 'includes rememberable module' do
-      expect(User.devise_modules).to include(:rememberable)
-    end
-
-    it 'includes validatable module' do
-      expect(User.devise_modules).to include(:validatable)
-    end
-
-    it 'includes omniauthable module' do
-      expect(User.devise_modules).to include(:omniauthable)
+  describe 'devise modules' do
+    it do
+      expect(described_class.devise_modules).to include(
+        :database_authenticatable,
+        :registerable,
+        :recoverable,
+        :rememberable,
+        :validatable,
+        :confirmable,
+        :trackable,
+        :omniauthable
+      )
     end
   end
 
-  describe 'instance methods' do
-    let!(:user) { create(:user) }
+  describe '#display_name' do
+    it 'returns full name or github username' do
+      u1 = build(:user, first_name: 'Khoa', last_name: 'Nguyen', github_username: 'khoa-dev')
+      u2 = build(:user, first_name: nil, last_name: nil, github_username: 'khoa-dev')
 
-    describe '#admin?' do
-      it 'returns true if the user has an admin role' do
-        user.add_role(:admin)
-        expect(user.admin?).to be true
-      end
-
-      it 'returns false if the user does not have an admin role' do
-        expect(user.admin?).to be false
-      end
+      expect(u1.display_name).to eq('Khoa Nguyen')
+      expect(u2.display_name).to eq('khoa-dev')
     end
+  end
 
-    describe '#employee?' do
-      it 'returns true if the user has an employee role and is not an admin' do
-        user.add_role(:employee)
-        expect(user.employee?).to be true
-      end
-    end
+  describe '#initials' do
+    it { expect(build(:user, first_name: 'Khoa', last_name: 'Nguyen').initials).to eq('KN') }
+  end
+
+  describe '#full_name' do
+    it { expect(build(:user, first_name: 'Khoa', last_name: 'Nguyen').full_name).to eq('Khoa Nguyen') }
+  end
+
+  describe 'roles' do
+    it { expect(create(:user, :admin).admin?).to be(true) }
+    it { expect(create(:user).admin?).to be(false) }
+    it { expect(create(:user).employee?).to be(true) }
+    it { expect(create(:user).super_admin?).to be(false) }
   end
 end

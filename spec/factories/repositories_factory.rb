@@ -33,15 +33,18 @@
 #
 FactoryBot.define do
   factory :repository do
-    github_installation { nil }
-    github_id { '' }
-    name { 'MyString' }
-    full_name { 'MyString' }
-    description { 'MyText' }
-    language { 'MyString' }
-    visibility { 'MyString' }
-    default_branch { 'MyString' }
-    github_url { 'MyString' }
-    connected_at { '2026-07-30 14:17:30' }
+    sequence(:github_id) { |n| 4_200_000_000 + n }
+    name { 'AI-code-review' }
+    full_name { "MyiTran/#{name}" }
+    language { 'Ruby' }
+    connected { true }
+    connected_at { Time.current }
+
+    github_installation
+
+    trait :disconnected do
+      connected { false }
+      disconnected_at { Time.current }
+    end
   end
 end

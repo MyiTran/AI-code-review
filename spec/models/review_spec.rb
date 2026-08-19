@@ -33,3 +33,14 @@ require 'rails_helper'
 # RSpec.describe Review, type: :model do
 #   pending "add some examples to (or delete) #{__FILE__}"
 # end
+RSpec.describe Review, type: :model do
+  describe 'associations' do
+    it { is_expected.to belong_to(:pull_request) }
+    it { is_expected.to belong_to(:ai_model) }
+  end
+
+  describe 'validations' do
+    it { is_expected.to validate_presence_of(:commit_sha) }
+    it { is_expected.to validate_presence_of(:status) }
+  end
+end

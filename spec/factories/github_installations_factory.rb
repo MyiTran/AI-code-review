@@ -23,11 +23,11 @@
 #
 FactoryBot.define do
   factory :github_installation do
-    user { nil }
-    installation_id { '' }
-    account_login { 'MyString' }
-    account_id { '' }
-    account_type { 'MyString' }
-    repository_selection { 'MyString' }
+    user
+    sequence(:installation_id) { |n| "inst_#{n}" }
+    account_login { 'MyiTran' }
+    sequence(:account_id) { |n| 1000 + n }
+    account_type { 'User' }
+    repository_selection { 'all' }
   end
 end
