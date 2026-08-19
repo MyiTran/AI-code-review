@@ -14,7 +14,7 @@
         i.bi.bi-github
 
       .stat-value.mb-2
-        = @repository_count
+        = @dashboard.repository_count
 
       .stat-label.mb-2
         | Repositories
@@ -25,7 +25,7 @@
         i.bi.bi-github
 
       .stat-value.mb-2
-        = @pull_request_count
+        = @dashboard.pull_request_count
 
       .stat-label.mb-2
         | Pull Requests
@@ -36,7 +36,7 @@
         i.bi.bi-github
 
       .stat-value.mb-2
-        = @review_count
+        = @dashboard.review_count
 
       .stat-label.mb-2
         | AI Reviews
@@ -47,7 +47,7 @@
         i.bi.bi-github
 
       .stat-value.mb-2
-        = @issues_found_count
+        = @dashboard.issues_found_count
 
       .stat-label.mb-2
         | Issues Found
@@ -64,7 +64,7 @@
 
         = link_to 'View all', repositories_path, class: 'btn btn-sm btn-light'
 
-      - if @repositories.any?
+      - if @dashboard.recent_repositories.any?
         .table-responsive
           table.table.mb-0
             thead
@@ -76,7 +76,7 @@
                 th Last activity
 
             tbody
-              - @repositories.each do |repository|
+              - @dashboard.recent_repositories.each do |repository|
                 tr
                   td
                     .d-flex.align-items-center.gap-3
@@ -117,33 +117,33 @@
           h2.card-title-custom Monthly usage
 
           p.mb-0.mt-1.text-secondary.small
-            | #{@plan_name} plan AI review allowance
+            | #{@dashboard.plan_name} plan AI review allowance
 
         span.stat-icon.stat-icon-primary
           i.bi.bi-lightning-charge
 
       .text-center.py-3
         .display-5.fw-bold.mb-1
-          = @monthly_review_count
+          = @dashboard.monthly_review_count
 
         p.text-secondary.mb-4
-          | of #{@monthly_review_limit} reviews used
+          | of #{@dashboard.monthly_review_limit} reviews used
 
       .progress.mb-3
         .progress-bar[
           role="progressbar"
-          style="width: #{@monthly_usage_percent}%"
-          aria-valuenow=@monthly_usage_percent
+          style="width: #{@dashboard.monthly_usage_percent}%"
+          aria-valuenow=@dashboard.monthly_usage_percent
           aria-valuemin="0"
           aria-valuemax="100"
         ]
 
       .d-flex.justify-content-between.text-secondary.small.mb-4
         span
-          | #{@monthly_usage_percent}% used
+          | #{@dashboard.monthly_usage_percent}% used
 
         span
-          | #{@monthly_review_remaining} remaining
+          | #{@dashboard.monthly_review_remaining} remaining
 
       .p-3.rounded-3.bg-light
         .d-flex.gap-3
@@ -151,7 +151,7 @@
 
           div
             p.mb-1.fw-semibold.small
-              | Current plan: #{@plan_name}
+              | Current plan: #{@dashboard.plan_name}
 
             p.mb-0.text-secondary.small
               | Upgrade your plan to increase your monthly AI review limit.
@@ -171,7 +171,7 @@
 
         = link_to 'View all reviews', reviews_path, class: 'btn btn-light'
 
-      - if @recent_reviews.any?
+      - if @dashboard.recent_reviews.any?
         .table-responsive
           table.table.mb-0
             thead
@@ -184,7 +184,7 @@
                 th Reviewed
 
             tbody
-              - @recent_reviews.each do |review|
+              - @dashboard.recent_reviews.each do |review|
                 - pull_request = review.pull_request
                 - repository = pull_request.repository
 

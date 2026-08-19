@@ -1,10 +1,55 @@
 class DashboardPresenter
   ZERO = Constants::ZERO
 
-  attr_reader :year
+  attr_reader :year, :user
 
-  def initialize(year: Date.current.year)
+  def initialize(user:, year: Date.current.year)
     @year = year
+    @user = user
+  end
+
+  def repository_count
+    @repository_count ||= repositories.count
+  end
+
+  def pull_request_count
+    @pull_request_count ||= PullRequest.where(repository: repositories).count
+  end
+
+  def review_count
+    @review_count ||= reviews.count
+  end
+
+  def issues_found_count
+    @issues_found_count ||= reviews.sum(:issues_found_count)
+  end
+
+  def plan_name
+    'Free'
+  end
+
+  def monthly_review_limit
+    20
+  end
+
+  def monthly_review_count
+    @monthly_review_count ||= reviews.where(created_at: Time.current.all_month).count
+  end
+
+  def monthly_usage_percent
+    [(monthly_review_count.to_f / monthly_review_limit * 100).round, 100].min
+  end
+
+  def monthly_review_remaining
+    [monthly_review_limit - monthly_review_count, 0].max
+  end
+
+  def recent_repositories
+    @recent_repositories ||= repositories.includes(:ai_model).order(updated_at: :desc).limit(5)
+  end
+
+  def recent_reviews
+    @recent_reviews ||= reviews.includes(:ai_model, pull_request: :repository).order(created_at: :desc).limit(5)
   end
 
   def user_count
@@ -67,6 +112,14 @@ class DashboardPresenter
   end
 
   private
+
+  def repositories
+    @repositories ||= user.repositories
+  end
+
+  def reviews
+    @reviews ||= Review.by_user(user)
+  end
 
   def current_month_date
     @current_month_date ||= Date.new(year, Date.current.month, 1)
