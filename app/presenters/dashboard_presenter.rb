@@ -17,7 +17,11 @@ class DashboardPresenter
   end
 
   def pull_request_count
-    @pull_request_count ||= PullRequest.where(repository: repositories).count
+    @pull_request_count ||= PullRequest.joins(repository: :github_installation).where(github_installations: { user_id: user.id }).where(created_at: Time.current.all_month).count
+  end
+
+  def pull_request_limit
+    @pull_request_limit ||= Subscriptions::GetPlanLimitsService.call(user)[:pull_requests]
   end
 
   def review_count

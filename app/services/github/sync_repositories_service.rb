@@ -1,15 +1,24 @@
 module Github
-  class SyncRepositories
-    def self.call(installation)
-      github_repositories = Github::ListRepositories.call(installation)
+  class SyncRepositoriesService < ApplicationService
+    def initialize(installation)
+      @installation = installation
+    end
 
-      github_repositories.each { |github_repository| save_repository(installation, github_repository) }
-      mark_disconnected_repositories(installation, github_repositories)
+    def call
+      github_repositories = Github::ListRepositoriesService.call(installation)
+
+      github_repositories.each { |github_repository| save_repository(github_repository) }
+
+      mark_disconnected_repositories(github_repositories)
 
       installation.repositories.reload
     end
 
-    def self.save_repository(installation, github_repository)
+    private
+
+    attr_reader :installation
+
+    def save_repository(github_repository)
       repository = installation.repositories.find_or_initialize_by(github_id: github_repository.id)
       new_repository = repository.new_record?
 
@@ -27,7 +36,7 @@ module Github
       repository.save!
     end
 
-    def self.connect_new_repository(repository, user)
+    def connect_new_repository(repository, user)
       return if Subscriptions::RepositoryLimitReachedService.call(user)
 
       repository.connected = true
@@ -35,13 +44,15 @@ module Github
       repository.disconnected_at = nil
     end
 
-    def self.mark_disconnected_repositories(installation, github_repositories)
-      github_ids = github_repositories.map(&:id)
+    def mark_disconnected_repositories(github_repositories)
+      connected_github_ids = github_repositories.map(&:id)
       current_time = Time.current
 
-      installation.repositories.where(connected: true).where.not(github_id: github_ids).update_all(connected: false, disconnected_at: current_time, updated_at: current_time) # rubocop:disable Rails/SkipsModelValidations
+      installation.repositories.where(connected: true).where.not(github_id: connected_github_ids).update_all( # rubocop:disable Rails/SkipsModelValidations
+        connected: false,
+        disconnected_at: current_time,
+        updated_at: current_time
+      )
     end
-
-    private_class_method :save_repository, :connect_new_repository, :mark_disconnected_repositories
   end
 end
