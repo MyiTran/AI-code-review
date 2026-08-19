@@ -36,4 +36,6 @@ class PullRequest < ApplicationRecord
   validates :github_id, presence: true, uniqueness: { scope: :repository_id }
   validates :number, presence: true, uniqueness: { scope: :repository_id }
   validates :title, :state, presence: true
+
+  scope :by_user, ->(user) { joins(repository: :github_installation).where(github_installations: { user_id: user.id }) }
 end

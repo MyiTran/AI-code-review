@@ -28,7 +28,7 @@ gem 'image_processing', '~> 2.0'
 gem 'active_storage_validations'
 
 # Job
-gem 'redis'
+gem 'redis', '< 6.0'
 gem 'sidekiq'
 gem 'sidekiq-scheduler'
 gem 'sidekiq-unique-jobs'
@@ -61,6 +61,7 @@ gem 'ransack'
 # Others
 gem 'enumerize'
 gem 'web-console'
+gem 'commonmarker'
 
 # github
 gem 'omniauth-github'
