@@ -19,5 +19,16 @@ require 'rails_helper'
 #  index_ai_models_on_slug  (slug) UNIQUE
 #
 RSpec.describe AiModel, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe 'associations' do
+    it { is_expected.to have_many(:reviews).dependent(:restrict_with_error) }
+  end
+
+  describe 'validations' do
+    subject(:ai_model) { build(:ai_model) }
+
+    it { is_expected.to validate_presence_of(:name) }
+    it { is_expected.to validate_presence_of(:slug) }
+    it { is_expected.to validate_presence_of(:provider) }
+    it { is_expected.to validate_uniqueness_of(:slug) }
+  end
 end
