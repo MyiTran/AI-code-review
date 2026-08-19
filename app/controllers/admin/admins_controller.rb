@@ -80,8 +80,11 @@ module Admin
     def update_role
       return if @admin == current_user
 
+      role = params.dig(:user, :role)
+      return unless role.in?(%w[admin])
+
       @admin.roles = []
-      @admin.add_role(params[:role])
+      @admin.add_role(role)
     end
   end
 end
