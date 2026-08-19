@@ -2,7 +2,7 @@ class ReviewRetriesController < ApplicationController
   def create
     review = Review.by_user(current_user).find(params.expect(:review_id))
 
-    if review.status == 'failed'
+    if review.failed?
       review.update!(status: 'processing', error_message: nil)
       Realtime::BroadcastReviewService.call(review)
       Reviews::GenerateJob.perform_async(review.id)

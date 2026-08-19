@@ -7,6 +7,6 @@ class PullRequestsController < ApplicationController
   private
 
   def current_user_pull_requests
-    PullRequest.joins(repository: :github_installation).where(github_installations: { user_id: current_user.id })
+    PullRequest.by_user(current_user)
   end
 end

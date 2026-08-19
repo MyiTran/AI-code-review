@@ -3,14 +3,14 @@ class RepositoriesController < ApplicationController
   def index
     @repositories = current_user.repositories.includes(:ai_model).order(created_at: :desc).by_keyword(params[:query]).by_language(params[:language]).by_connection_status(params[:connection_status])
     @languages = Repository.available_languages(current_user.repositories)
-    @default_ai_model = AiModel.find_by(is_default: true, active: true)
+    @default_ai_model = AiModel.default.active.first
   end
 
   def show
     @repository = current_user.repositories.find(params.expect(:id))
-    @ai_models = AiModel.where(active: true).order(:name)
+    @ai_models = AiModel.active.order(:name)
     @pull_requests = @repository.pull_requests.includes(:reviews).order(updated_at: :desc)
-    @reviews = Review.joins(:pull_request).where(pull_requests: { repository_id: @repository.id }).includes(:ai_model, :pull_request).order(created_at: :desc)
+    @reviews = Review.by_repository(@repository.id).includes(:ai_model, :pull_request).order(created_at: :desc)
   end
 
   def update

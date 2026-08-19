@@ -35,6 +35,8 @@ class Review < ApplicationRecord
   belongs_to :pull_request
   belongs_to :ai_model
 
+  enum :status, { processing: 'processing', completed: 'completed', failed: 'failed' }
+
   validates :commit_sha, presence: true
   validates :status, presence: true
 
