@@ -1,5 +1,8 @@
 module Admin
   class AdminsController < BaseController
+    before_action :set_admin, only: [:edit, :update, :destroy]
+    before_action :authorize_admin, only: [:edit, :update, :destroy]
+
     def index
       authorize User, policy_class: Admin::AdminPolicy
 
@@ -12,22 +15,14 @@ module Admin
       authorize @admin, policy_class: Admin::AdminPolicy
     end
 
-    def edit
-      @admin = admin
-      authorize @admin, policy_class: Admin::AdminPolicy
-    end
+    def edit; end
 
     def create
-      @admin = User.new(admin_params)
+      @admin = User.new(create_admin_params)
       authorize @admin, policy_class: Admin::AdminPolicy
 
       @admin.provider = :email
       @admin.confirmed_at = Time.current
-
-      if admin_params[:password].blank?
-        @admin.errors.add(:password, "can't be blank")
-        return render :new, status: :unprocessable_content
-      end
 
       if @admin.save
         @admin.add_role(:admin)
@@ -38,9 +33,6 @@ module Admin
     end
 
     def update
-      @admin = admin
-      authorize @admin, policy_class: Admin::AdminPolicy
-
       @admin.skip_reconfirmation!
 
       if admin_params[:password].blank?
@@ -49,7 +41,6 @@ module Admin
       end
 
       if @admin.update(admin_params)
-        update_role
         redirect_to admin_admins_path, notice: 'Admin updated!'
       else
         render :edit, status: :unprocessable_content
@@ -57,34 +48,26 @@ module Admin
     end
 
     def destroy
-      @admin = admin
-      authorize @admin, policy_class: Admin::AdminPolicy
-
       @admin.destroy!
       redirect_to admin_admins_path, notice: 'Admin deleted!'
     end
 
     private
 
-    def admin
-      policy_scope(User, policy_scope_class: Admin::AdminPolicy::Scope).find(params.expect(:id))
+    def set_admin
+      @admin = policy_scope(User, policy_scope_class: Admin::AdminPolicy::Scope).find(params.expect(:id))
+    end
+
+    def authorize_admin
+      authorize @admin, policy_class: Admin::AdminPolicy
+    end
+
+    def create_admin_params
+      params.expect(user: [:first_name, :last_name, :email, :password, :password_confirmation])
     end
 
     def admin_params
-      attributes = params.expect(user: [:first_name, :last_name, :email, :password, :password_confirmation])
-      attributes.delete(:password) if attributes[:password].blank?
-      attributes.delete(:password_confirmation) if attributes[:password_confirmation].blank?
-      attributes
-    end
-
-    def update_role
-      return if @admin == current_user
-
-      role = params.dig(:user, :role)
-      return unless role.in?(%w[admin])
-
-      @admin.roles = []
-      @admin.add_role(role)
+      params.expect(user: [:first_name, :last_name, :email, :password, :password_confirmation])
     end
   end
 end

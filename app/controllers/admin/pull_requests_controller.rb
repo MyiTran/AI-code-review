@@ -1,9 +1,10 @@
 module Admin
   class PullRequestsController < BaseController
+    before_action :set_user
+    before_action :set_repository
+    before_action :set_pull_request
+
     def show
-      @user = User.find(params.expect(:user_id))
-      @repository = @user.repositories.find(params.expect(:repository_id))
-      @pull_request = @repository.pull_requests.find(params.expect(:id))
       @reviews = @pull_request.reviews.includes(:ai_model).order(created_at: :desc)
     end
   end
