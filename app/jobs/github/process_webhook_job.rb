@@ -11,7 +11,7 @@ module Github
       delivery.processing!
 
       pull_request = Github::SyncPullRequestService.call(delivery)
-      Realtime::BroadcastPullRequestService.pull_request(pull_request) if pull_request.present?
+      Realtime::BroadcastPullRequestService.call(pull_request) if pull_request.present?
       enqueue_review(pull_request) if review_required?(delivery, pull_request)
 
       delivery.processed!

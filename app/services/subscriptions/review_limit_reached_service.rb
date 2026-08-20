@@ -5,15 +5,14 @@ module Subscriptions
     end
 
     def call
-      count >= Subscriptions::GetPlanLimitsService.call(user)[:reviews]
+      count = Subscriptions::MonthlyReviewsCountService.call(user).to_i
+      limit = Subscriptions::GetPlanLimitsService.call(user).fetch(:reviews).to_i
+
+      count >= limit
     end
 
     private
 
     attr_reader :user
-
-    def count
-      Review.by_user(user).where(created_at: Time.current.all_month).count
-    end
   end
 end

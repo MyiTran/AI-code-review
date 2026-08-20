@@ -36,6 +36,8 @@ class Review < ApplicationRecord
   belongs_to :pull_request
   belongs_to :ai_model
 
+  after_create :clear_usage_cache
+
   enum :status, { processing: 'processing', completed: 'completed', failed: 'failed' }
 
   validates :commit_sha, presence: true
@@ -59,5 +61,11 @@ class Review < ApplicationRecord
       .where(created_at: ...created_at)
       .order(created_at: :desc)
       .first
+  end
+
+  private
+
+  def clear_usage_cache
+    Subscriptions::ClearUsageCacheService.call(pull_request.repository.user)
   end
 end

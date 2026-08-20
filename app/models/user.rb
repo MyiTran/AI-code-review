@@ -55,6 +55,7 @@ class User < ApplicationRecord
 
   # enums
   enumerize :provider, in: { email: 0, github: 1 }, default: :email, scope: true
+  enumerize :plan, in: { free: 'free', pro: 'pro' }, default: :free, scope: true
 
   # encrypts
   encrypts :github_access_token

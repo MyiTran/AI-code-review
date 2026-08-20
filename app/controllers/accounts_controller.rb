@@ -1,7 +1,6 @@
 class AccountsController < ApplicationController
   def show
-    @user = current_user
-    @limits = Subscriptions::GetPlanLimitsService.call(@user)
+    @limits = Subscriptions::GetPlanLimitsService.call(current_user)
   end
 
   def update

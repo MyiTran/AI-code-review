@@ -33,9 +33,17 @@ class PullRequest < ApplicationRecord
   belongs_to :repository
   has_many :reviews, dependent: :destroy
 
+  after_create :clear_usage_cache
+
   validates :github_id, presence: true, uniqueness: { scope: :repository_id }
   validates :number, presence: true, uniqueness: { scope: :repository_id }
   validates :title, :state, presence: true
 
   scope :by_user, ->(user) { joins(repository: :github_installation).where(github_installations: { user_id: user.id }) }
+
+  private
+
+  def clear_usage_cache
+    Subscriptions::ClearUsageCacheService.call(repository.user)
+  end
 end

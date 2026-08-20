@@ -1,10 +1,14 @@
 class RepositoriesController < ApplicationController
   helper GithubHelper
-  def index
+
+  def index # rubocop:disable Metrics/AbcSize
     @repositories = current_user.repositories.includes(:ai_model).order(created_at: :desc).by_keyword(params[:query]).by_language(params[:language]).by_connection_status(params[:connection_status]).by_ai_model(params[:ai_model])
     @languages = Repository.available_languages(current_user.repositories)
     @ai_models = AiModel.active.order(:name).pluck(:name, :id)
     @default_ai_model = AiModel.default.active.first
+    @repository_count = Subscriptions::RepositoriesCountService.call(current_user).to_i
+    @repository_limit = Subscriptions::GetPlanLimitsService.call(current_user).fetch(:repositories).to_i
+    @repository_limit_reached = @repository_count >= @repository_limit
   end
 
   def show
@@ -23,6 +27,7 @@ class RepositoriesController < ApplicationController
     if attributes.key?(:connected)
       connected = ActiveModel::Type::Boolean.new.cast(attributes[:connected])
       attributes[:disconnected_at] = connected ? nil : Time.current
+      attributes[:auto_review_enabled] = false unless connected
     end
 
     repository.update!(attributes)
@@ -37,9 +42,7 @@ class RepositoriesController < ApplicationController
   end
 
   def available_ai_models
-    return AiModel.where(active: true) if current_user.pro?
-
-    AiModel.where(active: true, is_premium: false)
+    current_user.pro? ? AiModel.where(active: true) : AiModel.where(active: true, is_premium: false)
   end
 
   def invalid_ai_model?(attributes)
@@ -49,13 +52,12 @@ class RepositoriesController < ApplicationController
   def update_message(repository, attributes)
     return auto_review_message(repository) if attributes.key?(:auto_review_enabled)
     return 'AI model updated successfully.' if attributes.key?(:ai_model_id)
+    return 'Repository connected successfully.' if repository.connected?
 
     'Repository disconnected successfully.'
   end
 
   def auto_review_message(repository)
-    return 'Automatic AI review enabled successfully.' if repository.auto_review_enabled?
-
-    'Automatic AI review disabled successfully.'
+    repository.auto_review_enabled? ? 'Automatic AI review enabled successfully.' : 'Automatic AI review disabled successfully.'
   end
 end

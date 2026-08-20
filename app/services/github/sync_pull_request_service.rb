@@ -38,12 +38,17 @@ module Github
       raise
     end
 
+    private
+
+    attr_reader :delivery
+
     def self.pull_request_limit_reached?(repository)
       user = repository.github_installation.user
-      limit = Subscriptions::GetPlanLimitsService.call(user)[:pull_requests]
-      user.repositories.joins(:pull_requests).where(pull_requests: { created_at: Time.current.all_month }).count >= limit
+      plan_limits = Subscriptions::GetPlanLimitsService.call(user)
+      limit = plan_limits ? plan_limits[:pull_requests].to_i : 0
+      current_pull_requests_count = user.repositories.joins(:pull_requests).where(pull_requests: { created_at: Time.current.all_month }).count
+      current_pull_requests_count >= limit
     end
-
     private_class_method :pull_request_limit_reached?
   end
 end

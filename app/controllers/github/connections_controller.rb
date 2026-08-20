@@ -1,14 +1,10 @@
 module Github
   class ConnectionsController < ApplicationController
-    def create # rubocop:disable Metrics/AbcSize
+    def create
       repository = current_user.repositories.find(params.expect(:repository_id))
       return redirect_to repository_path(repository), alert: 'Repository limit reached for your current plan.' if Subscriptions::RepositoryLimitReachedService.call(current_user)
 
-      github_repositories = Github::ListRepositoriesService.call(repository.github_installation)
-      has_access = github_repositories.any? { |github_repository| github_repository.id == repository.github_id }
-
-      if has_access
-        repository.update!(connected: true, connected_at: Time.current, disconnected_at: nil)
+      if Github::ConnectRepositoryService.call(repository.github_installation, repository)
         redirect_to repository_path(repository), notice: 'Repository connected.'
       else
         session[:github_return_repository_id] = repository.id
