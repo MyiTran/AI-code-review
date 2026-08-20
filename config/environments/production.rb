@@ -75,7 +75,7 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   # Store files locally.
-  config.active_storage.service = :amazon
+  config.active_storage.service = ENV.fetch('ACTIVE_STORAGE_SERVICE', 'amazon').to_sym
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [
