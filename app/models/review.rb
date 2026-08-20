@@ -14,6 +14,7 @@
 #  status             :string           default("processing"), not null
 #  summary            :text
 #  tokens_used        :integer
+#  triggered_by       :string
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  ai_model_id        :uuid             not null

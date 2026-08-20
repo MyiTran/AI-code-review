@@ -17,6 +17,7 @@
 #  last_name              :string
 #  last_sign_in_at        :datetime
 #  last_sign_in_ip        :string
+#  plan                   :string           default("free"), not null
 #  provider               :integer
 #  remember_created_at    :datetime
 #  reset_password_sent_at :datetime
@@ -43,15 +44,15 @@ FactoryBot.define do
     password { 'Password123@' }
     password_confirmation { password }
     confirmed_at { Time.current }
-    provider { :email }
 
-    after(:create) do |user|
-      user.add_role(:employee)
-    end
+    provider { :github }
+    sequence(:uid) { |number| "github-uid-#{number}" }
+    sequence(:github_username) { |number| "github-user-#{number}" }
+    github_access_token { 'github-access-token' }
+
+    after(:create) { |user| user.add_role(:employee) }
 
     trait :admin do
-      sequence(:email) { |number| "admin#{number}@gmail.com" }
-
       after(:create) do |user|
         user.remove_role(:employee)
         user.add_role(:admin)
@@ -59,19 +60,10 @@ FactoryBot.define do
     end
 
     trait :super_admin do
-      sequence(:email) { |number| "super_admin#{number}@gmail.com" }
-
       after(:create) do |user|
         user.remove_role(:employee)
         user.add_role(:super_admin)
       end
-    end
-
-    trait :github do
-      provider { :github }
-      uid { SecureRandom.uuid }
-      sequence(:github_username) { |number| "github-user-#{number}" }
-      github_access_token { 'github-access-token' }
     end
   end
 end

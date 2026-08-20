@@ -37,6 +37,10 @@ class ApplicationController < ActionController::Base
     redirect_back_or_to(root_path, alert: 'You are not authorized to perform this action.')
   end
 
+  def not_found_record
+    head :not_found
+  end
+
   def rescue_routing_error
     redirect_to root_path, alert: 'Resource not found'
   end

@@ -1,4 +1,5 @@
 require 'vcr'
+require 'webmock/rspec'
 
 VCR.configure do |config|
   config.hook_into :webmock
@@ -8,17 +9,20 @@ VCR.configure do |config|
   config.cassette_library_dir = File.expand_path('../cassettes', __dir__)
   config.configure_rspec_metadata!
   config.default_cassette_options = {
-    # Enable automatic expiration and re-recording of cassettes
-    # re_record_interval: 1.week,
     record: ENV['CI'] ? :none : :once,
     record_on_error: false,
     match_requests_on: %i[method uri body]
   }
 
-  # Make sure headers containing secrets aren't recorded in cassettes and stored in git
   %w[Authorization X-Api-Key].each do |sensitive_header|
     config.filter_sensitive_data("[#{sensitive_header.upcase}]") do |interaction|
       interaction.request.headers[sensitive_header]&.first
     end
   end
+
+  config.filter_sensitive_data('[GITHUB_APP_ID]') { ENV['GITHUB_APP_ID'] }
+  config.filter_sensitive_data('[GITHUB_APP_PRIVATE_KEY]') { ENV['GITHUB_APP_PRIVATE_KEY'] }
+  config.filter_sensitive_data('[GITHUB_WEBHOOK_SECRET]') { ENV['GITHUB_WEBHOOK_SECRET'] }
+  config.filter_sensitive_data('[GEMINI_API_KEY]') { ENV['GEMINI_API_KEY'] }
+  config.filter_sensitive_data('[TEST_GITHUB_INSTALLATION_ID]') { ENV['TEST_GITHUB_INSTALLATION_ID'] }
 end

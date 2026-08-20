@@ -24,10 +24,16 @@
 FactoryBot.define do
   factory :github_installation do
     user
-    sequence(:installation_id) { |n| "inst_#{n}" }
-    account_login { 'MyiTran' }
-    sequence(:account_id) { |n| 1000 + n }
+
+    sequence(:installation_id) { |number| 1000 + number }
+    sequence(:account_id) { |number| 2000 + number }
+    account_login { user.github_username }
     account_type { 'User' }
-    repository_selection { 'all' }
+    repository_selection { 'selected' }
+
+    trait :organization do
+      account_type { 'Organization' }
+      account_login { 'test-org' }
+    end
   end
 end
