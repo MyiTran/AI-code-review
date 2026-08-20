@@ -24,11 +24,7 @@ module Callback
     end
 
     def verify_and_connect_repository(installation, repository)
-      github_repositories = Github::ListRepositoriesService.call(installation)
-      has_access = github_repositories.any? { |github_repository| github_repository.id == repository.github_id }
-
-      if has_access
-        repository.update!(connected: true, connected_at: Time.current, disconnected_at: nil)
+      if Github::ConnectRepositoryService.call(installation, repository)
         redirect_to repository_path(repository), notice: 'Repository connected.'
       else
         redirect_to repository_path(repository), alert: 'Repository access was not granted on GitHub.'

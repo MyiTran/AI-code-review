@@ -55,6 +55,7 @@ class User < ApplicationRecord
 
   # enums
   enumerize :provider, in: { email: 0, github: 1 }, default: :email, scope: true
+  enumerize :plan, in: { free: 'free', pro: 'pro' }, default: :free, scope: true
 
   # encrypts
   encrypts :github_access_token
@@ -68,7 +69,6 @@ class User < ApplicationRecord
   validates :password, password: true
   validates :avatar, content_type: Constants::IMAGE_CONTENT_TYPES, size: { less_than: Constants::IMAGE_MAX_SIZE }
   validates :email, presence: true, uniqueness: { case_sensitive: false }, format: { with: URI::MailTo::EMAIL_REGEXP }
-  validates :plan, inclusion: { in: ['free', 'pro'] }
 
   # instance methods
   def display_name

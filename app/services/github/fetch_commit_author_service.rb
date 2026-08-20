@@ -7,7 +7,7 @@ module Github
 
     def call
       repository = pull_request.repository
-      token = Github::InstallationToken.call(repository.github_installation.installation_id)
+      token = Github::GenerateInstallationTokenService.call(repository.github_installation.installation_id)
       commit = Octokit::Client.new(access_token: token).commit(repository.full_name, commit_sha)
 
       commit.author&.login || commit.commit.author.name
