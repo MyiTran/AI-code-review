@@ -17,39 +17,39 @@
 
   .p-4
     .d-flex.flex-column.flex-md-row.align-items-md-center.gap-4.mb-4
-      - if @user.avatar_url.present?
-        = image_tag @user.avatar_url, class: 'rounded-circle', width: 72, height: 72, alt: @user.display_name
+      - if current_user.avatar_url.present?
+        = image_tag current_user.avatar_url, class: 'rounded-circle', width: 72, height: 72, alt: current_user.display_name
       - else
         .rounded-circle.bg-light.d-flex.align-items-center.justify-content-center style="width: 72px; height: 72px;"
           span.fw-bold.fs-4
-            = @user.initials
+            = current_user.initials
 
       div
         h3.fs-5.mb-1
-          = @user.display_name.presence || 'GitHub user'
+          = current_user.display_name.presence || 'GitHub user'
 
-        - if @user.github_username.present?
+        - if current_user.github_username.present?
           p.text-secondary.mb-0
-            | @#{@user.github_username}
+            | @#{current_user.github_username}
 
     .row.g-4
       .col-12.col-md-6
         .settings-info-item
           span.text-secondary.small.d-block.mb-1 Name
           span.fw-semibold
-            = @user.full_name.presence || 'Not provided'
+            = current_user.full_name.presence || 'Not provided'
 
       .col-12.col-md-6
         .settings-info-item
           span.text-secondary.small.d-block.mb-1 Email
           span.fw-semibold
-            = @user.email
+            = current_user.email
 
       .col-12.col-md-6
         .settings-info-item
           span.text-secondary.small.d-block.mb-1 GitHub username
           span.fw-semibold
-            = @user.github_username.presence || 'Not available'
+            = current_user.github_username.presence || 'Not available'
 
       .col-12.col-md-6
         .settings-info-item
@@ -75,14 +75,14 @@
         .settings-info-item
           span.text-secondary.small.d-block.mb-1 Member since
           span.fw-semibold
-            = l(@user.created_at, format: :long)
+            = l(current_user.created_at, format: :long)
 
       .col-12.col-md-4
         .settings-info-item
           span.text-secondary.small.d-block.mb-1 Last signed in
           span.fw-semibold
-            - if @user.last_sign_in_at.present?
-              = l(@user.last_sign_in_at, format: :long)
+            - if current_user.last_sign_in_at.present?
+              = l(current_user.last_sign_in_at, format: :long)
             - else
               | Not available
 
@@ -90,4 +90,5 @@
         .settings-info-item
           span.text-secondary.small.d-block.mb-1 Sign-in count
           span.fw-semibold
-            = @user.sign_in_count
+            = current_user.sign_in_count
+            
