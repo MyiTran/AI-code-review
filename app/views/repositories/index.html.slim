@@ -33,7 +33,7 @@
 
       .col-6.col-md-4.col-xl-2
         = form.label :ai_model, 'AI model', class: 'form-label small fw-semibold'
-        = form.select :ai_model, options_for_select([], params[:ai_model]), { include_blank: 'All models' }, class: 'form-select', disabled: true
+        = form.select :ai_model, options_for_select(@ai_models, params[:ai_model]), { include_blank: 'All models' }, class: 'form-select'
 
       .col-6.col-md-4.col-xl-2
         .d-flex.gap-2

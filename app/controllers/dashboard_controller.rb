@@ -1,5 +1,5 @@
 class DashboardController < ApplicationController
   def index
-    @dashboard = Mock::Dashboard.call
+    @dashboard = DashboardPresenter.new(user: current_user)
   end
 end

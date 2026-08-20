@@ -1,8 +1,9 @@
 class RepositoriesController < ApplicationController
   helper GithubHelper
   def index
-    @repositories = current_user.repositories.includes(:ai_model).order(created_at: :desc).by_keyword(params[:query]).by_language(params[:language]).by_connection_status(params[:connection_status])
+    @repositories = current_user.repositories.includes(:ai_model).order(created_at: :desc).by_keyword(params[:query]).by_language(params[:language]).by_connection_status(params[:connection_status]).by_ai_model(params[:ai_model])
     @languages = Repository.available_languages(current_user.repositories)
+    @ai_models = AiModel.active.order(:name).pluck(:name, :id)
     @default_ai_model = AiModel.default.active.first
   end
 
