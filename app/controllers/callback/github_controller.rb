@@ -17,7 +17,8 @@ module Callback
       repository_id = session.delete(:github_return_repository_id)
       return redirect_to repositories_path, notice: 'GitHub repositories synced successfully.' if repository_id.blank?
 
-      repository = current_user.repositories.find(repository_id)
+      repository = current_user.repositories.find_by(id: repository_id)
+      return redirect_to repositories_path, alert: 'Repository not found' if repository.blank?
       return redirect_to repository_path(repository), alert: 'Repository limit reached for your current plan.' if Subscriptions::RepositoryLimitReachedService.call(current_user)
 
       verify_and_connect_repository(installation, repository)
