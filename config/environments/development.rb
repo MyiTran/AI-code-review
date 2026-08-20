@@ -73,8 +73,13 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :letter_opener_web
   config.action_mailer.default_url_options = { host: ENV['APP_HOST'] }
 
+  # Enable web console in browser - protected by devise
+  config.web_console.development_only = false
+  config.web_console.permissions = '0.0.0.0/0'
+
   # Allow ngrok host for development
   config.hosts << '.ngrok-free.dev'
+  config.hosts << /[a-z0-9-]+\.ngrok-free\.app/
 
   # Bullet enable
   config.after_initialize do
