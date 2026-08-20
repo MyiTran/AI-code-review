@@ -1,20 +1,29 @@
 puts '~> Creating admin users'
 
-super_admin_email = 'super_admin@gmail.com'
-if User.find_by(email: super_admin_email).blank?
-  super_admin = User.create!(
-    email: super_admin_email,
-    password: 'Password123@',
-    confirmed_at: Time.current
-  )
+accounts = [
+  {
+    email: ENV.fetch('SUPER_ADMIN_EMAIL'),
+    password: ENV.fetch('SUPER_ADMIN_PASSWORD'),
+    role: :super_admin
+  },
+  {
+    email: ENV.fetch('ADMIN_EMAIL'),
+    password: ENV.fetch('ADMIN_PASSWORD'),
+    role: :admin
+  }
+]
 
-  super_admin.add_role(:super_admin)
+accounts.each do |attributes|
+  user = User.find_or_initialize_by(email: attributes[:email])
+
+  if user.new_record?
+    user.password = attributes[:password]
+    user.password_confirmation = attributes[:password]
+    user.confirmed_at = Time.current
+    user.save!
+  end
+
+  user.add_role(attributes[:role]) unless user.has_role?(attributes[:role])
 end
 
 puts '~> Created admin users'
-
-SUPER_ADMIN_EMAIL=super_admin@gmail.com
-SUPER_ADMIN_PASSWORD=Password123!
-
-ADMIN_EMAIL=tranthihongdiep@gmail.com
-ADMIN_PASSWORD=Tramy260905
