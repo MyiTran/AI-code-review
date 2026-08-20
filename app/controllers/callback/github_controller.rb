@@ -5,23 +5,30 @@ module Callback
       installation = Github::SaveInstallationService.call(current_user, github_installation)
 
       Github::SyncRepositoriesService.call(installation)
-
-      redirect_to return_path, notice: 'GitHub repositories synced successfully.'
+      handle_repository_connection(installation)
     rescue StandardError => e
-      Rails.logger.error("GitHub SSL error: #{e.class} - #{e.message}")
+      Rails.logger.error("GitHub callback failed: #{e.class} - #{e.message}")
       redirect_to repositories_path, alert: 'Could not connect to GitHub. Please try again.'
     end
 
     private
 
-    def return_path
+    def handle_repository_connection(installation)
       repository_id = session.delete(:github_return_repository_id)
-      repository = current_user.repositories.find_by(id: repository_id)
+      return redirect_to repositories_path, notice: 'GitHub repositories synced successfully.' if repository_id.blank?
 
-      if repository
-        repository_path(repository)
+      repository = current_user.repositories.find_by(id: repository_id)
+      return redirect_to repositories_path, alert: 'Repository not found' if repository.blank?
+      return redirect_to repository_path(repository), alert: 'Repository limit reached for your current plan.' if Subscriptions::RepositoryLimitReachedService.call(current_user)
+
+      verify_and_connect_repository(installation, repository)
+    end
+
+    def verify_and_connect_repository(installation, repository)
+      if Github::ConnectRepositoryService.call(installation, repository)
+        redirect_to repository_path(repository), notice: 'Repository connected.'
       else
-        repositories_path
+        redirect_to repository_path(repository), alert: 'Repository access was not granted on GitHub.'
       end
     end
   end

@@ -1,8 +1,8 @@
 .d-flex.flex-column.flex-lg-row.align-items-lg-center.justify-content-between.gap-3.mb-4
   div
-    h1.page-title Settings
+    h1.page-title Account
     p.page-description
-      | Manage your account information.
+      | Manage your account and subscription.
 
 .dashboard-card.mb-4
   .p-4.border-bottom
@@ -11,7 +11,7 @@
         i.bi.bi-person
 
       div
-        h2.card-title-custom Account
+        h2.card-title-custom Account information
         p.mb-0.mt-1.text-secondary.small
           | Your account information from GitHub.
 
@@ -33,30 +33,92 @@
             | @#{current_user.github_username}
 
     .row.g-4
-      .col-12.col-md-6
+      .col-12.col-md-4
         .settings-info-item
           span.text-secondary.small.d-block.mb-1 Name
           span.fw-semibold
             = current_user.full_name.presence || 'Not provided'
 
-      .col-12.col-md-6
+      .col-12.col-md-4
         .settings-info-item
           span.text-secondary.small.d-block.mb-1 Email
           span.fw-semibold
             = current_user.email
 
-      .col-12.col-md-6
+      .col-12.col-md-4
         .settings-info-item
           span.text-secondary.small.d-block.mb-1 GitHub username
           span.fw-semibold
             = current_user.github_username.presence || 'Not available'
 
-      .col-12.col-md-6
-        .settings-info-item
-          span.text-secondary.small.d-block.mb-1 Connected account
-          span.badge.badge-soft-success.rounded-pill.px-3.py-2
-            i.bi.bi-github.me-1
-            | GitHub
+.dashboard-card.mb-4
+  .p-4.border-bottom
+    .d-flex.align-items-center.gap-3
+      span.settings-section-icon
+        i.bi.bi-credit-card
+
+      div
+        h2.card-title-custom Subscription
+        p.mb-0.mt-1.text-secondary.small
+          | Manage your current plan.
+
+  .p-4
+    .row.g-4
+      .col-12.col-lg-6
+        .border.rounded-3.p-4.h-100
+          .d-flex.justify-content-between.align-items-center.mb-3
+            h3.fs-5.mb-0 Free
+
+            - unless current_user.pro?
+              span.badge.badge-soft-success.rounded-pill Current plan
+
+          h4.fs-3.fw-bold.mb-4
+            | $0
+            span.fs-6.fw-normal.text-secondary
+              |  / month
+
+          p.mb-2
+            | 1 AI model — Gemini Flash Lite
+          p.mb-2
+            | 3 repositories
+          p.mb-2
+            | 30 pull requests / month
+          p.mb-4
+            | 60 AI reviews / month
+
+          - if current_user.pro?
+            = button_to 'Switch to Free', account_path, method: :patch, params: { plan: 'free', user_id: current_user.id }, class: 'btn btn-outline-primary w-100'
+          - else
+            button.btn.btn-light.w-100 type="button" disabled=true
+              | Current plan
+
+      .col-12.col-lg-6
+        .border.rounded-3.p-4.h-100
+          .d-flex.justify-content-between.align-items-center.mb-3
+            h3.fs-5.mb-0 Pro
+
+            - if current_user.pro?
+              span.badge.badge-soft-success.rounded-pill Current plan
+
+          h4.fs-3.fw-bold.mb-4
+            | $19
+            span.fs-6.fw-normal.text-secondary
+              |  / month
+
+          p.mb-2
+            | 2 AI models — Gemini Flash Lite + Gemini Flash
+          p.mb-2
+            | 50 repositories
+          p.mb-2
+            | 500 pull requests / month
+          p.mb-4
+            | 1,000 AI reviews / month
+
+          - if current_user.pro?
+            button.btn.btn-light.w-100 type="button" disabled=true
+              | Current plan
+          - else
+            = button_to 'Upgrade to Pro', account_path, method: :patch, params: { plan: 'pro', user_id: current_user.id }, class: 'btn btn-primary w-100'
 
 .dashboard-card
   .p-4.border-bottom

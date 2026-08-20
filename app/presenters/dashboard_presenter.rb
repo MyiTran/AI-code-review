@@ -9,11 +9,19 @@ class DashboardPresenter
   end
 
   def repository_count
-    @repository_count ||= repositories.count
+    @repository_count ||= repositories.where(connected: true).count
+  end
+
+  def repository_limit
+    @repository_limit ||= Subscriptions::GetPlanLimitsService.call(user)[:repositories]
   end
 
   def pull_request_count
-    @pull_request_count ||= PullRequest.where(repository: repositories).count
+    @pull_request_count ||= PullRequest.joins(repository: :github_installation).where(github_installations: { user_id: user.id }).where(created_at: Time.current.all_month).count
+  end
+
+  def pull_request_limit
+    @pull_request_limit ||= Subscriptions::GetPlanLimitsService.call(user)[:pull_requests]
   end
 
   def review_count
@@ -25,11 +33,11 @@ class DashboardPresenter
   end
 
   def plan_name
-    'Free'
+    user.pro? ? 'Pro' : 'Free'
   end
 
   def monthly_review_limit
-    20
+    @monthly_review_limit ||= Subscriptions::GetPlanLimitsService.call(user)[:reviews]
   end
 
   def monthly_review_count
@@ -37,7 +45,10 @@ class DashboardPresenter
   end
 
   def monthly_usage_percent
-    [(monthly_review_count.to_f / monthly_review_limit * 100).round, 100].min
+    limit = monthly_review_limit
+    return ZERO if limit.to_i.zero?
+
+    [(monthly_review_count.to_f / limit * 100).round, 100].min
   end
 
   def monthly_review_remaining

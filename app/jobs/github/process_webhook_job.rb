@@ -12,7 +12,6 @@ module Github
 
       pull_request = Github::SyncPullRequestService.call(delivery)
       Realtime::BroadcastPullRequestService.call(pull_request) if pull_request.present?
-
       enqueue_review(pull_request) if review_required?(delivery, pull_request)
 
       delivery.processed!
@@ -25,6 +24,10 @@ module Github
     private
 
     def enqueue_review(pull_request)
+      user = pull_request.repository.github_installation.user
+      limit = Subscriptions::GetPlanLimitsService.call(user)[:reviews]
+      return if Review.by_user(user).where(created_at: Time.current.all_month).count >= limit
+
       ai_model = pull_request.repository.ai_model || AiModel.find_by!(is_default: true, active: true)
       review = find_or_create_review(pull_request, ai_model)
 
@@ -37,6 +40,7 @@ module Github
       return review if review.persisted?
 
       review.base_commit_sha = previous_commit_sha(pull_request)
+      review.triggered_by = Github::FetchCommitAuthorService.call(pull_request, pull_request.head_commit_sha)
       review.status = 'processing'
       review.save!
       review

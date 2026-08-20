@@ -20,6 +20,7 @@ module Github
 
     def save_repository(github_repository)
       repository = installation.repositories.find_or_initialize_by(github_id: github_repository.id)
+      new_repository = repository.new_record?
 
       repository.assign_attributes(
         name: github_repository.name,
@@ -28,19 +29,19 @@ module Github
         language: github_repository.language,
         visibility: github_repository.visibility,
         default_branch: github_repository.default_branch,
-        github_url: github_repository.html_url,
-        connected_at: connected_at_for(repository),
-        connected: true,
-        disconnected_at: nil
+        github_url: github_repository.html_url
       )
 
+      connect_new_repository(repository, installation.user) if new_repository
       repository.save!
     end
 
-    def connected_at_for(repository)
-      return Time.current if repository.new_record? || !repository.connected?
+    def connect_new_repository(repository, user)
+      return if Subscriptions::RepositoryLimitReachedService.call(user)
 
-      repository.connected_at
+      repository.connected = true
+      repository.connected_at = Time.current
+      repository.disconnected_at = nil
     end
 
     def mark_disconnected_repositories(github_repositories)
