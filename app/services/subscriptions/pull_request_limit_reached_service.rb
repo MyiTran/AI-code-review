@@ -5,15 +5,14 @@ module Subscriptions
     end
 
     def call
-      count >= Subscriptions::GetPlanLimitsService.call(user)[:pull_requests]
+      count = Subscriptions::MonthlyPullRequestsCountService.call(user).to_i
+      limit = Subscriptions::GetPlanLimitsService.call(user).fetch(:pull_requests).to_i
+
+      count >= limit
     end
 
     private
 
     attr_reader :user
-
-    def count
-      PullRequest.joins(repository: :github_installation).where(github_installations: { user_id: user.id }, created_at: Time.current.all_month).count
-    end
   end
 end

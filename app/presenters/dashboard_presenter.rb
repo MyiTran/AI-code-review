@@ -9,7 +9,7 @@ class DashboardPresenter
   end
 
   def repository_count
-    @repository_count ||= repositories.where(connected: true).count
+    @repository_count ||= Subscriptions::RepositoriesCountService.call(user).to_i
   end
 
   def repository_limit

@@ -5,7 +5,10 @@ module Subscriptions
     end
 
     def call
-      user.repositories.where(connected: true).count >= Subscriptions::GetPlanLimitsService.call(user)[:repositories]
+      count = Subscriptions::RepositoriesCountService.call(user).to_i
+      limit = Subscriptions::GetPlanLimitsService.call(user).fetch(:repositories).to_i
+
+      count >= limit
     end
 
     private
