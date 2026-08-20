@@ -69,7 +69,7 @@
           .d-flex.justify-content-between.align-items-center.mb-3
             h3.fs-5.mb-0 Free
 
-            - unless @user.pro?
+            - unless current_user.pro?
               span.badge.badge-soft-success.rounded-pill Current plan
 
           h4.fs-3.fw-bold.mb-4
@@ -86,8 +86,8 @@
           p.mb-4
             | 60 AI reviews / month
 
-          - if @user.pro?
-            = button_to 'Switch to Free', account_path, method: :patch, params: { plan: 'free', user_id: @user.id }, class: 'btn btn-outline-primary w-100'
+          - if current_user.pro?
+            = button_to 'Switch to Free', account_path, method: :patch, params: { plan: 'free', user_id: current_user.id }, class: 'btn btn-outline-primary w-100'
           - else
             button.btn.btn-light.w-100 type="button" disabled=true
               | Current plan
@@ -97,7 +97,7 @@
           .d-flex.justify-content-between.align-items-center.mb-3
             h3.fs-5.mb-0 Pro
 
-            - if @user.pro?
+            - if current_user.pro?
               span.badge.badge-soft-success.rounded-pill Current plan
 
           h4.fs-3.fw-bold.mb-4
@@ -114,11 +114,11 @@
           p.mb-4
             | 1,000 AI reviews / month
 
-          - if @user.pro?
+          - if current_user.pro?
             button.btn.btn-light.w-100 type="button" disabled=true
               | Current plan
           - else
-            = button_to 'Upgrade to Pro', account_path, method: :patch, params: { plan: 'pro', user_id: @user.id }, class: 'btn btn-primary w-100'
+            = button_to 'Upgrade to Pro', account_path, method: :patch, params: { plan: 'pro', user_id: current_user.id }, class: 'btn btn-primary w-100'
 
 .dashboard-card
   .p-4.border-bottom
