@@ -1,3 +1,5 @@
+puts '~> Creating AI models'
+
 ai_models = [
   {
     name: 'Gemini Flash',
@@ -21,3 +23,5 @@ ai_models.each do |attributes|
   ai_model = AiModel.find_or_initialize_by(slug: attributes[:slug])
   ai_model.update!(attributes)
 end
+
+puts '~> Created AI models'

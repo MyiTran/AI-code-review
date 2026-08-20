@@ -122,31 +122,45 @@
 
       .repository-info-row
         span.text-secondary Repository
-        = link_to repository.name, repository_path_for.call(repository), class: 'fw-semibold text-decoration-none'
+
+        = link_to repository.name,
+          repository_path_for.call(repository),
+          class: 'fw-semibold text-decoration-none'
 
       .repository-info-row
         span.text-secondary Pull request
+
         span.fw-semibold
           | ##{pull_request.number}
 
       .repository-info-row
         span.text-secondary Author
+
         span.fw-semibold
           = pull_request.author.presence || 'Unknown'
 
       .repository-info-row
         span.text-secondary Commit
+
         code
           = review.commit_sha.first(8)
 
       .repository-info-row
         span.text-secondary AI model
+
         span.ai-model-badge
           i.bi.bi-stars
           = review.ai_model.name
 
       .repository-info-row
+        span.text-secondary Triggered by
+
+        span.fw-semibold
+          = review.triggered_by.presence || 'Unknown'
+
+      .repository-info-row
         span.text-secondary Duration
+
         span.fw-semibold
           - if review.latency_ms.present?
             = "#{review.latency_ms} ms"
@@ -155,6 +169,7 @@
 
       .repository-info-row
         span.text-secondary Reviewed
+
         span.fw-semibold
           - if review.reviewed_at.present?
             = l(review.reviewed_at, format: :long)
