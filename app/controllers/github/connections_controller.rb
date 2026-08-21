@@ -2,7 +2,6 @@ module Github
   class ConnectionsController < ApplicationController
     def create
       repository = current_user.repositories.find(params.expect(:repository_id))
-      return redirect_to repository_path(repository), alert: 'Repository limit reached for your current plan.' if Subscriptions::RepositoryLimitReachedService.call(current_user)
 
       if Github::ConnectRepositoryService.call(repository.github_installation, repository)
         redirect_to repository_path(repository), notice: 'Repository connected.'
