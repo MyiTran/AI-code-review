@@ -32,9 +32,13 @@
 #  fk_rails_...  (github_installation_id => github_installations.id)
 #
 class Repository < ApplicationRecord
+  CACHE_EXPIRES_IN = 5.minutes
+
   belongs_to :github_installation
   belongs_to :ai_model, optional: true
   has_many :pull_requests, dependent: :destroy
+
+  after_commit :clear_repositories_count_cache, on: :create
 
   validates :github_id, :name, :full_name, presence: true
   validates :github_id, uniqueness: { scope: :github_installation_id }
@@ -80,5 +84,25 @@ class Repository < ApplicationRecord
 
   def self.available_languages(repositories_scope)
     repositories_scope.where.not(language: [nil, '']).distinct.order(:language).pluck(:language)
+  end
+
+  def self.cached_count(user)
+    Rails.cache.fetch(count_cache_key(user), expires_in: CACHE_EXPIRES_IN) do
+      user.repositories.count
+    end
+  end
+
+  def self.clear_count_cache(user)
+    Rails.cache.delete(count_cache_key(user))
+  end
+
+  def self.count_cache_key(user)
+    "users/#{user.id}/repositories_count"
+  end
+
+  private
+
+  def clear_repositories_count_cache
+    Repository.clear_count_cache(user)
   end
 end

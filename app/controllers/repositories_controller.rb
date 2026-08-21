@@ -6,8 +6,8 @@ class RepositoriesController < ApplicationController
     @languages = Repository.available_languages(current_user.repositories)
     @ai_models = AiModel.active.order(:name).pluck(:name, :id)
     @default_ai_model = AiModel.default.active.first
-    @repository_count = Subscriptions::RepositoriesCountService.call(current_user).to_i
-    @repository_limit = Subscriptions::GetPlanLimitsService.call(current_user).fetch(:repositories).to_i
+    @repository_count = Repository.cached_count(current_user)
+    @repository_limit = Subscriptions::GetPlanLimitsService.call(current_user).fetch(:repositories)
     @repository_limit_reached = @repository_count >= @repository_limit
   end
 
@@ -42,7 +42,7 @@ class RepositoriesController < ApplicationController
   end
 
   def available_ai_models
-    current_user.pro? ? AiModel.where(active: true) : AiModel.where(active: true, is_premium: false)
+    current_user.pro? ? AiModel.active : AiModel.active.non_premium
   end
 
   def invalid_ai_model?(attributes)

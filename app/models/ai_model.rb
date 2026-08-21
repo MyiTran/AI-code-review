@@ -25,4 +25,5 @@ class AiModel < ApplicationRecord
 
   scope :default, -> { where(is_default: true) }
   scope :active, -> { where(active: true) }
+  scope :non_premium, -> { where(is_premium: false) }
 end

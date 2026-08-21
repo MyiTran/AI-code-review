@@ -33,10 +33,12 @@
 #  fk_rails_...  (pull_request_id => pull_requests.id)
 #
 class Review < ApplicationRecord
+  CACHE_EXPIRES_IN = 5.minutes
+
   belongs_to :pull_request
   belongs_to :ai_model
 
-  after_create :clear_usage_cache
+  after_commit :clear_monthly_count_cache, on: :create
 
   enum :status, { processing: 'processing', completed: 'completed', failed: 'failed' }
 
@@ -63,9 +65,23 @@ class Review < ApplicationRecord
       .first
   end
 
+  def self.monthly_count(user)
+    Rails.cache.fetch(monthly_count_cache_key(user), expires_in: CACHE_EXPIRES_IN) do
+      by_user(user).where(created_at: Time.current.all_month).count
+    end
+  end
+
+  def self.clear_monthly_count_cache(user)
+    Rails.cache.delete(monthly_count_cache_key(user))
+  end
+
+  def self.monthly_count_cache_key(user)
+    "users/#{user.id}/monthly_reviews_count/#{Time.current.strftime('%Y-%m')}"
+  end
+
   private
 
-  def clear_usage_cache
-    Subscriptions::ClearUsageCacheService.call(pull_request.repository.user)
+  def clear_monthly_count_cache
+    Review.clear_monthly_count_cache(pull_request.repository.user)
   end
 end

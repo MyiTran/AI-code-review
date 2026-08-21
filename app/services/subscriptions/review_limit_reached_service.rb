@@ -5,8 +5,8 @@ module Subscriptions
     end
 
     def call
-      count = Subscriptions::MonthlyReviewsCountService.call(user).to_i
-      limit = Subscriptions::GetPlanLimitsService.call(user).fetch(:reviews).to_i
+      count = Review.monthly_count(user)
+      limit = Subscriptions::GetPlanLimitsService.call(user).fetch(:reviews)
 
       count >= limit
     end

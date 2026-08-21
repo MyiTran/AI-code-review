@@ -5,8 +5,8 @@ module Subscriptions
     end
 
     def call
-      count = Subscriptions::RepositoriesCountService.call(user).to_i
-      limit = Subscriptions::GetPlanLimitsService.call(user).fetch(:repositories).to_i
+      count = Repository.cached_count(user)
+      limit = Subscriptions::GetPlanLimitsService.call(user).fetch(:repositories)
 
       count >= limit
     end
