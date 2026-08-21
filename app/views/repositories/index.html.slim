@@ -5,11 +5,7 @@
     p.page-description
       | Connect repositories and configure automatic AI code review.
 
-  = link_to github_app_installation_url,
-      class: 'btn btn-primary',
-      data: { turbo: false } do
-    i.bi.bi-plus-lg.me-2
-    | Connect repository
+  = connect_repository_button(repository_limit_reached: @repository_limit_reached)
 
 .dashboard-card.mb-4
   .p-4
@@ -45,10 +41,10 @@
 .dashboard-card
   .d-flex.flex-column.flex-md-row.align-items-md-center.justify-content-between.gap-2.p-4.border-bottom
     div
-      h2.card-title-custom Connected repositories
+      h2.card-title-custom Repositories
 
       p.mb-0.mt-1.text-secondary.small
-        | #{@repositories.count} repositories found
+        | #{@repositories.count} repositories found · #{@repository_count}/#{@repository_limit} used
 
     .d-flex.align-items-center.gap-2.text-secondary.small
       i.bi.bi-shield-check
@@ -136,9 +132,5 @@
       p.text-secondary.mb-4
         | Connect a GitHub repository to get started.
 
-      = link_to github_app_installation_url,
-          class: 'btn btn-primary',
-          data: { turbo: false } do
-        i.bi.bi-plus-lg.me-2
-        | Connect repository
+      = connect_repository_button(repository_limit_reached: @repository_limit_reached)
         

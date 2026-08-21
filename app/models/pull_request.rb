@@ -30,12 +30,36 @@
 #  fk_rails_...  (repository_id => repositories.id)
 #
 class PullRequest < ApplicationRecord
+  CACHE_EXPIRES_IN = 5.minutes
+
   belongs_to :repository
   has_many :reviews, dependent: :destroy
+
+  after_commit :clear_monthly_count_cache, on: :create
 
   validates :github_id, presence: true, uniqueness: { scope: :repository_id }
   validates :number, presence: true, uniqueness: { scope: :repository_id }
   validates :title, :state, presence: true
 
   scope :by_user, ->(user) { joins(repository: :github_installation).where(github_installations: { user_id: user.id }) }
+
+  def self.monthly_count(user)
+    Rails.cache.fetch(monthly_count_cache_key(user), expires_in: CACHE_EXPIRES_IN) do
+      by_user(user).where(created_at: Time.current.all_month).count
+    end
+  end
+
+  def self.clear_monthly_count_cache(user)
+    Rails.cache.delete(monthly_count_cache_key(user))
+  end
+
+  def self.monthly_count_cache_key(user)
+    "users/#{user.id}/monthly_pull_requests_count/#{Time.current.strftime('%Y-%m')}"
+  end
+
+  private
+
+  def clear_monthly_count_cache
+    PullRequest.clear_monthly_count_cache(repository.user)
+  end
 end
