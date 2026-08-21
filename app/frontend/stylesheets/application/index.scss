@@ -12,4 +12,5 @@
 @use 'settings';
 @use 'admin';
 
-@import 'bootstrap-icons/font/bootstrap-icons.css';
+$bootstrap-icons-font-dir: '/fonts';
+@import 'bootstrap-icons/font/bootstrap-icons';
