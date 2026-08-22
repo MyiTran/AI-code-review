@@ -5,15 +5,8 @@ RSpec.describe Github::AuthenticateUserService do
     OmniAuth::AuthHash.new(
       provider: 'github',
       uid: '123',
-      info: {
-        email: 'hazel@example.com',
-        name: 'Hazel Nguyen',
-        nickname: 'hazel-dev',
-        image: 'https://example.com/avatar.png'
-      },
-      credentials: {
-        token: 'github-token'
-      }
+      info: { email: 'hazel@example.com', name: 'Hazel Nguyen', nickname: 'hazel-dev', image: 'https://example.com/avatar.png' },
+      credentials: { token: 'github-token' }
     )
   end
 
@@ -32,13 +25,11 @@ RSpec.describe Github::AuthenticateUserService do
 
   it 'does not create duplicate user' do
     described_class.call(auth)
-
     expect { described_class.call(auth) }.not_to change(User, :count)
   end
 
   it 'generates noreply email when github email is blank' do
     auth.info.email = nil
-
     user = described_class.call(auth)
 
     expect(user.email).to eq('hazel-dev@users.noreply.github.com')

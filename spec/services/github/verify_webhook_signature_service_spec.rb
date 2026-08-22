@@ -4,13 +4,10 @@ RSpec.describe Github::VerifyWebhookSignatureService do
   let(:payload) { '{"action":"opened"}' }
   let(:secret) { 'webhook-secret' }
 
-  before do
-    allow(ENV).to receive(:fetch).with('GITHUB_WEBHOOK_SECRET').and_return(secret)
-  end
+  before { allow(ENV).to receive(:fetch).with('GITHUB_WEBHOOK_SECRET').and_return(secret) }
 
   it 'returns true for valid signature' do
-    digest = OpenSSL::HMAC.hexdigest('SHA256', secret, payload)
-    signature = "sha256=#{digest}"
+    signature = "sha256=#{OpenSSL::HMAC.hexdigest('SHA256', secret, payload)}"
 
     expect(described_class.call(payload, signature)).to be(true)
   end

@@ -73,15 +73,25 @@ RSpec.describe Repository, type: :model do
     end
 
     it 'returns unique available languages' do
-      create(:repository, language: 'Ruby')
-      create(:repository, language: nil)
+      duplicate_ruby = create(:repository, language: 'Ruby')
+      no_language = create(:repository, language: nil)
 
-      expect(described_class.available_languages(described_class.all)).to eq(['JavaScript', 'Ruby'])
+      repositories = described_class.where(
+        id: [
+          repo_ruby.id,
+          repo_js.id,
+          duplicate_ruby.id,
+          no_language.id
+        ]
+      )
+
+      expect(described_class.available_languages(repositories))
+        .to eq(['JavaScript', 'Ruby'])
     end
-  end
 
-  describe 'connection status methods' do
-    it { expect(build(:repository, connected: true).connected?).to be(true) }
-    it { expect(build(:repository, connected: false).disconnected?).to be(true) }
+    describe 'connection status methods' do
+      it { expect(build(:repository, connected: true).connected?).to be(true) }
+      it { expect(build(:repository, connected: false).disconnected?).to be(true) }
+    end
   end
 end
