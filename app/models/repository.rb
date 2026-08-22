@@ -37,6 +37,7 @@ class Repository < ApplicationRecord
   belongs_to :github_installation
   belongs_to :ai_model, optional: true
   has_many :pull_requests, dependent: :destroy
+  has_many :reviews, through: :pull_requests
 
   after_commit :clear_repositories_count_cache, on: :create
 

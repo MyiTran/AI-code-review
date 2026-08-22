@@ -18,16 +18,11 @@ module Admin
     def edit; end
 
     def create
-      @admin = User.new(create_admin_params)
+      @admin = User.new(admin_params)
       authorize @admin, policy_class: Admin::AdminPolicy
 
       @admin.provider = :email
       @admin.confirmed_at = Time.current
-
-      if admin_params[:password].blank?
-        @admin.errors.add(:password, "can't be blank")
-        return render :new, status: :unprocessable_content
-      end
 
       if @admin.save
         @admin.add_role(:admin)
@@ -65,10 +60,6 @@ module Admin
 
     def authorize_admin
       authorize @admin, policy_class: Admin::AdminPolicy
-    end
-
-    def create_admin_params
-      params.expect(user: [:first_name, :last_name, :email, :password, :password_confirmation])
     end
 
     def admin_params

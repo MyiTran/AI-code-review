@@ -5,7 +5,7 @@ module Admin
 
     def show
       @pull_requests = @repository.pull_requests.includes(:reviews).order(updated_at: :desc)
-      @reviews = Review.joins(:pull_request).where(pull_requests: { repository_id: @repository.id }).includes(:ai_model, :pull_request).order(created_at: :desc)
+      @reviews = @repository.reviews.order(created_at: :desc)
     end
   end
 end
