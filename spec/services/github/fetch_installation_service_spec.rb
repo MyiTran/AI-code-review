@@ -2,9 +2,19 @@ require 'rails_helper'
 
 RSpec.describe Github::FetchInstallationService do
   describe '.call' do
-    subject(:fetch_installation) { described_class.call(installation_id) }
+    subject(:fetch_installation) do
+      described_class.call(installation_id)
+    end
 
-    let(:installation_id) { ENV.fetch('TEST_GITHUB_INSTALLATION_ID') }
+    let(:installation_id) do
+      ENV.fetch('TEST_GITHUB_INSTALLATION_ID', '155385740')
+    end
+
+    before do
+      allow(Github::GenerateJwtService)
+        .to receive(:call)
+        .and_return('test-jwt')
+    end
 
     it 'fetches installation from GitHub', vcr: true do
       installation = fetch_installation
