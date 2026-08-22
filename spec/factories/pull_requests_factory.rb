@@ -31,7 +31,7 @@
 #
 FactoryBot.define do
   factory :pull_request do
-    repository
+    association :repository
 
     sequence(:github_id) { |number| 9_000_000 + number }
     sequence(:number) { |number| number }

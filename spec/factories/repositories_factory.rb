@@ -33,7 +33,7 @@
 #
 FactoryBot.define do
   factory :repository do
-    github_installation
+    association :github_installation
 
     sequence(:github_id) { |number| 4_200_000_000 + number }
     name { 'AI-code-review' }

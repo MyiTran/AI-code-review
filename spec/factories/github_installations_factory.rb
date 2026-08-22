@@ -23,7 +23,7 @@
 #
 FactoryBot.define do
   factory :github_installation do
-    user
+    association :user
 
     sequence(:installation_id) { |number| 1000 + number }
     sequence(:account_id) { |number| 2000 + number }

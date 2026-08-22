@@ -34,8 +34,8 @@
 #
 FactoryBot.define do
   factory :review do
-    pull_request
-    ai_model
+    association :pull_request
+    association :ai_model
 
     base_commit_sha { SecureRandom.hex(20) }
     commit_sha { SecureRandom.hex(20) }

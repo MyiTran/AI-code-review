@@ -12,6 +12,7 @@ RSpec.describe 'Pull requests', type: :request do
     it 'returns success' do
       get pull_request_path(pull_request)
       expect(response).to have_http_status(:ok)
+      expect(assigns(:pull_request)).to eq(pull_request)
     end
 
     it 'does not allow user to view another user pull request' do
