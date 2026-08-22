@@ -1,0 +1,70 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.github.com/app/installations/[TEST_GITHUB_INSTALLATION_ID]
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/vnd.github.v3+json
+      User-Agent:
+      - Octokit Ruby Gem 10.0.0
+      Content-Type:
+      - application/json
+      Authorization:
+      - "[AUTHORIZATION]"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sat, 22 Aug 2026 05:27:40 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - public, max-age=60, s-maxage=60
+      Vary:
+      - Accept,Accept-Encoding, Accept, X-Requested-With
+      Etag:
+      - W/"22fd8fba6c2e9452fd5581a1c90745289d80454c80a12961cd180236e0310b10"
+      X-Github-Media-Type:
+      - github.v3; format=json
+      X-Github-Api-Version-Selected:
+      - '2022-11-28'
+      Access-Control-Expose-Headers:
+      - ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
+        X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes,
+        X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO,
+        X-GitHub-Request-Id, Deprecation, Sunset, Warning
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubdomains; preload
+      X-Frame-Options:
+      - deny
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - '0'
+      Referrer-Policy:
+      - origin-when-cross-origin, strict-origin-when-cross-origin
+      Content-Security-Policy:
+      - default-src 'none'
+      Transfer-Encoding:
+      - chunked
+      Server:
+      - github.com
+      X-Github-Request-Id:
+      - FD2A:121AEF:BF2C78:D01524:6A89334C
+      X-Github-Edge-Region:
+      - southeastasia
+    body:
+      encoding: ASCII-8BIT
+      string: '{"id":[TEST_GITHUB_INSTALLATION_ID],"client_id":"Iv23lixVzOiZCNMTPJ94","account":{"login":"MyiTran","id":143374665,"node_id":"U_kgDOCIu5SQ","avatar_url":"https://avatars.githubusercontent.com/u/143374665?v=4","gravatar_id":"","url":"https://api.github.com/users/MyiTran","html_url":"https://github.com/MyiTran","followers_url":"https://api.github.com/users/MyiTran/followers","following_url":"https://api.github.com/users/MyiTran/following{/other_user}","gists_url":"https://api.github.com/users/MyiTran/gists{/gist_id}","starred_url":"https://api.github.com/users/MyiTran/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/MyiTran/subscriptions","organizations_url":"https://api.github.com/users/MyiTran/orgs","repos_url":"https://api.github.com/users/MyiTran/repos","events_url":"https://api.github.com/users/MyiTran/events{/privacy}","received_events_url":"https://api.github.com/users/MyiTran/received_events","type":"User","user_view_type":"public","site_admin":false},"repository_selection":"selected","access_tokens_url":"https://api.github.com/app/installations/[TEST_GITHUB_INSTALLATION_ID]/access_tokens","repositories_url":"https://api.github.com/installation/repositories","html_url":"https://github.com/settings/installations/[TEST_GITHUB_INSTALLATION_ID]","app_id":[GITHUB_APP_ID],"app_slug":"ai-review-local-dev","target_id":143374665,"target_type":"User","permissions":{"contents":"read","metadata":"read","pull_requests":"write"},"events":["pull_request","repository"],"created_at":"2026-08-21T07:02:54.000Z","updated_at":"2026-08-21T09:02:05.000Z","single_file_name":null,"has_multiple_single_files":false,"single_file_paths":[],"suspended_by":null,"suspended_at":null}'
+  recorded_at: Sat, 22 Aug 2026 05:27:40 GMT
+recorded_with: VCR 6.4.0

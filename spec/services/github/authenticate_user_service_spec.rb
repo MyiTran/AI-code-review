@@ -6,9 +6,9 @@ RSpec.describe Github::AuthenticateUserService do
       provider: 'github',
       uid: '123',
       info: {
-        email: 'khoa@example.com',
-        name: 'Khoa Nguyen',
-        nickname: 'khoa-dev',
+        email: 'hazel@example.com',
+        name: 'Hazel Nguyen',
+        nickname: 'hazel-dev',
         image: 'https://example.com/avatar.png'
       },
       credentials: {
@@ -26,7 +26,7 @@ RSpec.describe Github::AuthenticateUserService do
 
     expect(user.provider).to eq('github')
     expect(user.uid).to eq('123')
-    expect(user.github_username).to eq('khoa-dev')
+    expect(user.github_username).to eq('hazel-dev')
     expect(user.github_access_token).to eq('github-token')
   end
 
@@ -41,6 +41,6 @@ RSpec.describe Github::AuthenticateUserService do
 
     user = described_class.call(auth)
 
-    expect(user.email).to eq('khoa-dev@users.noreply.github.com')
+    expect(user.email).to eq('hazel-dev@users.noreply.github.com')
   end
 end
