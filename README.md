@@ -1,286 +1,272 @@
-# Rails boilerplate - From Golden Owl Solutions
+## Requirements
 
-This is a Rails boilerplate use rails 8.1.1
+Make sure the following dependencies are installed:
 
-## Prerequisites
+* Ruby 3.4.7
+* Ruby on Rails 8.1.3.1
+* PostgreSQL
+* Redis
+* Node.js
+* Bundler
 
-This project requires:
+## Project Setup
 
-- Ruby (see [.ruby-version](./.ruby-version)), preferably managed using [rbenv](https://github.com/rbenv/rbenv) or [asdf](https://asdf-vm.com/)
-- Node 23.5.0
-- Yarn 1.x (classic)
-- PostgreSQL must be installed and accepting connections
+Clone the repository:
 
-On macOS, these [Homebrew](http://brew.sh) packages are recommended:
-
-```sh
-  brew install rbenv
-  brew install node 23.5.0
-  brew install yarn
-  brew install postgresql@16
-  brew install redis
+```bash
+git clone https://github.com/MyiTran/AI-code-review.git
+cd AI-code-review
 ```
 
-## Getting started
+Install Ruby dependencies:
 
-## Install - setup app
-
-To setup a development environment (MacOS):
-
-**Clone the repo**:
-
-```sh
-  git clone git@github.com:GoldenOwlAsia/rails-view-template.git
+```bash
+bundle install
 ```
 
-**Install Ruby**:
+Install frontend dependencies:
 
-This project currently uses [Ruby 3.4.7](blob/staging/.ruby-version), which is most easily managed through a version manager like [asdf](https://asdf-vm.com/), [rbenv](https://github.com/rbenv/rbenv)
-
-**Install Nodejs**:
-
-This project user [Node 23.5.0 d](https://nodejs.org/en/blog/release/v23.5.0), which is most easily managed through a version manager like [asdf](https://github.com/asdf-vm/asdf-nodejs), [rvm](https://github.com/nvm-sh/nvm)
-
-**Install Ruby gems**:
-
-- install bundle version 2.6.9 (or similar if you are using an older version on your development)
-
-  ```sh
-  gem install bundler -v 2.6.9
-  ```
-
-- bundle
-
-  ```sh
-  bundle install
-  ```
-
-**Install Yarn**.
-
-```sh
-  npm install -g yarn
+```bash
+npm install
 ```
 
-**Install Javascript Packages**:
-Install packages:
+Prepare the database:
 
-```sh
-  yarn
+```bash
+bin/rails db:prepare
 ```
 
-**Set the RACK_ENV (optional)**:
-Later steps expect a `RACK_ENV` environment variable, so define one (usually 'development'.) This can be done by exporting a value in your shell config (by adding something like `export RACK_ENV=development` to your shell configuration file - `.bashrc`, etc)
+## Environment Variables
 
-**Personalise the app settings**:
+Create a local environment file:
 
-- Copy `config/database.yml.sample` to `config/database.yml` and customise the values as needed.
-- Copy `.env.sample` to `.env` and customise the values as needed.
-
-**Run server**:
-
-- rails server:
-
-```sh
-  rails s
+```bash
+cp .env.example .env
 ```
 
-- sidekiq
+Configure the following variables in `.env`:
 
-```sh
-  bundle exec sidekiq
+```dotenv
+# Application
+APP_HOST=localhost:3000
+APP_PROTOCOL=http
+
+# Redis and Sidekiq
+REDIS_URL=redis://127.0.0.1:6379/1
+
+# GitHub App
+GITHUB_APP_ID=
+GITHUB_APP_SLUG=
+GITHUB_APP_PRIVATE_KEY=
+GITHUB_WEBHOOK_SECRET=
+
+# GitHub OAuth
+GITHUB_OAUTH_CLIENT_ID=
+GITHUB_OAUTH_CLIENT_SECRET=
+
+# Google Gemini
+GEMINI_API_KEY=
+
+# Active Record Encryption
+ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=
+ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=
+ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=
+
+# Free plan limits
+FREE_REPOSITORIES_LIMIT=3
+FREE_PULL_REQUESTS_LIMIT=30
+FREE_REVIEWS_LIMIT=60
+
+# Pro plan limits
+PRO_REPOSITORIES_LIMIT=50
+PRO_PULL_REQUESTS_LIMIT=500
+PRO_REVIEWS_LIMIT=1000
 ```
 
-- Vite
+Generate the Active Record encryption keys if necessary:
 
-```sh
-  vite dev
+```bash
+bin/rails db:encryption:init
 ```
 
-## Development
+Copy the generated values into `.env`.
 
-### ERD
+Do not commit `.env`, the GitHub private key, webhook secret, OAuth secret, Gemini API key, or encryption keys to Git.
 
-- Using gem: `rails-mermaid_erd` - Its auto generate when run `rails db:migrate`
-- Can see ERD at `http://localhost:3000/erd`
+### GitHub App Configuration
 
-### FE references
+Configure the following URLs in the GitHub App settings.
 
-- DaisyUI: <https://daisyui.com/components/>
-- For icons: lucide icon packages: <https://lucide.dev/icons/>
+For local development:
 
-### Rubocop
+```text
+Homepage URL:
+http://localhost:3000
 
-- Run by:
+Setup URL:
+http://localhost:3000/callback/github
 
-  ```sh
-    bundle exec rubocop
-  ```
+Webhook URL:
+https://<your-ngrok-domain>/webhooks/github
+```
 
-### Rspec
+Start a public tunnel for the local webhook endpoint:
 
-- Run test by:
+```bash
+ngrok http 3000
+```
 
-  ```sh
-    bundle exec rspec
-  ```
+Copy the generated HTTPS URL and update the GitHub App Webhook URL:
 
-- Check test coverage at `coverage/index.html`
+```text
+https://<your-ngrok-domain>/webhooks/github
+```
 
-### ESLint
+The webhook secret configured on GitHub must match:
 
-- ESLint check:
+```dotenv
+GITHUB_WEBHOOK_SECRET=
+```
 
-  ```sh
-    yarn lint
-  ```
+## Database Design
 
-- ESLint check & auto fix:
+The Entity Relationship Diagram describes the relationships between users, GitHub installations, repositories, pull requests, reviews, AI models, subscriptions, roles, and webhook deliveries.
 
-  ```sh
-    yarn lint:fix
-  ```
+[View the Entity Relationship Diagram](ERD_URL)
 
-### Config Git hooks manager
+Replace `<ERD_URL>` with the public link to the ERD, for example a GitHub image, dbdiagram.io document, Lucidchart diagram, or project documentation page.
 
-- Use lefthook gem: <https://github.com/evilmartians/lefthook>
+## Running the Application
 
-  ```sh
-    bundle exec lefthook install
-  ```
+Make sure PostgreSQL and Redis are running.
 
-### For create tag & release - github
+On macOS with Homebrew:
 
-- Use git-cliff: install with brew
+```bash
+brew services start postgresql
+brew services start redis
+```
 
-  ```sh
-    brew install git-cliff
-  ```
+If the project contains a `Procfile.dev`, start all development processes with:
 
-  or
+```bash
+bin/dev
+```
 
-  ```sh
-    git cliff --bump
-  ```
+Otherwise, run the services in separate terminals.
 
-- create version with git-cliff:
+Start Rails:
 
-  ```sh
-    git cliff --tag 1.0.0 --output CHANGELOG.md
-  ```
+```bash
+bin/rails server
+```
 
-- example:
+Start Sidekiq:
 
-  ```sh
-    git tag -a 1.0.0 -m "Release version 1.0.0"
-  ```
+```bash
+bundle exec sidekiq
+```
 
-  - Can use github CLI to generate in local or create new release in github and copy changes logs from file `CHANGELOG.md`
+Start the Vite development server:
 
-## Project Directory Structure
+```bash
+bin/vite dev
+```
 
-- To generate the directory structure in YAML format, run the following command:
+Open the application:
 
-  ```bash
-  rake docs:generate_yaml
-  ```
+```text
+http://localhost:3000
+```
 
-- If you have not installed the tree command, you can install it by running:
+For local GitHub webhook testing, keep ngrok running:
 
-  ```bash
-  brew install tree
-  ```
+```bash
+ngrok http 3000
+```
 
-```yaml
----
-|
-  .
-  ├── CHANGELOG.md
-  ├── DEPLOYMENT.md
-  ├── Dockerfile
-  ├── Gemfile
-  ├── Gemfile.lock
-  ├── Procfile
-  ├── README.md
-  ├── Rakefile
-  ├── app
-  │   ├── channels
-  │   ├── controllers
-  │   ├── frontend
-  │   ├── helpers
-  │   ├── models
-  │   ├── policies
-  │   ├── queries
-  │   ├── services
-  │   ├── structure.txt
-  │   └── views
-  ├── bin
-  │   ├── brakeman
-  │   ├── bundle
-  │   ├── bundle-audit
-  │   ├── bundler-audit
-  │   ├── dev
-  │   ├── docker-entrypoint
-  │   ├── rails
-  │   ├── rake
-  │   ├── rspec
-  │   ├── rubocop
-  │   ├── setup
-  │   └── vite
-  ├── cliff.toml
-  ├── commitlint.config.js
-  ├── config
-  │   ├── application.rb
-  │   ├── boot.rb
-  │   ├── cable.yml
-  │   ├── credentials.yml.enc
-  │   ├── database.yml
-  │   ├── database.yml.sample
-  │   ├── environment.rb
-  │   ├── environments
-  │   ├── i18n-tasks.yml
-  │   ├── initializers
-  │   ├── locales
-  │   ├── master.key
-  │   ├── mermaid_erd.yml
-  │   ├── puma.rb
-  │   ├── routes.rb
-  │   ├── sidekiq.yml
-  │   ├── storage.rb
-  │   ├── storage.yml
-  │   └── vite.json
-  ├── config.ru
-  ├── coverage
-  │   ├── assets
-  │   └── index.html
-  ├── db
-  │   ├── migrate
-  │   ├── schema.rb
-  │   ├── seeds
-  │   └── seeds.rb
-  ├── docs
-  │   └── erd.html
-  ├── eslint.config.js
-  ├── lefthook.yml
-  ├── lib
-  │   ├── assets
-  │   ├── tasks
-  │   └── templates
-  ├── package.json
-  ├── postcss.config.cjs
-  ├── spec
-  │   ├── cassettes
-  │   ├── factories
-  │   ├── fixtures
-  │   ├── helpers
-  │   ├── i18n_spec.rb
-  │   ├── mailers
-  │   ├── models
-  │   ├── queries
-  │   ├── rails_helper.rb
-  │   ├── spec_helper.rb
-  │   ├── supports
-  │   └── views
-  ├── tailwind.config.js
-  ├── vite.config.ts
-  └── yarn.lock
+## Running Tests
+
+Create and prepare the test database:
+
+```bash
+RAILS_ENV=test \
+DATABASE_URL=postgresql://localhost/ai_code_review_test \
+bin/rails db:test:prepare
+```
+
+Run the complete test suite:
+
+```bash
+RAILS_ENV=test \
+DATABASE_URL=postgresql://localhost/ai_code_review_test \
+bin/rspec
+```
+
+Run a specific spec file:
+
+```bash
+RAILS_ENV=test \
+DATABASE_URL=postgresql://localhost/ai_code_review_test \
+bin/rspec spec/services/github/fetch_installation_service_spec.rb
+```
+
+The project uses:
+
+* RSpec for automated testing.
+* FactoryBot for generating test data.
+* VCR for recording and replaying external HTTP requests.
+* SimpleCov for measuring test coverage.
+
+The SimpleCov coverage report is generated at:
+
+```text
+coverage/index.html
+```
+
+## Background Processing
+
+GitHub webhook deliveries and AI reviews are processed asynchronously.
+
+The processing flow is:
+
+```text
+GitHub Webhook
+→ Rails webhook endpoint
+→ PostgreSQL stores the delivery
+→ Redis queues the job
+→ Sidekiq processes the Pull Request
+→ Gemini generates the AI review
+→ GitHub App posts the review comment
+```
+
+Sidekiq must be running for Pull Request synchronization and AI Review generation to work.
+
+## Useful Commands
+
+Check the webhook route:
+
+```bash
+bin/rails routes | grep webhook
+```
+
+Open the Rails console:
+
+```bash
+bin/rails console
+```
+
+Check the current database:
+
+```bash
+bin/rails runner '
+puts "Environment: #{Rails.env}"
+puts "Database: #{ActiveRecord::Base.connection.select_value("SELECT current_database()")}"
+'
+```
+
+Run code quality checks:
+
+```bash
+bin/rubocop
 ```
