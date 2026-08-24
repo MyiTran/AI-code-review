@@ -13,7 +13,7 @@ module Subscriptions
     attr_reader :user
 
     def count
-      PullRequest.joins(repository: :github_installation).where(github_installations: { user_id: user.id }, created_at: Time.current.all_month).count
+      PullRequest.by_user(user).by_month.count
     end
   end
 end

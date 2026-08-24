@@ -42,6 +42,7 @@ class PullRequest < ApplicationRecord
   validates :title, :state, presence: true
 
   scope :by_user, ->(user) { joins(repository: :github_installation).where(github_installations: { user_id: user.id }) }
+  scope :by_month, ->(time = Time.current) { where(created_at: time.all_month) }
 
   def self.monthly_count(user)
     Rails.cache.fetch(monthly_count_cache_key(user), expires_in: CACHE_EXPIRES_IN) do
