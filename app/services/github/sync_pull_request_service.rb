@@ -13,6 +13,9 @@ module Github
 
       payload = delivery.payload
       repository = Repository.find_by!(github_id: payload.dig('repository', 'id'))
+
+      return unless repository.connected?
+
       github_pull_request = payload.fetch('pull_request')
       pull_request = repository.pull_requests.find_or_initialize_by(github_id: github_pull_request.fetch('id'))
 
