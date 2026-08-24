@@ -224,6 +224,22 @@ The SimpleCov coverage report is generated at:
 coverage/index.html
 ```
 
+## Test Results & Coverage
+
+Run the complete test suite:
+
+```bash
+RAILS_ENV=test \
+DATABASE_URL=postgresql://localhost/ai_code_review_test \
+bin/rspec
+```
+
+Total Examples: 99 passing tests (0 failures)
+
+Code Coverage: 87.46% (328 / 375 relevant lines covered)
+<img width="1460" height="284" alt="image" src="https://github.com/user-attachments/assets/65a88e3d-8dcc-4d44-be9e-d65c8d7816e6" />
+
+
 ## Background Processing
 
 GitHub webhook deliveries and AI reviews are processed asynchronously.
