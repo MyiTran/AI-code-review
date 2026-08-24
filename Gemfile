@@ -28,7 +28,7 @@ gem 'image_processing', '~> 2.0'
 gem 'active_storage_validations'
 
 # Job
-gem 'redis', '< 6.0'
+gem 'redis', '< 7.0'
 gem 'sidekiq'
 gem 'sidekiq-scheduler'
 gem 'sidekiq-unique-jobs'
