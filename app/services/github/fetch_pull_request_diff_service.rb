@@ -10,13 +10,7 @@ module Github
       repository = pull_request.repository
       token = Github::GenerateInstallationTokenService.call(repository.github_installation.installation_id)
       client = Octokit::Client.new(access_token: token, auto_paginate: true)
-
-      files =
-        if base_sha.present? && head_sha.present?
-          client.compare(repository.full_name, base_sha, head_sha).files
-        else
-          client.pull_request_files(repository.full_name, pull_request.number)
-        end
+      files = fetch_files(client, repository)
 
       files.map do |file|
         {
@@ -32,5 +26,23 @@ module Github
     private
 
     attr_reader :pull_request, :base_sha, :head_sha
+
+    def fetch_files(client, repository)
+      return pull_request_files(client, repository) if base_sha.blank? || head_sha.blank?
+
+      comparison = client.compare(repository.full_name, base_sha, head_sha)
+
+      if comparison.status == 'ahead'
+        comparison.files
+      else
+        pull_request_files(client, repository)
+      end
+    rescue Octokit::NotFound, Octokit::UnprocessableEntity
+      pull_request_files(client, repository)
+    end
+
+    def pull_request_files(client, repository)
+      client.pull_request_files(repository.full_name, pull_request.number)
+    end
   end
 end
