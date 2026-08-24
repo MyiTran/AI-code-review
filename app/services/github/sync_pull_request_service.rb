@@ -13,6 +13,9 @@ module Github
 
       payload = delivery.payload
       repository = Repository.find_by!(github_id: payload.dig('repository', 'id'))
+
+      return unless repository.connected?
+
       github_pull_request = payload.fetch('pull_request')
       pull_request = repository.pull_requests.find_or_initialize_by(github_id: github_pull_request.fetch('id'))
 
@@ -41,9 +44,5 @@ module Github
     private
 
     attr_reader :delivery
-
-    def pull_request_limit_reached?(repository)
-      Subscriptions::PullRequestLimitReachedService.call(repository.github_installation.user)
-    end
   end
 end

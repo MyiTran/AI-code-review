@@ -5,14 +5,15 @@ module Subscriptions
     end
 
     def call
-      count = PullRequest.monthly_count(user)
-      limit = Subscriptions::GetPlanLimitsService.call(user).fetch(:pull_requests)
-
-      count >= limit
+      count >= Subscriptions::GetPlanLimitsService.call(user)[:pull_requests]
     end
 
     private
 
     attr_reader :user
+
+    def count
+      PullRequest.by_user(user).by_month.count
+    end
   end
 end

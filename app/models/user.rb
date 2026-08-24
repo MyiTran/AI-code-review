@@ -72,11 +72,11 @@ class User < ApplicationRecord
 
   # instance methods
   def display_name
-    full_name.presence || github_username
+    full_name.presence || github_username.presence || email.split('@').first
   end
 
   def initials
-    display_name.split.filter_map(&:first).join.upcase
+    (display_name.presence || email).split.filter_map(&:first).join.upcase
   end
 
   def full_name
@@ -98,6 +98,9 @@ class User < ApplicationRecord
   def pro?
     plan == 'pro'
   end
+
+  # scopes
+  scope :search, ->(keyword) { keyword.blank? ? all : where('first_name ILIKE :kw OR last_name ILIKE :kw OR email ILIKE :kw OR github_username ILIKE :kw', kw: "%#{keyword}%") }
 
   # class methods
   def self.ransackable_attributes(_auth_object = nil)

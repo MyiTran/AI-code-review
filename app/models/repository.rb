@@ -37,6 +37,7 @@ class Repository < ApplicationRecord
   belongs_to :github_installation
   belongs_to :ai_model, optional: true
   has_many :pull_requests, dependent: :destroy
+  has_many :reviews, through: :pull_requests
 
   after_commit :clear_repositories_count_cache, on: :create
 
@@ -45,7 +46,7 @@ class Repository < ApplicationRecord
 
   delegate :user, to: :github_installation
 
-  scope :by_keyword, ->(query) { where('name ILIKE :q OR full_name ILIKE :q', q: "%#{query}%") if query.present? }
+  scope :by_keyword, ->(query) { where('repositories.name ILIKE :q OR repositories.full_name ILIKE :q', q: "%#{query}%") if query.present? }
   scope :by_language, ->(language) { where(language: language) if language.present? }
   scope :by_ai_model,
     ->(ai_model_id) do
