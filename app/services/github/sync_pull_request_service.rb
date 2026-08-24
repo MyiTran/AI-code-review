@@ -44,5 +44,10 @@ module Github
     private
 
     attr_reader :delivery
+
+    def pull_request_limit_reached?(repository)
+      user = repository.github_installation.user
+      Subscriptions::PullRequestLimitReachedService.call(user)
+    end
   end
 end
