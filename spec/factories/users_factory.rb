@@ -40,16 +40,29 @@ FactoryBot.define do
   factory :user do
     first_name { Faker::Name.first_name }
     last_name { Faker::Name.last_name }
-    sequence(:email) { |n| "user#{n}@gmail.com" }
+    sequence(:email) { |number| "user#{number}@gmail.com" }
     password { 'Password123@' }
+    password_confirmation { password }
     confirmed_at { Time.current }
-    after(:build) { |user| user.add_role(:employee) }
+
+    provider { :github }
+    sequence(:uid) { |number| "github-uid-#{number}" }
+    sequence(:github_username) { |number| "github-user-#{number}" }
+    github_access_token { 'github-access-token' }
+
+    after(:create) { |user| user.add_role(:employee) }
 
     trait :admin do
-      sequence(:email) { |n| "admin#{n}@gmail.com" }
       after(:create) do |user|
         user.remove_role(:employee)
         user.add_role(:admin)
+      end
+    end
+
+    trait :super_admin do
+      after(:create) do |user|
+        user.remove_role(:employee)
+        user.add_role(:super_admin)
       end
     end
   end

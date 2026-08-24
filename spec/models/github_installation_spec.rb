@@ -24,5 +24,8 @@ require 'rails_helper'
 #  fk_rails_...  (user_id => users.id)
 #
 RSpec.describe GithubInstallation, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe 'associations' do
+    it { is_expected.to belong_to(:user) }
+    it { is_expected.to have_many(:repositories).dependent(:destroy) }
+  end
 end

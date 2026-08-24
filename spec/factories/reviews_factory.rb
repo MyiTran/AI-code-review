@@ -34,7 +34,32 @@
 #
 FactoryBot.define do
   factory :review do
-    status { 'completed' }
-    content { 'No errors found.' }
+    association :pull_request
+    association :ai_model
+
+    base_commit_sha { SecureRandom.hex(20) }
+    commit_sha { SecureRandom.hex(20) }
+    status { 'processing' }
+    issues_found_count { 0 }
+
+    trait :completed do
+      status { 'completed' }
+      summary { 'AI review summary' }
+      review_content { 'AI review content' }
+      issues_found_count { 1 }
+      tokens_used { 100 }
+      latency_ms { 500 }
+      reviewed_at { Time.current }
+    end
+
+    trait :failed do
+      status { 'failed' }
+      error_message { 'Something went wrong' }
+    end
+
+    trait :commented do
+      github_comment_id { 12345 }
+      commented_at { Time.current }
+    end
   end
 end

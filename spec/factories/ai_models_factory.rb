@@ -18,7 +18,24 @@
 #
 FactoryBot.define do
   factory :ai_model do
-    name { 'Gemini Flash' }
-    is_default { true }
+    sequence(:name) { |number| "Gemini Model #{number}" }
+    sequence(:slug) { |number| "gemini-model-#{number}" }
+
+    provider { 'google' }
+    active { true }
+    is_default { false }
+    is_premium { false }
+
+    trait :default do
+      is_default { true }
+    end
+
+    trait :premium do
+      is_premium { true }
+    end
+
+    trait :inactive do
+      active { false }
+    end
   end
 end

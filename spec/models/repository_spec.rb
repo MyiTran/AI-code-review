@@ -34,5 +34,64 @@ require 'rails_helper'
 #  fk_rails_...  (github_installation_id => github_installations.id)
 #
 RSpec.describe Repository, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe 'associations' do
+    it { is_expected.to belong_to(:github_installation) }
+    it { is_expected.to belong_to(:ai_model).optional }
+    it { is_expected.to have_many(:pull_requests).dependent(:destroy) }
+  end
+
+  describe 'validations' do
+    subject(:repository) { build(:repository) }
+
+    it { is_expected.to validate_presence_of(:github_id) }
+    it { is_expected.to validate_presence_of(:name) }
+    it { is_expected.to validate_presence_of(:full_name) }
+    it { is_expected.to validate_uniqueness_of(:github_id).scoped_to(:github_installation_id) }
+  end
+
+  describe 'delegations' do
+    it { is_expected.to delegate_method(:user).to(:github_installation) }
+  end
+
+  describe 'scopes' do
+    let!(:repo_ruby) { create(:repository, name: 'ai-code-review', language: 'Ruby', connected: true) }
+    let!(:repo_js) { create(:repository, name: 'blog-app', language: 'JavaScript', connected: false) }
+
+    it 'filters by keyword' do
+      expect(described_class.by_keyword('ai-code')).to include(repo_ruby)
+      expect(described_class.by_keyword('ai-code')).not_to include(repo_js)
+    end
+
+    it 'filters by language' do
+      expect(described_class.by_language('Ruby')).to include(repo_ruby)
+      expect(described_class.by_language('Ruby')).not_to include(repo_js)
+    end
+
+    it 'filters by connection status' do
+      expect(described_class.by_connection_status('connected')).to include(repo_ruby)
+      expect(described_class.by_connection_status('disconnected')).to include(repo_js)
+    end
+
+    it 'returns unique available languages' do
+      duplicate_ruby = create(:repository, language: 'Ruby')
+      no_language = create(:repository, language: nil)
+
+      repositories = described_class.where(
+        id: [
+          repo_ruby.id,
+          repo_js.id,
+          duplicate_ruby.id,
+          no_language.id
+        ]
+      )
+
+      expect(described_class.available_languages(repositories))
+        .to eq(['JavaScript', 'Ruby'])
+    end
+
+    describe 'connection status methods' do
+      it { expect(build(:repository, connected: true).connected?).to be(true) }
+      it { expect(build(:repository, connected: false).disconnected?).to be(true) }
+    end
+  end
 end

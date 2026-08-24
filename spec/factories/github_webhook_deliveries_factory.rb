@@ -18,10 +18,10 @@
 #
 FactoryBot.define do
   factory :github_webhook_delivery do
-    delivery_id { SecureRandom.uuid }
+    sequence(:delivery_id) { |number| "delivery-#{number}" }
     event_name { 'pull_request' }
     action { 'opened' }
     status { 'received' }
-    payload { { 'action' => 'opened', 'pull_request' => { 'number' => 1 } } }
+    payload { {} }
   end
 end

@@ -224,3 +224,6 @@ Naming/BlockForwarding:
 
 Rails/I18nLocaleTexts:
   Enabled: false
+
+FactoryBot/AssociationStyle:
+  EnforcedStyle: explicit

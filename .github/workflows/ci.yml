@@ -32,10 +32,23 @@ jobs:
       TEST_DATABASE_HOST: localhost
       GITHUB_OAUTH_CLIENT_ID: test_github_client_id
       GITHUB_OAUTH_CLIENT_SECRET: test_github_client_secret
+      GITHUB_APP_SLUG: test-github-app
+      TEST_GITHUB_INSTALLATION_ID: 155385740
 
       ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY: test_primary_key_12345678901234567890
       ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY: test_deterministic_key_1234567890
       ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT: test_salt_12345678901234567890
+
+      FREE_REPOSITORIES_LIMIT: 3
+      FREE_PULL_REQUESTS_LIMIT: 30
+      FREE_REVIEWS_LIMIT: 60
+
+      PRO_REPOSITORIES_LIMIT: 50
+      PRO_PULL_REQUESTS_LIMIT: 500
+      PRO_REVIEWS_LIMIT: 1000
+
+      RAILS_ENV: test
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/rails_boilerplate_test
 
     services:
       postgres:

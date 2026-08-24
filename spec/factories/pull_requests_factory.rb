@@ -31,13 +31,22 @@
 #
 FactoryBot.define do
   factory :pull_request do
-    repository
-    sequence(:github_id) { |n| 4_200_000_000 + n }
-    sequence(:number) { |n| n }
-    title { 'Test Pull Request' }
-    author { 'MyiTran' }
+    association :repository
+
+    sequence(:github_id) { |number| 9_000_000 + number }
+    sequence(:number) { |number| number }
+    title { 'Add new feature' }
+    author { 'github-user' }
     state { 'open' }
     source_branch { 'feature/test' }
     target_branch { 'main' }
+    head_commit_sha { SecureRandom.hex(20) }
+    github_url { "#{repository.github_url}/pull/#{number}" }
+    opened_at { Time.current }
+
+    trait :closed do
+      state { 'closed' }
+      closed_at { Time.current }
+    end
   end
 end

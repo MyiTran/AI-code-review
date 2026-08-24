@@ -23,11 +23,17 @@
 #
 FactoryBot.define do
   factory :github_installation do
-    user { nil }
-    installation_id { '' }
-    account_login { 'MyString' }
-    account_id { '' }
-    account_type { 'MyString' }
-    repository_selection { 'MyString' }
+    association :user
+
+    sequence(:installation_id) { |number| 1000 + number }
+    sequence(:account_id) { |number| 2000 + number }
+    account_login { user.github_username }
+    account_type { 'User' }
+    repository_selection { 'selected' }
+
+    trait :organization do
+      account_type { 'Organization' }
+      account_login { 'test-org' }
+    end
   end
 end

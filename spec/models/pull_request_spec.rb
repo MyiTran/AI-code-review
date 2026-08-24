@@ -32,5 +32,37 @@ require 'rails_helper'
 #  fk_rails_...  (repository_id => repositories.id)
 #
 RSpec.describe PullRequest, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe 'associations' do
+    it { is_expected.to belong_to(:repository) }
+    it { is_expected.to have_many(:reviews).dependent(:destroy) }
+  end
+
+  describe 'validations' do
+    subject(:pull_request) { build(:pull_request, repository: repository) }
+
+    let(:user) { create(:user, email: "pull-request-#{SecureRandom.uuid}@example.com", uid: "github-uid-#{SecureRandom.uuid}", github_username: "github-user-#{SecureRandom.uuid}") }
+    let(:installation) { create(:github_installation, user: user) }
+    let(:repository) { create(:repository, github_installation: installation) }
+
+    it { is_expected.to validate_presence_of(:github_id) }
+    it { is_expected.to validate_presence_of(:number) }
+    it { is_expected.to validate_presence_of(:title) }
+    it { is_expected.to validate_presence_of(:state) }
+
+    it 'validates github id uniqueness within repository' do
+      existing = create(:pull_request, repository: repository)
+      duplicate = build(:pull_request, repository: repository, github_id: existing.github_id)
+
+      expect(duplicate).not_to be_valid
+      expect(duplicate.errors[:github_id]).to be_present
+    end
+
+    it 'validates number uniqueness within repository' do
+      existing = create(:pull_request, repository: repository)
+      duplicate = build(:pull_request, repository: repository, number: existing.number)
+
+      expect(duplicate).not_to be_valid
+      expect(duplicate.errors[:number]).to be_present
+    end
+  end
 end
