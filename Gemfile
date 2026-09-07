@@ -24,7 +24,7 @@ gem 'omniauth-rails_csrf_protection'
 
 # File
 gem 'ruby-vips'
-gem 'image_processing', '~> 2.0'
+gem 'image_processing', '~> 2.1'
 gem 'active_storage_validations'
 
 # Job
