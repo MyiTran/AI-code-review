@@ -203,7 +203,7 @@ GEM
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.8, >= 1.8.1)
       terminal-table (>= 1.5.1)
-    image_processing (2.0.3)
+    image_processing (2.1.0)
     io-console (0.8.2)
     irb (1.18.0)
       pp (>= 0.6.0)
@@ -630,7 +630,7 @@ DEPENDENCIES
   faker
   good_migrations
   i18n-tasks
-  image_processing (~> 2.0)
+  image_processing (~> 2.1)
   jwt
   lefthook
   letter_opener
