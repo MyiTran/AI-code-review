@@ -136,6 +136,28 @@ The Entity Relationship Diagram describes the relationships between users, GitHu
 
 Replace `<ERD_URL>` with the public link to the ERD, for example a GitHub image, dbdiagram.io document, Lucidchart diagram, or project documentation page.
 
+## Core System Flows
+
+The application has two main flows: connecting GitHub repositories and automatically reviewing Pull Requests.
+
+### 1. GitHub Authentication and Repository Synchronization
+
+GitHub OAuth is used to authenticate users. Repository access is granted separately through the GitHub App.
+
+After the GitHub App is installed, the application uses the Installation ID and Octokit to retrieve and synchronize only the repositories selected by the user.
+
+<img width="2589" height="603" alt="image" src="https://github.com/user-attachments/assets/de4c58fd-a72f-4ac6-b018-ff9238d73067" />
+
+
+### 2. AI Code Review and GitHub Comment
+
+When a Pull Request is opened or updated, GitHub sends a webhook event to the application.
+
+The event is verified and processed asynchronously by Sidekiq. The application retrieves the Pull Request diff through Octokit, sends the changed code to Gemini, stores the review result, and posts the AI review comment back to GitHub.
+
+<img width="3064" height="847" alt="image" src="https://github.com/user-attachments/assets/991c03ec-c28f-4ff0-87c6-34246d025b13" />
+
+
 ## Running the Application
 
 Make sure PostgreSQL and Redis are running.
