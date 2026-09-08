@@ -132,9 +132,11 @@ GITHUB_WEBHOOK_SECRET=
 
 The Entity Relationship Diagram describes the relationships between users, GitHub installations, repositories, pull requests, reviews, AI models, subscriptions, roles, and webhook deliveries.
 
-[View the Entity Relationship Diagram](ERD_URL)
-
-Replace `<ERD_URL>` with the public link to the ERD, for example a GitHub image, dbdiagram.io document, Lucidchart diagram, or project documentation page.
+<img
+  width="1000"
+  alt="Entity Relationship Diagram"
+  src="https://github.com/user-attachments/assets/56ecb064-a625-4c36-a228-6edb2779d1a8"
+/>
 
 ## Core System Flows
 
